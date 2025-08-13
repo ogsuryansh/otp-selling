@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Deployment Debug Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #28a745;
+        }
+        
+        .status-card.error {
+            border-left-color: #dc3545;
+        }
+        
+        .status-card.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .status-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .status-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Vercel Deployment Debug Dashboard</h1>
+            <p>Monitor and troubleshoot your OTP Bot Admin Panel deployment</p>
+        </div>
+        
+        <div class="content">
+            <!-- Environment Status -->
+            <div class="section">
+                <h2>🌍 Environment Status</h2>
+                <div class="status-grid" id="environmentStatus">
+                    <div class="status-card">
+                        <h3>Loading...</h3>
+                        <p>Checking environment configuration</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="checkEnvironment()">🔄 Refresh Environment</button>
+            </div>
+            
+            <!-- API Health Check -->
+            <div class="section">
+                <h2>🏥 API Health Check</h2>
+                <div class="status-grid" id="apiHealth">
+                    <div class="status-card">
+                        <h3>Loading...</h3>
+                        <p>Checking API endpoints</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="checkAPIHealth()">🔄 Refresh Health</button>
+                <button class="btn" onclick="generateTestData()">🧪 Generate Test Data</button>
+            </div>
+            
+            <!-- File System Status -->
+            <div class="section">
+                <h2>📁 File System Status</h2>
+                <div id="filesystemStatus">
+                    <div class="status-card">
+                        <h3>Loading...</h3>
+                        <p>Checking file system access</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="checkFilesystem()">🔄 Refresh Filesystem</button>
+            </div>
+            
+            <!-- Debug Logs -->
+            <div class="section">
+                <h2>📋 Debug Logs</h2>
+                <div class="log-container" id="debugLogs">
+                    Loading debug logs...
+                </div>
+                <button class="btn" onclick="loadDebugLogs()">🔄 Refresh Logs</button>
+                <button class="btn" onclick="clearLogs()">🗑️ Clear Logs</button>
+            </div>
+            
+            <!-- API Test Panel -->
+            <div class="section">
+                <h2>🧪 API Test Panel</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="testEndpoint('/api/users')">Test Users API</button>
+                    <button class="btn" onclick="testEndpoint('/api/statistics')">Test Statistics API</button>
+                    <button class="btn" onclick="testEndpoint('/api/transactions')">Test Transactions API</button>
+                    <button class="btn" onclick="testEndpoint('/api/health')">Test Health API</button>
+                </div>
+                <div id="apiTestResults" class="json-display">
+                    API test results will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkEnvironment();
+            checkAPIHealth();
+            checkFilesystem();
+            loadDebugLogs();
+        });
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function checkEnvironment() {
+            const statusDiv = document.getElementById('environmentStatus');
+            statusDiv.innerHTML = '<div class="status-card"><h3><span class="loading"></span> Checking...</h3><p>Environment configuration</p></div>';
+            
+            const result = await makeRequest(`${API_BASE}/api/debug/environment`);
+            
+            if (result.success) {
+                const env = result.data;
+                statusDiv.innerHTML = `
+                    <div class="status-card ${env.vercel.isVercel ? '' : 'warning'}">
+                        <h3>🌐 Deployment</h3>
+                        <p>${env.vercel.isVercel ? 'Vercel' : 'Local/Other'}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>🔧 Node.js</h3>
+                        <p>${env.nodeVersion}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>💾 Memory</h3>
+                        <p>${env.memory.used} / ${env.memory.total}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>⏱️ Uptime</h3>
+                        <p>${env.uptime}</p>
+                    </div>
+                    <div class="status-card ${env.debugMode ? '' : 'warning'}">
+                        <h3>🐛 Debug Mode</h3>
+                        <p>${env.debugMode ? 'Enabled' : 'Disabled'}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>🌍 Environment</h3>
+                        <p>${env.nodeEnv}</p>
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="status-card error">
+                        <h3>❌ Error</h3>
+                        <p>Failed to load environment: ${result.error}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function checkAPIHealth() {
+            const healthDiv = document.getElementById('apiHealth');
+            healthDiv.innerHTML = '<div class="status-card"><h3><span class="loading"></span> Checking...</h3><p>API endpoints</p></div>';
+            
+            const endpoints = [
+                { name: 'Health', url: '/api/health' },
+                { name: 'Users', url: '/api/users' },
+                { name: 'Statistics', url: '/api/statistics' },
+                { name: 'Transactions', url: '/api/transactions' }
+            ];
+            
+            let html = '';
+            
+            for (const endpoint of endpoints) {
+                const result = await makeRequest(`${API_BASE}${endpoint.url}`);
+                const status = result.success ? 'success' : 'error';
+                const icon = result.success ? '✅' : '❌';
+                
+                html += `
+                    <div class="status-card ${result.success ? '' : 'error'}">
+                        <h3>${icon} ${endpoint.name}</h3>
+                        <p>${result.success ? 'OK' : result.error}</p>
+                    </div>
+                `;
+            }
+            
+            healthDiv.innerHTML = html;
+        }
+        
+        async function checkFilesystem() {
+            const fsDiv = document.getElementById('filesystemStatus');
+            fsDiv.innerHTML = '<div class="status-card"><h3><span class="loading"></span> Checking...</h3><p>File system access</p></div>';
+            
+            const result = await makeRequest(`${API_BASE}/api/debug/filesystem`);
+            
+            if (result.success) {
+                const fs = result.data;
+                fsDiv.innerHTML = `
+                    <div class="status-card ${fs.userDataFileExists ? '' : 'warning'}">
+                        <h3>📄 User Data File</h3>
+                        <p>${fs.userDataFileExists ? `Exists (${fs.userDataFileSize} bytes)` : 'Not found'}</p>
+                    </div>
+                    <div class="status-card ${fs.dataDirExists ? '' : 'error'}">
+                        <h3>📁 Data Directory</h3>
+                        <p>${fs.dataDirExists ? 'Exists' : 'Not found'}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>📍 Current Directory</h3>
+                        <p>${fs.currentDir}</p>
+                    </div>
+                `;
+            } else {
+                fsDiv.innerHTML = `
+                    <div class="status-card error">
+                        <h3>❌ Error</h3>
+                        <p>Failed to check filesystem: ${result.error}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadDebugLogs() {
+            const logsDiv = document.getElementById('debugLogs');
+            logsDiv.textContent = 'Loading debug logs...';
+            
+            const result = await makeRequest(`${API_BASE}/api/debug/logs?limit=50`);
+            
+            if (result.success) {
+                const logs = result.data;
+                if (logs.length === 0) {
+                    logsDiv.textContent = 'No debug logs available. Try making some API calls first.';
+                } else {
+                    logsDiv.textContent = logs.map(log => 
+                        `[${log.timestamp}] ${log.message}${log.data ? ' - ' + JSON.stringify(log.data) : ''}`
+                    ).join('\n');
+                }
+            } else {
+                logsDiv.textContent = `Error loading logs: ${result.error}`;
+            }
+        }
+        
+        async function generateTestData() {
+            const result = await makeRequest(`${API_BASE}/api/debug/test-data`);
+            
+            if (result.success) {
+                showMessage('Test data generated successfully!', 'success');
+                checkAPIHealth();
+                checkFilesystem();
+            } else {
+                showMessage(`Failed to generate test data: ${result.error}`, 'error');
+            }
+        }
+        
+        async function testEndpoint(endpoint) {
+            const resultsDiv = document.getElementById('apiTestResults');
+            resultsDiv.textContent = `Testing ${endpoint}...`;
+            
+            const result = await makeRequest(`${API_BASE}${endpoint}`);
+            
+            if (result.success) {
+                resultsDiv.textContent = `✅ ${endpoint} - Success\n\n${JSON.stringify(result.data, null, 2)}`;
+            } else {
+                resultsDiv.textContent = `❌ ${endpoint} - Failed\n\nError: ${result.error}`;
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('debugLogs').textContent = 'Logs cleared.';
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            document.querySelector('.content').insertBefore(messageDiv, document.querySelector('.content').firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

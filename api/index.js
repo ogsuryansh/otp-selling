@@ -6,33 +6,215 @@ const fs = require('fs').promises;
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enhanced debugging and logging
+const DEBUG_MODE = process.env.DEBUG === 'true' || process.env.NODE_ENV === 'development';
+const REQUEST_LOG = [];
+
+// Debug logging function
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    const logEntry = {
+        timestamp,
+        message,
+        data,
+        environment: process.env.NODE_ENV || 'unknown',
+        vercel: !!process.env.VERCEL,
+        region: process.env.VERCEL_REGION || 'unknown'
+    };
+    
+    if (DEBUG_MODE) {
+        console.log(`[DEBUG ${timestamp}] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    }
+    
+    REQUEST_LOG.push(logEntry);
+    
+    // Keep only last 100 log entries to prevent memory issues
+    if (REQUEST_LOG.length > 100) {
+        REQUEST_LOG.shift();
+    }
+}
+
+// Request logging middleware
+app.use((req, res, next) => {
+    const startTime = Date.now();
+    debugLog(`Request started: ${req.method} ${req.path}`, {
+        headers: req.headers,
+        query: req.query,
+        body: req.body,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+    });
+    
+    res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        debugLog(`Request completed: ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+    });
+    
+    next();
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 const USER_DATA_FILE = path.join(__dirname, '../data/user_data.json');
 
+// Enhanced file operations with debugging
 async function loadUsers() {
     try {
+        debugLog('Attempting to load users from file', { filePath: USER_DATA_FILE });
+        
+        // Check if file exists
+        try {
+            await fs.access(USER_DATA_FILE);
+            debugLog('User data file exists');
+        } catch (accessError) {
+            debugLog('User data file does not exist, creating empty data', { error: accessError.message });
+            return {};
+        }
+        
         const data = await fs.readFile(USER_DATA_FILE, 'utf8');
-        return JSON.parse(data);
+        const users = JSON.parse(data);
+        debugLog('Users loaded successfully', { userCount: Object.keys(users).length });
+        return users;
     } catch (error) {
-        console.error('Error loading users:', error);
+        debugLog('Error loading users', { error: error.message, stack: error.stack });
         return {};
     }
 }
 
 async function saveUsers(users) {
     try {
+        debugLog('Attempting to save users', { userCount: Object.keys(users).length });
+        
         const dataDir = path.dirname(USER_DATA_FILE);
         await fs.mkdir(dataDir, { recursive: true });
+        debugLog('Data directory ensured', { dataDir });
+        
         await fs.writeFile(USER_DATA_FILE, JSON.stringify(users, null, 2), 'utf8');
+        debugLog('Users saved successfully');
         return true;
     } catch (error) {
-        console.error('Error saving users:', error);
+        debugLog('Error saving users', { error: error.message, stack: error.stack });
         return false;
     }
 }
+
+// Environment info endpoint
+app.get('/api/debug/environment', (req, res) => {
+    const envInfo = {
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: process.arch,
+        nodeEnv: process.env.NODE_ENV || 'not set',
+        port: PORT,
+        debugMode: DEBUG_MODE,
+        vercel: {
+            isVercel: !!process.env.VERCEL,
+            region: process.env.VERCEL_REGION || 'not set',
+            environment: process.env.VERCEL_ENV || 'not set',
+            url: process.env.VERCEL_URL || 'not set'
+        },
+        memory: {
+            used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
+            total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB',
+            external: Math.round(process.memoryUsage().external / 1024 / 1024) + ' MB'
+        },
+        uptime: Math.round(process.uptime()) + ' seconds',
+        timestamp: new Date().toISOString()
+    };
+    
+    debugLog('Environment info requested', envInfo);
+    res.json(envInfo);
+});
+
+// Debug logs endpoint
+app.get('/api/debug/logs', (req, res) => {
+    const { limit = 50 } = req.query;
+    const logs = REQUEST_LOG.slice(-parseInt(limit));
+    debugLog('Debug logs requested', { requestedLimit: limit, returnedCount: logs.length });
+    res.json(logs);
+});
+
+// File system debug endpoint
+app.get('/api/debug/filesystem', async (req, res) => {
+    try {
+        const fsInfo = {
+            currentDir: __dirname,
+            userDataFile: USER_DATA_FILE,
+            userDataFileExists: false,
+            userDataFileSize: 0,
+            dataDirExists: false,
+            dataDirContents: []
+        };
+        
+        // Check if user data file exists
+        try {
+            const stats = await fs.stat(USER_DATA_FILE);
+            fsInfo.userDataFileExists = true;
+            fsInfo.userDataFileSize = stats.size;
+        } catch (error) {
+            fsInfo.userDataFileExists = false;
+        }
+        
+        // Check data directory
+        const dataDir = path.dirname(USER_DATA_FILE);
+        try {
+            const stats = await fs.stat(dataDir);
+            fsInfo.dataDirExists = true;
+            fsInfo.dataDirContents = await fs.readdir(dataDir);
+        } catch (error) {
+            fsInfo.dataDirExists = false;
+        }
+        
+        debugLog('Filesystem info requested', fsInfo);
+        res.json(fsInfo);
+    } catch (error) {
+        debugLog('Error getting filesystem info', { error: error.message });
+        res.status(500).json({ error: 'Failed to get filesystem info', details: error.message });
+    }
+});
+
+// Test data endpoint for debugging
+app.get('/api/debug/test-data', async (req, res) => {
+    try {
+        debugLog('Test data generation requested');
+        
+        const testUsers = {
+            "123456789": {
+                user_id: 123456789,
+                first_name: "Test User",
+                username: "testuser",
+                balance: 100.50,
+                is_banned: false,
+                registration_date: new Date().toISOString(),
+                last_activity: new Date().toISOString(),
+                transactions: [
+                    {
+                        type: "test",
+                        amount: 50.00,
+                        description: "Test transaction",
+                        timestamp: new Date().toISOString(),
+                        balance_before: 50.50,
+                        balance_after: 100.50
+                    }
+                ]
+            }
+        };
+        
+        const saved = await saveUsers(testUsers);
+        debugLog('Test data saved', { success: saved });
+        
+        res.json({ 
+            success: saved, 
+            message: 'Test data generated and saved',
+            testUser: testUsers["123456789"]
+        });
+    } catch (error) {
+        debugLog('Error generating test data', { error: error.message });
+        res.status(500).json({ error: 'Failed to generate test data', details: error.message });
+    }
+});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
@@ -40,6 +222,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/users', async (req, res) => {
     try {
+        debugLog('Users endpoint called');
         const users = await loadUsers();
         const formattedUsers = Object.values(users).map(user => ({
             id: user.user_id,
@@ -50,15 +233,17 @@ app.get('/api/users', async (req, res) => {
             registration_date: user.registration_date || 'Unknown',
             last_activity: user.last_activity || 'Unknown'
         }));
+        debugLog('Users formatted successfully', { count: formattedUsers.length });
         res.json(formattedUsers);
     } catch (error) {
-        console.error('Error getting users:', error);
-        res.status(500).json({ error: 'Failed to load users' });
+        debugLog('Error getting users', { error: error.message, stack: error.stack });
+        res.status(500).json({ error: 'Failed to load users', details: error.message });
     }
 });
 
 app.get('/api/transactions', async (req, res) => {
     try {
+        debugLog('Transactions endpoint called');
         const users = await loadUsers();
         const allTransactions = [];
         
@@ -78,15 +263,17 @@ app.get('/api/transactions', async (req, res) => {
         });
         
         allTransactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        debugLog('Transactions processed successfully', { count: allTransactions.length });
         res.json(allTransactions);
     } catch (error) {
-        console.error('Error getting transactions:', error);
-        res.status(500).json({ error: 'Failed to load transactions' });
+        debugLog('Error getting transactions', { error: error.message, stack: error.stack });
+        res.status(500).json({ error: 'Failed to load transactions', details: error.message });
     }
 });
 
 app.get('/api/statistics', async (req, res) => {
     try {
+        debugLog('Statistics endpoint called');
         const users = await loadUsers();
         const userList = Object.values(users);
         
@@ -96,16 +283,19 @@ app.get('/api/statistics', async (req, res) => {
         const totalBalance = userList.reduce((sum, user) => sum + (user.balance || 0), 0);
         const totalTransactions = userList.reduce((sum, user) => sum + (user.transactions?.length || 0), 0);
         
-        res.json({
+        const stats = {
             totalUsers,
             activeUsers,
             bannedUsers,
             totalBalance,
             totalTransactions
-        });
+        };
+        
+        debugLog('Statistics calculated successfully', stats);
+        res.json(stats);
     } catch (error) {
-        console.error('Error getting statistics:', error);
-        res.status(500).json({ error: 'Failed to load statistics' });
+        debugLog('Error getting statistics', { error: error.message, stack: error.stack });
+        res.status(500).json({ error: 'Failed to load statistics', details: error.message });
     }
 });
 
@@ -321,12 +511,27 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    debugLog('Unhandled error occurred', { 
+        error: err.message, 
+        stack: err.stack,
+        path: req.path,
+        method: req.method
+    });
+    res.status(500).json({ error: 'Internal server error', details: err.message });
 });
 
 app.use((req, res) => {
-    res.status(404).json({ error: 'Not found' });
+    debugLog('404 Not Found', { path: req.path, method: req.method });
+    res.status(404).json({ error: 'Not found', path: req.path });
+});
+
+// Startup logging
+debugLog('API server initialized', {
+    port: PORT,
+    debugMode: DEBUG_MODE,
+    environment: process.env.NODE_ENV || 'unknown',
+    vercel: !!process.env.VERCEL,
+    userDataFile: USER_DATA_FILE
 });
 
 module.exports = app;

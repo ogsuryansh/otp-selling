@@ -7,7 +7,9 @@
     "dev": "vercel dev",
     "local": "node start-local.js",
     "build": "echo 'No build step required'",
-    "start": "node api/index.js"
+    "start": "node api/index.js",
+    "debug": "DEBUG=true NODE_ENV=development node api/index.js",
+    "debug:vercel": "vercel dev --debug"
   },
   "keywords": ["admin-panel", "otp-bot", "vercel", "nodejs"],
   "author": "Your Name",

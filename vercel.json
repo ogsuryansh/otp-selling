@@ -10,19 +10,6 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
     }
-  ],
-  "env": {
-    "DEBUG": "true",
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }

@@ -57,26 +57,45 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-const USER_DATA_FILE = path.join(__dirname, '../data/user_data.json');
+// Try to read from backend data file first, fallback to local data file
+const BACKEND_DATA_FILE = path.join(__dirname, '../../backend/user_data.json');
+const LOCAL_DATA_FILE = path.join(__dirname, '../data/user_data.json');
+const USER_DATA_FILE = BACKEND_DATA_FILE;
 
 // Enhanced file operations with debugging
 async function loadUsers() {
     try {
-        debugLog('Attempting to load users from file', { filePath: USER_DATA_FILE });
+        debugLog('Attempting to load users from file', { 
+            backendFile: BACKEND_DATA_FILE,
+            localFile: LOCAL_DATA_FILE,
+            usingFile: USER_DATA_FILE
+        });
         
-        // Check if file exists
+        // Try backend file first
         try {
-            await fs.access(USER_DATA_FILE);
-            debugLog('User data file exists');
-        } catch (accessError) {
-            debugLog('User data file does not exist, creating empty data', { error: accessError.message });
-            return {};
+            await fs.access(BACKEND_DATA_FILE);
+            debugLog('Backend data file exists, using it');
+            const data = await fs.readFile(BACKEND_DATA_FILE, 'utf8');
+            const users = JSON.parse(data);
+            debugLog('Users loaded from backend file successfully', { userCount: Object.keys(users).length });
+            return users;
+        } catch (backendError) {
+            debugLog('Backend data file not accessible', { error: backendError.message });
+            
+            // Try local file as fallback
+            try {
+                await fs.access(LOCAL_DATA_FILE);
+                debugLog('Local data file exists, using it as fallback');
+                const data = await fs.readFile(LOCAL_DATA_FILE, 'utf8');
+                const users = JSON.parse(data);
+                debugLog('Users loaded from local file successfully', { userCount: Object.keys(users).length });
+                return users;
+            } catch (localError) {
+                debugLog('Local data file also not accessible', { error: localError.message });
+                debugLog('Creating empty data structure');
+                return {};
+            }
         }
-        
-        const data = await fs.readFile(USER_DATA_FILE, 'utf8');
-        const users = JSON.parse(data);
-        debugLog('Users loaded successfully', { userCount: Object.keys(users).length });
-        return users;
     } catch (error) {
         debugLog('Error loading users', { error: error.message, stack: error.stack });
         return {};
@@ -87,13 +106,28 @@ async function saveUsers(users) {
     try {
         debugLog('Attempting to save users', { userCount: Object.keys(users).length });
         
-        const dataDir = path.dirname(USER_DATA_FILE);
-        await fs.mkdir(dataDir, { recursive: true });
-        debugLog('Data directory ensured', { dataDir });
-        
-        await fs.writeFile(USER_DATA_FILE, JSON.stringify(users, null, 2), 'utf8');
-        debugLog('Users saved successfully');
-        return true;
+        // Try to save to backend file first
+        try {
+            const dataDir = path.dirname(BACKEND_DATA_FILE);
+            await fs.mkdir(dataDir, { recursive: true });
+            await fs.writeFile(BACKEND_DATA_FILE, JSON.stringify(users, null, 2), 'utf8');
+            debugLog('Users saved to backend file successfully');
+            return true;
+        } catch (backendError) {
+            debugLog('Failed to save to backend file', { error: backendError.message });
+            
+            // Fallback to local file
+            try {
+                const dataDir = path.dirname(LOCAL_DATA_FILE);
+                await fs.mkdir(dataDir, { recursive: true });
+                await fs.writeFile(LOCAL_DATA_FILE, JSON.stringify(users, null, 2), 'utf8');
+                debugLog('Users saved to local file successfully');
+                return true;
+            } catch (localError) {
+                debugLog('Failed to save to local file', { error: localError.message });
+                return false;
+            }
+        }
     } catch (error) {
         debugLog('Error saving users', { error: error.message, stack: error.stack });
         return false;
@@ -141,30 +175,54 @@ app.get('/api/debug/filesystem', async (req, res) => {
     try {
         const fsInfo = {
             currentDir: __dirname,
-            userDataFile: USER_DATA_FILE,
-            userDataFileExists: false,
-            userDataFileSize: 0,
-            dataDirExists: false,
-            dataDirContents: []
+            backendDataFile: BACKEND_DATA_FILE,
+            localDataFile: LOCAL_DATA_FILE,
+            backendFileExists: false,
+            backendFileSize: 0,
+            localFileExists: false,
+            localFileSize: 0,
+            backendDirExists: false,
+            localDirExists: false,
+            backendDirContents: [],
+            localDirContents: []
         };
         
-        // Check if user data file exists
+        // Check backend data file
         try {
-            const stats = await fs.stat(USER_DATA_FILE);
-            fsInfo.userDataFileExists = true;
-            fsInfo.userDataFileSize = stats.size;
+            const stats = await fs.stat(BACKEND_DATA_FILE);
+            fsInfo.backendFileExists = true;
+            fsInfo.backendFileSize = stats.size;
         } catch (error) {
-            fsInfo.userDataFileExists = false;
+            fsInfo.backendFileExists = false;
         }
         
-        // Check data directory
-        const dataDir = path.dirname(USER_DATA_FILE);
+        // Check local data file
         try {
-            const stats = await fs.stat(dataDir);
-            fsInfo.dataDirExists = true;
-            fsInfo.dataDirContents = await fs.readdir(dataDir);
+            const stats = await fs.stat(LOCAL_DATA_FILE);
+            fsInfo.localFileExists = true;
+            fsInfo.localFileSize = stats.size;
         } catch (error) {
-            fsInfo.dataDirExists = false;
+            fsInfo.localFileExists = false;
+        }
+        
+        // Check backend directory
+        const backendDir = path.dirname(BACKEND_DATA_FILE);
+        try {
+            const stats = await fs.stat(backendDir);
+            fsInfo.backendDirExists = true;
+            fsInfo.backendDirContents = await fs.readdir(backendDir);
+        } catch (error) {
+            fsInfo.backendDirExists = false;
+        }
+        
+        // Check local directory
+        const localDir = path.dirname(LOCAL_DATA_FILE);
+        try {
+            const stats = await fs.stat(localDir);
+            fsInfo.localDirExists = true;
+            fsInfo.localDirContents = await fs.readdir(localDir);
+        } catch (error) {
+            fsInfo.localDirExists = false;
         }
         
         debugLog('Filesystem info requested', fsInfo);
@@ -572,7 +630,9 @@ debugLog('API server initialized', {
     debugMode: DEBUG_MODE,
     environment: process.env.NODE_ENV || 'unknown',
     vercel: !!process.env.VERCEL,
-    userDataFile: USER_DATA_FILE
+    backendDataFile: BACKEND_DATA_FILE,
+    localDataFile: LOCAL_DATA_FILE,
+    usingFile: USER_DATA_FILE
 });
 
 // Start the server if this file is run directly

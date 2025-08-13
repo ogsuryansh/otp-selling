@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vercel dev",
     "local": "node start-local.js",
-    "build": "echo 'No build step required'",
+    "build": "node copy-backend-data.js",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",
-    "debug:vercel": "vercel dev --debug"
+    "debug:vercel": "vercel dev --debug",
+    "copy-data": "node copy-backend-data.js"
   },
   "keywords": ["admin-panel", "otp-bot", "vercel", "nodejs"],
   "author": "Your Name",

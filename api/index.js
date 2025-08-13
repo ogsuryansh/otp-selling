@@ -46,10 +46,21 @@ function debugLog(message, data = null) {
 // MongoDB connection function
 async function connectToMongoDB() {
     try {
-        debugLog('Connecting to MongoDB...', { uri: MONGODB_URI, database: MONGODB_DATABASE });
+        debugLog('Connecting to MongoDB...', { 
+            uri: MONGODB_URI, 
+            database: MONGODB_DATABASE,
+            hasUri: !!MONGODB_URI,
+            uriLength: MONGODB_URI ? MONGODB_URI.length : 0,
+            environment: process.env.NODE_ENV || 'unknown'
+        });
+        
+        if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017') {
+            debugLog('❌ MONGODB_URI not set or using default localhost');
+            return false;
+        }
         
         client = new MongoClient(MONGODB_URI, {
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 10000,
             maxPoolSize: 10
         });
         
@@ -65,7 +76,12 @@ async function connectToMongoDB() {
         
         return true;
     } catch (error) {
-        debugLog('❌ MongoDB connection failed', error.message);
+        debugLog('❌ MongoDB connection failed', {
+            error: error.message,
+            stack: error.stack,
+            uri: MONGODB_URI,
+            database: MONGODB_DATABASE
+        });
         return false;
     }
 }
@@ -131,38 +147,28 @@ async function saveUser(user) {
     }
 }
 
-// Environment info endpoint
+// Environment debug endpoint
 app.get('/api/debug/environment', (req, res) => {
-    const envInfo = {
-        nodeVersion: process.version,
-        platform: process.platform,
-        arch: process.arch,
-        nodeEnv: process.env.NODE_ENV || 'not set',
-        port: PORT,
-        debugMode: DEBUG_MODE,
-        mongodb: {
-            uri: MONGODB_URI,
-            database: MONGODB_DATABASE,
-            collection: MONGODB_COLLECTION,
-            connected: !!client && client.topology && client.topology.isConnected()
-        },
-        vercel: {
-            isVercel: !!process.env.VERCEL,
-            region: process.env.VERCEL_REGION || 'not set',
-            environment: process.env.VERCEL_ENV || 'not set',
-            url: process.env.VERCEL_URL || 'not set'
-        },
-        memory: {
-            used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
-            total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB',
-            external: Math.round(process.memoryUsage().external / 1024 / 1024) + ' MB'
-        },
-        uptime: Math.round(process.uptime()) + ' seconds',
-        timestamp: new Date().toISOString()
-    };
-    
-    debugLog('Environment info requested', envInfo);
-    res.json(envInfo);
+    try {
+        const envInfo = {
+            NODE_ENV: process.env.NODE_ENV || 'not set',
+            VERCEL: !!process.env.VERCEL,
+            VERCEL_REGION: process.env.VERCEL_REGION || 'not set',
+            MONGODB_URI: process.env.MONGODB_URI ? 
+                `${process.env.MONGODB_URI.substring(0, 20)}...` : 'not set',
+            MONGODB_DATABASE: process.env.MONGODB_DATABASE || 'not set',
+            MONGODB_COLLECTION: process.env.MONGODB_COLLECTION || 'not set',
+            DEBUG: process.env.DEBUG || 'not set',
+            hasMongoUri: !!process.env.MONGODB_URI,
+            mongoUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0
+        };
+        
+        debugLog('Environment debug requested', envInfo);
+        res.json(envInfo);
+    } catch (error) {
+        debugLog('Error getting environment info', { error: error.message });
+        res.status(500).json({ error: 'Failed to get environment info', details: error.message });
+    }
 });
 
 // Debug logs endpoint

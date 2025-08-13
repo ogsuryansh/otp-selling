@@ -217,7 +217,31 @@ app.get('/api/debug/test-data', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    debugLog('Root route accessed');
+    try {
+        // Try to serve admin panel
+        res.sendFile(path.join(__dirname, '../admin_panel.html'));
+    } catch (error) {
+        debugLog('Error serving admin panel', error.message);
+        res.json({ 
+            message: 'OTP Bot Admin Panel API',
+            endpoints: {
+                health: '/api/health',
+                test: '/api/test',
+                users: '/api/users',
+                statistics: '/api/statistics',
+                transactions: '/api/transactions',
+                debug: {
+                    environment: '/api/debug/environment',
+                    logs: '/api/debug/logs',
+                    filesystem: '/api/debug/filesystem',
+                    testData: '/api/debug/test-data'
+                }
+            },
+            adminPanel: '/admin_panel.html',
+            debugDashboard: '/debug-dashboard.html'
+        });
+    }
 });
 
 app.get('/api/users', async (req, res) => {
@@ -507,7 +531,24 @@ app.get('/api/user/:user_id/transactions', async (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+    debugLog('Health check endpoint called');
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        debug: DEBUG_MODE,
+        environment: process.env.NODE_ENV || 'unknown',
+        vercel: !!process.env.VERCEL
+    });
+});
+
+// Simple test endpoint
+app.get('/api/test', (req, res) => {
+    debugLog('Test endpoint called');
+    res.json({ 
+        message: 'API is working!',
+        timestamp: new Date().toISOString(),
+        debug: DEBUG_MODE
+    });
 });
 
 app.use((err, req, res, next) => {

@@ -4,11 +4,31 @@
     {
       "src": "api/index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/debug-dashboard.html",
+      "dest": "/debug-dashboard.html"
+    },
+    {
+      "src": "/admin_panel.html",
+      "dest": "/admin_panel.html"
+    },
+    {
+      "src": "/",
       "dest": "/api/index.js"
     }
   ]

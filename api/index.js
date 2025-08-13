@@ -534,4 +534,16 @@ debugLog('API server initialized', {
     userDataFile: USER_DATA_FILE
 });
 
+// Start the server if this file is run directly
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server is running on port ${PORT}`);
+        console.log(`🌐 Local URL: http://localhost:${PORT}`);
+        console.log(`🔧 Debug Mode: ${DEBUG_MODE ? 'Enabled' : 'Disabled'}`);
+        console.log(`📁 User Data File: ${USER_DATA_FILE}`);
+        console.log(`⏰ Started at: ${new Date().toISOString()}`);
+    });
+}
+
 module.exports = app;
+ 

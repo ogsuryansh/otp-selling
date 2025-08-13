@@ -6,11 +6,10 @@
   "scripts": {
     "dev": "vercel dev",
     "local": "node start-local.js",
-    "build": "node copy-backend-data.js",
+    "build": "echo 'No build step required'",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",
-    "debug:vercel": "vercel dev --debug",
-    "copy-data": "node copy-backend-data.js"
+    "debug:vercel": "vercel dev --debug"
   },
   "keywords": ["admin-panel", "otp-bot", "vercel", "nodejs"],
   "author": "Your Name",
@@ -18,7 +17,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "mongodb": "^6.3.0"
   },
   "devDependencies": {
     "vercel": "^32.5.0"

@@ -112,9 +112,13 @@ app.use(express.static(path.join(__dirname, '../public')));
 // MongoDB data operations
 async function loadUsers() {
     try {
-        if (!collection) {
-            debugLog('❌ MongoDB not connected');
-            return [];
+        if (!collection || !client || !client.topology || !client.topology.isConnected()) {
+            debugLog('❌ MongoDB not connected - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed');
+                return [];
+            }
         }
         
         const users = await collection.find({}).toArray();
@@ -128,9 +132,13 @@ async function loadUsers() {
 
 async function saveUser(user) {
     try {
-        if (!collection) {
-            debugLog('❌ MongoDB not connected');
-            return false;
+        if (!collection || !client || !client.topology || !client.topology.isConnected()) {
+            debugLog('❌ MongoDB not connected - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed');
+                return false;
+            }
         }
         
         const result = await collection.updateOne(
@@ -288,15 +296,19 @@ app.get('/api/statistics', async (req, res) => {
     try {
         debugLog('Statistics endpoint called');
         
-        if (!collection) {
-            debugLog('❌ MongoDB not connected for statistics');
-            return res.json({
-                totalUsers: 0,
-                activeUsers: 0,
-                bannedUsers: 0,
-                totalBalance: 0,
-                totalTransactions: 0
-            });
+        if (!collection || !client || !client.topology || !client.topology.isConnected()) {
+            debugLog('❌ MongoDB not connected for statistics - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for statistics');
+                return res.json({
+                    totalUsers: 0,
+                    activeUsers: 0,
+                    bannedUsers: 0,
+                    totalBalance: 0,
+                    totalTransactions: 0
+                });
+            }
         }
         
         const totalUsers = await collection.countDocuments({});

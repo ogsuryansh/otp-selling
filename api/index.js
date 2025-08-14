@@ -1,3 +1,6 @@
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -54,14 +57,18 @@ async function connectToMongoDB() {
             environment: process.env.NODE_ENV || 'unknown'
         });
         
+        // Check if MONGODB_URI is properly set
         if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017') {
             debugLog('❌ MONGODB_URI not set or using default localhost');
+            console.error('❌ MONGODB_URI not set. Please check your .env file');
             return false;
         }
         
         client = new MongoClient(MONGODB_URI, {
-            serverSelectionTimeoutMS: 10000,
-            maxPoolSize: 10
+            serverSelectionTimeoutMS: 15000,
+            maxPoolSize: 10,
+            retryWrites: true,
+            w: 'majority'
         });
         
         await client.connect();
@@ -82,6 +89,7 @@ async function connectToMongoDB() {
             uri: MONGODB_URI,
             database: MONGODB_DATABASE
         });
+        console.error('❌ MongoDB connection failed:', error.message);
         return false;
     }
 }
@@ -736,6 +744,206 @@ app.get('/api/test', (req, res) => {
             connected: !!client && client.topology && client.topology.isConnected()
         }
     });
+});
+
+// Server Management API Endpoints
+app.get('/api/servers', async (req, res) => {
+    debugLog('GET /api/servers called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for servers endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for servers endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const serversCollection = db.collection('servers');
+        const servers = await serversCollection.find({}).sort({ createdAt: -1 }).toArray();
+        
+        debugLog(`Retrieved ${servers.length} servers`);
+        res.json(servers);
+    } catch (error) {
+        debugLog('Error retrieving servers', { error: error.message, stack: error.stack });
+        console.error('Error in GET /api/servers:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve servers', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.post('/api/servers', async (req, res) => {
+    debugLog('POST /api/servers called', { body: req.body });
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for servers endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for servers endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const { name, code, country, status } = req.body;
+        
+        // Validation
+        if (!name || !code || !country || !status) {
+            return res.status(400).json({ 
+                error: 'Missing required fields', 
+                message: 'Please fill in all required fields: name, code, country, status' 
+            });
+        }
+        
+        // Check if server code already exists
+        const serversCollection = db.collection('servers');
+        const existingServer = await serversCollection.findOne({ code: code });
+        if (existingServer) {
+            return res.status(400).json({ 
+                error: 'Server code already exists',
+                message: 'A server with this code already exists. Please use a different code.' 
+            });
+        }
+        
+        const newServer = {
+            name,
+            code,
+            country,
+            status,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const result = await serversCollection.insertOne(newServer);
+        newServer._id = result.insertedId;
+        
+        debugLog('Server created successfully', { serverId: result.insertedId });
+        res.status(201).json(newServer);
+    } catch (error) {
+        debugLog('Error creating server', { error: error.message, stack: error.stack });
+        console.error('Error in POST /api/servers:', error);
+        res.status(500).json({ 
+            error: 'Failed to create server', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.get('/api/servers/:id', async (req, res) => {
+    debugLog(`GET /api/servers/${req.params.id} called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for servers endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const serversCollection = db.collection('servers');
+        const server = await serversCollection.findOne({ _id: new ObjectId(req.params.id) });
+        
+        if (!server) {
+            return res.status(404).json({ error: 'Server not found' });
+        }
+        
+        debugLog('Server retrieved successfully', { serverId: req.params.id });
+        res.json(server);
+    } catch (error) {
+        debugLog('Error retrieving server', { error: error.message, serverId: req.params.id });
+        res.status(500).json({ error: 'Failed to retrieve server', details: error.message });
+    }
+});
+
+app.put('/api/servers/:id', async (req, res) => {
+    debugLog(`PUT /api/servers/${req.params.id} called`, { body: req.body });
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for servers endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { name, code, country, status } = req.body;
+        
+        // Validation
+        if (!name || !code || !country || !status) {
+            return res.status(400).json({ error: 'Missing required fields: name, code, country, status' });
+        }
+        
+        const { ObjectId } = require('mongodb');
+        const serversCollection = db.collection('servers');
+        
+        // Check if server code already exists (excluding current server)
+        const existingServer = await serversCollection.findOne({ 
+            code: code, 
+            _id: { $ne: new ObjectId(req.params.id) } 
+        });
+        if (existingServer) {
+            return res.status(400).json({ error: 'Server code already exists' });
+        }
+        
+        const updateData = {
+            name,
+            code,
+            country,
+            status,
+            updatedAt: new Date()
+        };
+        
+        const result = await serversCollection.updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: updateData }
+        );
+        
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Server not found' });
+        }
+        
+        debugLog('Server updated successfully', { serverId: req.params.id });
+        res.json({ message: 'Server updated successfully', updated: true });
+    } catch (error) {
+        debugLog('Error updating server', { error: error.message, serverId: req.params.id });
+        res.status(500).json({ error: 'Failed to update server', details: error.message });
+    }
+});
+
+app.delete('/api/servers/:id', async (req, res) => {
+    debugLog(`DELETE /api/servers/${req.params.id} called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for servers endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const serversCollection = db.collection('servers');
+        
+        const result = await serversCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Server not found' });
+        }
+        
+        debugLog('Server deleted successfully', { serverId: req.params.id });
+        res.json({ message: 'Server deleted successfully', deleted: true });
+    } catch (error) {
+        debugLog('Error deleting server', { error: error.message, serverId: req.params.id });
+        res.status(500).json({ error: 'Failed to delete server', details: error.message });
+    }
 });
 
 app.use((err, req, res, next) => {

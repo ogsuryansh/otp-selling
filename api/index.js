@@ -107,7 +107,6 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
 
 // MongoDB data operations
 async function loadUsers() {
@@ -218,7 +217,7 @@ app.get('/api/debug/mongodb', async (req, res) => {
 app.get('/', (req, res) => {
     debugLog('Root route accessed');
     try {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
+        res.sendFile(path.join(__dirname, '../index.html'));
     } catch (error) {
         debugLog('Error serving home page', error.message);
         res.json({ 
@@ -249,7 +248,7 @@ app.get('/', (req, res) => {
 app.get('/users', (req, res) => {
     debugLog('Users page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../public/users.html'));
+        res.sendFile(path.join(__dirname, '../users.html'));
     } catch (error) {
         debugLog('Error serving users page', error.message);
         res.status(500).json({ error: 'Failed to load users page' });
@@ -269,7 +268,7 @@ app.get('/admin', (req, res) => {
 app.get('/transactions', (req, res) => {
     debugLog('Transactions page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../public/transactions.html'));
+        res.sendFile(path.join(__dirname, '../transactions.html'));
     } catch (error) {
         debugLog('Error serving transactions page', error.message);
         res.status(500).json({ error: 'Failed to load transactions page' });
@@ -279,7 +278,7 @@ app.get('/transactions', (req, res) => {
 app.get('/statistics', (req, res) => {
     debugLog('Statistics page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../public/statistics.html'));
+        res.sendFile(path.join(__dirname, '../statistics.html'));
     } catch (error) {
         debugLog('Error serving statistics page', error.message);
         res.status(500).json({ error: 'Failed to load statistics page' });

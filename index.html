@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Bot Dashboard - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .stat-description {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .feature-title {
+            color: #4a5568;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .feature-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .feature-link:hover {
+            background: #5a67d8;
+        }
+
+        .system-status {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .status-title {
+            color: #4a5568;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .status-online {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-offline {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online .status-dot {
+            background: #38a169;
+        }
+
+        .status-offline .status-dot {
+            background: #e53e3e;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 OTP Bot Dashboard</h1>
+            <p>Welcome to your comprehensive OTP bot management system</p>
+            <div class="nav-links">
+                <a href="/users" class="nav-link">👥 Users</a>
+                <a href="/admin" class="nav-link">⚙️ Admin Panel</a>
+                <a href="/transactions" class="nav-link">💳 Transactions</a>
+                <a href="/statistics" class="nav-link">📊 Statistics</a>
+            </div>
+        </div>
+
+        <div class="quick-stats">
+            <div class="stat-card" onclick="window.location.href='/users'">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="totalUsers">-</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-description">Manage user accounts and view balances</div>
+            </div>
+            <div class="stat-card" onclick="window.location.href='/statistics'">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number" id="totalBalance">-</div>
+                <div class="stat-label">Total Balance</div>
+                <div class="stat-description">Track system-wide balance and transactions</div>
+            </div>
+            <div class="stat-card" onclick="window.location.href='/transactions'">
+                <div class="stat-icon">💳</div>
+                <div class="stat-number" id="totalTransactions">-</div>
+                <div class="stat-label">Transactions</div>
+                <div class="stat-description">View transaction history and activity</div>
+            </div>
+            <div class="stat-card" onclick="window.location.href='/statistics'">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="activeUsers">-</div>
+                <div class="stat-label">Active Users</div>
+                <div class="stat-description">Monitor active user engagement</div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <div class="feature-title">User Management</div>
+                <div class="feature-description">
+                    View all users, their balances, and account status. Search, filter, and manage user accounts efficiently.
+                </div>
+                <a href="/users" class="feature-link">View Users →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <div class="feature-title">Admin Panel</div>
+                <div class="feature-description">
+                    Full administrative control with user management, balance adjustments, and system monitoring.
+                </div>
+                <a href="/admin" class="feature-link">Access Admin →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💳</div>
+                <div class="feature-title">Transaction History</div>
+                <div class="feature-description">
+                    Complete transaction logs with filtering, search, and detailed analytics for all financial activities.
+                </div>
+                <a href="/transactions" class="feature-link">View Transactions →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Analytics & Statistics</div>
+                <div class="feature-description">
+                    Comprehensive analytics dashboard with charts, growth metrics, and system performance insights.
+                </div>
+                <a href="/statistics" class="feature-link">View Statistics →</a>
+            </div>
+        </div>
+
+        <div class="system-status">
+            <div class="status-title">System Status</div>
+            <div id="statusIndicator" class="status-indicator status-online">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+            <div id="statusDetails">
+                <p>All systems operational • Database connected • API responding</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load quick statistics
+        async function loadQuickStats() {
+            try {
+                const response = await fetch('/api/statistics');
+                const stats = await response.json();
+                
+                document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+                document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
+                document.getElementById('totalBalance').textContent = `${(stats.totalBalance || 0).toFixed(2)} 💎`;
+                document.getElementById('totalTransactions').textContent = stats.totalTransactions || 0;
+            } catch (error) {
+                console.error('Error loading quick stats:', error);
+            }
+        }
+
+        // Check system status
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch('/api/health');
+                const health = await response.json();
+                
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusDetails = document.getElementById('statusDetails');
+                
+                if (health.status === 'OK') {
+                    statusIndicator.className = 'status-indicator status-online';
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Online</span>';
+                    statusDetails.innerHTML = '<p>All systems operational • Database connected • API responding</p>';
+                } else {
+                    statusIndicator.className = 'status-indicator status-offline';
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Offline</span>';
+                    statusDetails.innerHTML = '<p>Some systems may be experiencing issues</p>';
+                }
+            } catch (error) {
+                console.error('Error checking system status:', error);
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusDetails = document.getElementById('statusDetails');
+                
+                statusIndicator.className = 'status-indicator status-offline';
+                statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Offline</span>';
+                statusDetails.innerHTML = '<p>Unable to connect to system services</p>';
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        function startAutoRefresh() {
+            setInterval(() => {
+                loadQuickStats();
+                checkSystemStatus();
+            }, 30000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuickStats();
+            checkSystemStatus();
+            startAutoRefresh();
+        });
+    </script>
+</body>
+</html>

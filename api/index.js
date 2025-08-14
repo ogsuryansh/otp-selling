@@ -275,13 +275,13 @@ app.get('/transactions', (req, res) => {
     }
 });
 
-app.get('/statistics', (req, res) => {
-    debugLog('Statistics page accessed');
+app.get('/servers', (req, res) => {
+    debugLog('Servers page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../statistics.html'));
+        res.sendFile(path.join(__dirname, '../servers.html'));
     } catch (error) {
-        debugLog('Error serving statistics page', error.message);
-        res.status(500).json({ error: 'Failed to load statistics page' });
+        debugLog('Error serving servers page', error.message);
+        res.status(500).json({ error: 'Failed to load servers page' });
     }
 });
 

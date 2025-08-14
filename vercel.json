@@ -28,7 +28,7 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/statistics",
+      "src": "/servers",
       "dest": "/api/index.js"
     },
     {

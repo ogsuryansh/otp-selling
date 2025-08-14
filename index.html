@@ -3,356 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Bot Dashboard - Home</title>
+    <title>OTP Bot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 40px 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .header h1 {
-            color: #4a5568;
-            font-size: 3rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .header p {
-            color: #718096;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #718096;
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 15px;
-        }
-
-        .stat-description {
-            color: #a0aec0;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .feature-title {
-            color: #4a5568;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .feature-description {
-            color: #718096;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .feature-link {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s ease;
-        }
-
-        .feature-link:hover {
-            background: #5a67d8;
-        }
-
-        .system-status {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .status-title {
-            color: #4a5568;
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .status-online {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status-offline {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .status-online .status-dot {
-            background: #38a169;
-        }
-
-        .status-offline .status-dot {
-            background: #e53e3e;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-        }
-
-        .error {
-            background: #fed7d7;
-            color: #742a2a;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .quick-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-links {
-                flex-direction: column;
-                align-items: center;
-            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🤖 OTP Bot Dashboard</h1>
-            <p>Welcome to your comprehensive OTP bot management system</p>
-            <div class="nav-links">
-                <a href="/users" class="nav-link">👥 Users</a>
-                <a href="/admin" class="nav-link">⚙️ Admin Panel</a>
-                <a href="/transactions" class="nav-link">💳 Transactions</a>
-                <a href="/statistics" class="nav-link">📊 Statistics</a>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">🤖 OTP Bot Dashboard</h1>
+            <p class="text-gray-200 mb-6">Manage your OTP bot system efficiently</p>
+            
+            <!-- Navigation -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="/users" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    👥 Users
+                </a>
+                <a href="/admin" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    ⚙️ Admin
+                </a>
+                <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    💳 Transactions
+                </a>
+                <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🖥️ Servers
+                </a>
             </div>
         </div>
 
-        <div class="quick-stats">
-            <div class="stat-card" onclick="window.location.href='/users'">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number" id="totalUsers">-</div>
-                <div class="stat-label">Total Users</div>
-                <div class="stat-description">Manage user accounts and view balances</div>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/users'">
+                <div class="text-2xl mb-2">👥</div>
+                <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
+                <div class="text-gray-300 text-sm">Total Users</div>
             </div>
-            <div class="stat-card" onclick="window.location.href='/statistics'">
-                <div class="stat-icon">💰</div>
-                <div class="stat-number" id="totalBalance">-</div>
-                <div class="stat-label">Total Balance</div>
-                <div class="stat-description">Track system-wide balance and transactions</div>
+            
+            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/statistics'">
+                <div class="text-2xl mb-2">✅</div>
+                <div class="text-2xl font-bold text-white" id="activeUsers">-</div>
+                <div class="text-gray-300 text-sm">Active Users</div>
             </div>
-            <div class="stat-card" onclick="window.location.href='/transactions'">
-                <div class="stat-icon">💳</div>
-                <div class="stat-number" id="totalTransactions">-</div>
-                <div class="stat-label">Transactions</div>
-                <div class="stat-description">View transaction history and activity</div>
+            
+            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/transactions'">
+                <div class="text-2xl mb-2">💳</div>
+                <div class="text-2xl font-bold text-white" id="totalTransactions">-</div>
+                <div class="text-gray-300 text-sm">Transactions</div>
             </div>
-            <div class="stat-card" onclick="window.location.href='/statistics'">
-                <div class="stat-icon">✅</div>
-                <div class="stat-number" id="activeUsers">-</div>
-                <div class="stat-label">Active Users</div>
-                <div class="stat-description">Monitor active user engagement</div>
-            </div>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <div class="feature-title">User Management</div>
-                <div class="feature-description">
-                    View all users, their balances, and account status. Search, filter, and manage user accounts efficiently.
-                </div>
-                <a href="/users" class="feature-link">View Users →</a>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚙️</div>
-                <div class="feature-title">Admin Panel</div>
-                <div class="feature-description">
-                    Full administrative control with user management, balance adjustments, and system monitoring.
-                </div>
-                <a href="/admin" class="feature-link">Access Admin →</a>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💳</div>
-                <div class="feature-title">Transaction History</div>
-                <div class="feature-description">
-                    Complete transaction logs with filtering, search, and detailed analytics for all financial activities.
-                </div>
-                <a href="/transactions" class="feature-link">View Transactions →</a>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <div class="feature-title">Analytics & Statistics</div>
-                <div class="feature-description">
-                    Comprehensive analytics dashboard with charts, growth metrics, and system performance insights.
-                </div>
-                <a href="/statistics" class="feature-link">View Statistics →</a>
+            
+            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/statistics'">
+                <div class="text-2xl mb-2">💰</div>
+                <div class="text-2xl font-bold text-white" id="totalBalance">-</div>
+                <div class="text-gray-300 text-sm">Total Balance</div>
             </div>
         </div>
 
-        <div class="system-status">
-            <div class="status-title">System Status</div>
-            <div id="statusIndicator" class="status-indicator status-online">
-                <div class="status-dot"></div>
-                <span>System Online</span>
+        <!-- Features Grid -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-4">
+                    <div class="text-3xl mr-3">👥</div>
+                    <h3 class="text-xl font-semibold text-white">User Management</h3>
+                </div>
+                <p class="text-gray-300 text-sm mb-4">View and manage all user accounts, balances, and status</p>
+                <a href="/users" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
+                    View Users →
+                </a>
             </div>
-            <div id="statusDetails">
-                <p>All systems operational • Database connected • API responding</p>
+            
+            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-4">
+                    <div class="text-3xl mr-3">⚙️</div>
+                    <h3 class="text-xl font-semibold text-white">Admin Panel</h3>
+                </div>
+                <p class="text-gray-300 text-sm mb-4">Full administrative control and system management</p>
+                <a href="/admin" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
+                    Access Admin →
+                </a>
             </div>
+            
+            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-4">
+                    <div class="text-3xl mr-3">💳</div>
+                    <h3 class="text-xl font-semibold text-white">Transactions</h3>
+                </div>
+                <p class="text-gray-300 text-sm mb-4">Complete transaction history with filtering and search</p>
+                <a href="/transactions" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
+                    View Transactions →
+                </a>
+            </div>
+            
+            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-4">
+                    <div class="text-3xl mr-3">🖥️</div>
+                    <h3 class="text-xl font-semibold text-white">Server Management</h3>
+                </div>
+                <p class="text-gray-300 text-sm mb-4">Manage and monitor your OTP bot servers</p>
+                <a href="/servers" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
+                    Manage Servers →
+                </a>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="glass rounded-xl p-6 text-center">
+            <h3 class="text-xl font-semibold text-white mb-4">System Status</h3>
+            <div id="statusIndicator" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 text-green-300 mb-3">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium">System Online</span>
+            </div>
+            <p class="text-gray-300 text-sm" id="statusDetails">All systems operational • Database connected • API responding</p>
         </div>
     </div>
 
@@ -382,22 +163,22 @@
                 const statusDetails = document.getElementById('statusDetails');
                 
                 if (health.status === 'OK') {
-                    statusIndicator.className = 'status-indicator status-online';
-                    statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Online</span>';
-                    statusDetails.innerHTML = '<p>All systems operational • Database connected • API responding</p>';
+                    statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 text-green-300 mb-3';
+                    statusIndicator.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Online</span>';
+                    statusDetails.textContent = 'All systems operational • Database connected • API responding';
                 } else {
-                    statusIndicator.className = 'status-indicator status-offline';
-                    statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Offline</span>';
-                    statusDetails.innerHTML = '<p>Some systems may be experiencing issues</p>';
+                    statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 text-red-300 mb-3';
+                    statusIndicator.innerHTML = '<div class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Offline</span>';
+                    statusDetails.textContent = 'Some systems may be experiencing issues';
                 }
             } catch (error) {
                 console.error('Error checking system status:', error);
                 const statusIndicator = document.getElementById('statusIndicator');
                 const statusDetails = document.getElementById('statusDetails');
                 
-                statusIndicator.className = 'status-indicator status-offline';
-                statusIndicator.innerHTML = '<div class="status-dot"></div><span>System Offline</span>';
-                statusDetails.innerHTML = '<p>Unable to connect to system services</p>';
+                statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 text-red-300 mb-3';
+                statusIndicator.innerHTML = '<div class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Offline</span>';
+                statusDetails.textContent = 'Unable to connect to system services';
             }
         }
 

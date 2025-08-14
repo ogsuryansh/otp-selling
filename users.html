@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+            <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="responsive.css">
     <script>
         tailwind.config = {
             theme: {
@@ -100,6 +101,63 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3);
         }
+        
+        /* Responsive table styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .glass {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .stats-grid > div {
+                padding: 1rem 0.5rem;
+            }
+            
+            .stats-grid .text-2xl {
+                font-size: 1.25rem;
+            }
+            
+            .stats-grid .text-sm {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-controls > div {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.25rem;
+            }
+            
+            .glass {
+                padding: 0.75rem;
+            }
+            
+            .stats-grid > div {
+                padding: 0.75rem 0.5rem;
+            }
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-800">
@@ -127,7 +185,7 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 stats-grid">
             <div class="glass rounded-xl p-4 text-center">
                 <div class="text-2xl mb-2">👥</div>
                 <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
@@ -157,7 +215,7 @@
         <div class="glass rounded-xl p-6 mb-6">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <h2 class="text-xl font-semibold text-white">User List</h2>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto search-controls">
                     <input type="text" id="searchInput" class="px-4 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 border border-white/20 focus:outline-none focus:border-white/40 text-sm" placeholder="Search users...">
                     <button onclick="loadUsers()" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         🔄 Refresh
@@ -185,14 +243,14 @@
             <table class="w-full text-sm" id="usersTable" style="display: none;">
                 <thead>
                     <tr class="border-b border-white/20">
-                        <th class="text-left py-3 px-4 text-white font-semibold">ID</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Name</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Username</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Balance</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Status</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Registration</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Last Activity</th>
-                        <th class="text-left py-3 px-4 text-white font-semibold">Actions</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm">ID</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm">Name</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm hidden md:table-cell">Username</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm">Balance</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm">Status</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm hidden lg:table-cell">Registration</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm hidden lg:table-cell">Last Activity</th>
+                        <th class="text-left py-3 px-2 md:px-4 text-white font-semibold text-xs md:text-sm">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody" class="text-gray-300">
@@ -365,30 +423,30 @@
                 const statusClass = user.status === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300';
                 
                 row.innerHTML = `
-                    <td class="py-3 px-4">${user.id}</td>
-                    <td class="py-3 px-4">${user.name}</td>
-                    <td class="py-3 px-4">${user.username}</td>
-                    <td class="py-3 px-4 font-semibold text-primary">${user.balance.toFixed(2)} 💎</td>
-                    <td class="py-3 px-4">
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">${user.id}</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">${user.name}</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden md:table-cell">${user.username}</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-primary">${user.balance.toFixed(2)} 💎</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">
                         <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">
                             ${user.status}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-sm">${formatDate(user.registration_date)}</td>
-                    <td class="py-3 px-4 text-sm">${formatDate(user.last_activity)}</td>
-                    <td class="py-3 px-4">
-                        <div class="flex flex-wrap gap-1">
-                            <button onclick="openAddBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-success text-xs px-2 py-1">
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden lg:table-cell">${formatDate(user.registration_date)}</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden lg:table-cell">${formatDate(user.last_activity)}</td>
+                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">
+                        <div class="flex flex-col sm:flex-row gap-1">
+                            <button onclick="openAddBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-success text-xs px-2 py-1 w-full sm:w-auto">
                                 ➕ Add
                             </button>
-                            <button onclick="openCutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-warning text-xs px-2 py-1">
+                            <button onclick="openCutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-warning text-xs px-2 py-1 w-full sm:w-auto">
                                 ➖ Cut
                             </button>
                             ${user.status === 'active' ? 
-                                `<button onclick="openBanUserModal(${user.id}, '${user.name}')" class="btn btn-danger text-xs px-2 py-1">🚫 Ban</button>` :
-                                `<button onclick="unbanUser(${user.id})" class="btn btn-success text-xs px-2 py-1">✅ Unban</button>`
+                                `<button onclick="openBanUserModal(${user.id}, '${user.name}')" class="btn btn-danger text-xs px-2 py-1 w-full sm:w-auto">🚫 Ban</button>` :
+                                `<button onclick="unbanUser(${user.id})" class="btn btn-success text-xs px-2 py-1 w-full sm:w-auto">✅ Unban</button>`
                             }
-                            <button onclick="openBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-primary text-xs px-2 py-1">
+                            <button onclick="openBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-primary text-xs px-2 py-1 w-full sm:w-auto">
                                 ✏️ Edit
                             </button>
                         </div>

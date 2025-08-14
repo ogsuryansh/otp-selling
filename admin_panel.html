@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Bot Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+            <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="responsive.css">
     <script>
         tailwind.config = {
             theme: {
@@ -25,6 +26,63 @@
         }
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .glass {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .quick-actions-grid > button {
+                padding: 1rem 0.5rem;
+            }
+            
+            .quick-actions-grid .text-2xl {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions-grid .text-sm {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.25rem;
+            }
+            
+            .glass {
+                padding: 0.75rem;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -53,7 +111,7 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 stats-grid">
             <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer">
                 <div class="text-2xl mb-2">👥</div>
                 <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
@@ -82,7 +140,7 @@
         <!-- Quick Actions -->
         <div class="glass rounded-xl p-6 mb-6">
             <h3 class="text-xl font-semibold text-white mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 quick-actions-grid">
                 <button onclick="openModal('addBalance')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                     <div class="text-2xl mb-2">➕</div>
                     <div class="text-white text-sm font-medium">Add Balance</div>

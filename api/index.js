@@ -107,7 +107,7 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json());
-// Static files are handled by Vercel routing, not Express
+app.use(express.static(path.join(__dirname, '../public')));
 
 // MongoDB data operations
 async function loadUsers() {
@@ -214,37 +214,77 @@ app.get('/api/debug/mongodb', async (req, res) => {
     }
 });
 
-// API routes only - static pages are handled by Vercel routing
+// Serve static pages
 app.get('/', (req, res) => {
-    debugLog('Root route accessed - serving API info');
-    serveApiInfo(res);
+    debugLog('Root route accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
+    } catch (error) {
+        debugLog('Error serving home page', error.message);
+        res.json({ 
+            message: 'OTP Bot Dashboard API',
+            pages: {
+                home: '/',
+                users: '/users',
+                admin: '/admin',
+                transactions: '/transactions',
+                statistics: '/statistics'
+            },
+            endpoints: {
+                health: '/api/health',
+                test: '/api/test',
+                users: '/api/users',
+                statistics: '/api/statistics',
+                transactions: '/api/transactions',
+                debug: {
+                    environment: '/api/debug/environment',
+                    logs: '/api/debug/logs',
+                    mongodb: '/api/debug/mongodb'
+                }
+            }
+        });
+    }
 });
 
-// Helper function to serve API info
-function serveApiInfo(res) {
-    res.json({ 
-        message: 'OTP Bot Dashboard API',
-        pages: {
-            home: '/',
-            users: '/users',
-            admin: '/admin',
-            transactions: '/transactions',
-            statistics: '/statistics'
-        },
-        endpoints: {
-            health: '/api/health',
-            test: '/api/test',
-            users: '/api/users',
-            statistics: '/api/statistics',
-            transactions: '/api/transactions',
-            debug: {
-                environment: '/api/debug/environment',
-                logs: '/api/debug/logs',
-                mongodb: '/api/debug/mongodb'
-            }
-        }
-    });
-}
+app.get('/users', (req, res) => {
+    debugLog('Users page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/users.html'));
+    } catch (error) {
+        debugLog('Error serving users page', error.message);
+        res.status(500).json({ error: 'Failed to load users page' });
+    }
+});
+
+app.get('/admin', (req, res) => {
+    debugLog('Admin page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../admin_panel.html'));
+    } catch (error) {
+        debugLog('Error serving admin page', error.message);
+        res.status(500).json({ error: 'Failed to load admin page' });
+    }
+});
+
+app.get('/transactions', (req, res) => {
+    debugLog('Transactions page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/transactions.html'));
+    } catch (error) {
+        debugLog('Error serving transactions page', error.message);
+        res.status(500).json({ error: 'Failed to load transactions page' });
+    }
+});
+
+app.get('/statistics', (req, res) => {
+    debugLog('Statistics page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/statistics.html'));
+    } catch (error) {
+        debugLog('Error serving statistics page', error.message);
+        res.status(500).json({ error: 'Failed to load statistics page' });
+    }
+});
 
 app.get('/api/users', async (req, res) => {
     try {

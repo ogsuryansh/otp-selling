@@ -214,15 +214,22 @@ app.get('/api/debug/mongodb', async (req, res) => {
     }
 });
 
+// Serve static pages
 app.get('/', (req, res) => {
     debugLog('Root route accessed');
     try {
-        // Try to serve admin panel
-        res.sendFile(path.join(__dirname, '../admin_panel.html'));
+        res.sendFile(path.join(__dirname, '../public/index.html'));
     } catch (error) {
-        debugLog('Error serving admin panel', error.message);
+        debugLog('Error serving home page', error.message);
         res.json({ 
-            message: 'OTP Bot Admin Panel API',
+            message: 'OTP Bot Dashboard API',
+            pages: {
+                home: '/',
+                users: '/users',
+                admin: '/admin',
+                transactions: '/transactions',
+                statistics: '/statistics'
+            },
             endpoints: {
                 health: '/api/health',
                 test: '/api/test',
@@ -234,10 +241,48 @@ app.get('/', (req, res) => {
                     logs: '/api/debug/logs',
                     mongodb: '/api/debug/mongodb'
                 }
-            },
-            adminPanel: '/admin_panel.html',
-            debugDashboard: '/debug-dashboard.html'
+            }
         });
+    }
+});
+
+app.get('/users', (req, res) => {
+    debugLog('Users page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/users.html'));
+    } catch (error) {
+        debugLog('Error serving users page', error.message);
+        res.status(500).json({ error: 'Failed to load users page' });
+    }
+});
+
+app.get('/admin', (req, res) => {
+    debugLog('Admin page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../admin_panel.html'));
+    } catch (error) {
+        debugLog('Error serving admin page', error.message);
+        res.status(500).json({ error: 'Failed to load admin page' });
+    }
+});
+
+app.get('/transactions', (req, res) => {
+    debugLog('Transactions page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/transactions.html'));
+    } catch (error) {
+        debugLog('Error serving transactions page', error.message);
+        res.status(500).json({ error: 'Failed to load transactions page' });
+    }
+});
+
+app.get('/statistics', (req, res) => {
+    debugLog('Statistics page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../public/statistics.html'));
+    } catch (error) {
+        debugLog('Error serving statistics page', error.message);
+        res.status(500).json({ error: 'Failed to load statistics page' });
     }
 });
 
@@ -530,6 +575,87 @@ app.post('/api/unban_user', async (req, res) => {
     } catch (error) {
         debugLog('Error unbanning user', { error: error.message });
         res.status(500).json({ success: false, message: 'Failed to unban user' });
+    }
+});
+
+// Update user endpoint
+app.post('/api/update_user', async (req, res) => {
+    try {
+        const { user_id, first_name, username, balance, is_banned, ban_reason, admin_id } = req.body;
+        
+        if (!user_id || !first_name || balance === undefined) {
+            return res.status(400).json({ success: false, message: 'User ID, name, and balance are required' });
+        }
+        
+        if (!collection) {
+            return res.status(500).json({ success: false, message: 'Database not connected' });
+        }
+        
+        const user = await collection.findOne({ user_id: parseInt(user_id) });
+        if (!user) {
+            return res.status(404).json({ success: false, message: `User ${user_id} not found` });
+        }
+        
+        const oldBalance = user.balance || 0;
+        const balanceChanged = oldBalance !== parseFloat(balance);
+        
+        // Create transaction record if balance changed
+        let transaction = null;
+        if (balanceChanged) {
+            transaction = {
+                type: 'admin_action',
+                amount: parseFloat(balance) - oldBalance,
+                description: `Admin updated balance from ${oldBalance} to ${balance} 💎`,
+                timestamp: new Date().toISOString(),
+                balance_before: oldBalance,
+                balance_after: parseFloat(balance),
+                admin_id: admin_id || 7574316340
+            };
+        }
+        
+        // Prepare update data
+        const updateData = {
+            first_name: first_name,
+            balance: parseFloat(balance)
+        };
+        
+        if (username !== undefined) {
+            updateData.username = username;
+        }
+        
+        if (is_banned !== undefined) {
+            updateData.is_banned = is_banned;
+            if (is_banned && ban_reason) {
+                updateData.ban_reason = ban_reason;
+                updateData.ban_date = new Date().toISOString();
+            } else if (!is_banned) {
+                updateData.ban_reason = null;
+                updateData.ban_date = null;
+            }
+        }
+        
+        // Perform update
+        const updateOperation = { $set: updateData };
+        if (transaction) {
+            updateOperation.$push = { transactions: transaction };
+        }
+        
+        await collection.updateOne(
+            { user_id: parseInt(user_id) },
+            updateOperation
+        );
+        
+        res.json({ 
+            success: true, 
+            message: `User ${user_id} updated successfully`,
+            changes: {
+                balanceChanged,
+                statusChanged: is_banned !== undefined && is_banned !== user.is_banned
+            }
+        });
+    } catch (error) {
+        debugLog('Error updating user', { error: error.message });
+        res.status(500).json({ success: false, message: 'Failed to update user' });
     }
 });
 

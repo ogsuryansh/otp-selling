@@ -107,7 +107,7 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+// Static files are handled by Vercel routing, not Express
 
 // MongoDB data operations
 async function loadUsers() {
@@ -214,91 +214,10 @@ app.get('/api/debug/mongodb', async (req, res) => {
     }
 });
 
-// Serve static pages
+// API routes only - static pages are handled by Vercel routing
 app.get('/', (req, res) => {
-    debugLog('Root route accessed');
-    const indexPath = path.join(__dirname, '../public/index.html');
-    
-    // Check if file exists before sending
-    if (require('fs').existsSync(indexPath)) {
-        try {
-            res.sendFile(indexPath);
-        } catch (error) {
-            debugLog('Error serving home page', error.message);
-            serveApiInfo(res);
-        }
-    } else {
-        debugLog('Home page file not found, serving API info');
-        serveApiInfo(res);
-    }
-});
-
-app.get('/users', (req, res) => {
-    debugLog('Users page accessed');
-    const usersPath = path.join(__dirname, '../public/users.html');
-    
-    if (require('fs').existsSync(usersPath)) {
-        try {
-            res.sendFile(usersPath);
-        } catch (error) {
-            debugLog('Error serving users page', error.message);
-            res.status(500).json({ error: 'Failed to load users page' });
-        }
-    } else {
-        debugLog('Users page file not found');
-        res.status(404).json({ error: 'Users page not found' });
-    }
-});
-
-app.get('/admin', (req, res) => {
-    debugLog('Admin page accessed');
-    const adminPath = path.join(__dirname, '../admin_panel.html');
-    
-    if (require('fs').existsSync(adminPath)) {
-        try {
-            res.sendFile(adminPath);
-        } catch (error) {
-            debugLog('Error serving admin page', error.message);
-            res.status(500).json({ error: 'Failed to load admin page' });
-        }
-    } else {
-        debugLog('Admin page file not found');
-        res.status(404).json({ error: 'Admin page not found' });
-    }
-});
-
-app.get('/transactions', (req, res) => {
-    debugLog('Transactions page accessed');
-    const transactionsPath = path.join(__dirname, '../public/transactions.html');
-    
-    if (require('fs').existsSync(transactionsPath)) {
-        try {
-            res.sendFile(transactionsPath);
-        } catch (error) {
-            debugLog('Error serving transactions page', error.message);
-            res.status(500).json({ error: 'Failed to load transactions page' });
-        }
-    } else {
-        debugLog('Transactions page file not found');
-        res.status(404).json({ error: 'Transactions page not found' });
-    }
-});
-
-app.get('/statistics', (req, res) => {
-    debugLog('Statistics page accessed');
-    const statisticsPath = path.join(__dirname, '../public/statistics.html');
-    
-    if (require('fs').existsSync(statisticsPath)) {
-        try {
-            res.sendFile(statisticsPath);
-        } catch (error) {
-            debugLog('Error serving statistics page', error.message);
-            res.status(500).json({ error: 'Failed to load statistics page' });
-        }
-    } else {
-        debugLog('Statistics page file not found');
-        res.status(404).json({ error: 'Statistics page not found' });
-    }
+    debugLog('Root route accessed - serving API info');
+    serveApiInfo(res);
 });
 
 // Helper function to serve API info

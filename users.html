@@ -26,6 +26,80 @@
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3);
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-800">
@@ -101,6 +175,11 @@
             <div class="text-red-300"></div>
         </div>
 
+        <!-- Success Message -->
+        <div id="successMessage" class="glass rounded-xl p-6 text-center mb-6 bg-green-500/20 border border-green-500/30" style="display: none;">
+            <div class="text-green-300"></div>
+        </div>
+
         <!-- Users Table -->
         <div class="glass rounded-xl p-6 overflow-x-auto">
             <table class="w-full text-sm" id="usersTable" style="display: none;">
@@ -113,11 +192,116 @@
                         <th class="text-left py-3 px-4 text-white font-semibold">Status</th>
                         <th class="text-left py-3 px-4 text-white font-semibold">Registration</th>
                         <th class="text-left py-3 px-4 text-white font-semibold">Last Activity</th>
+                        <th class="text-left py-3 px-4 text-white font-semibold">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody" class="text-gray-300">
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Balance Edit Modal -->
+    <div id="balanceModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800" id="balanceModalTitle">Edit Balance</h3>
+                <button onclick="closeModal('balanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+                <input type="text" id="balanceUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Current Balance:</label>
+                <input type="text" id="currentBalance" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">New Balance:</label>
+                <input type="number" id="newBalance" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" step="0.01" min="0">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="updateUserBalance()" class="btn btn-primary flex-1">Update Balance</button>
+                <button onclick="closeModal('balanceModal')" class="btn btn-secondary flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Balance Modal -->
+    <div id="addBalanceModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Add Balance</h3>
+                <button onclick="closeModal('addBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+                <input type="text" id="addBalanceUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Current Balance:</label>
+                <input type="text" id="addBalanceCurrent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Amount to Add:</label>
+                <input type="number" id="addBalanceAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" step="0.01" min="0.01">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="addBalance()" class="btn btn-success flex-1">Add Balance</button>
+                <button onclick="closeModal('addBalanceModal')" class="btn btn-secondary flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cut Balance Modal -->
+    <div id="cutBalanceModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Cut Balance</h3>
+                <button onclick="closeModal('cutBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+                <input type="text" id="cutBalanceUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Current Balance:</label>
+                <input type="text" id="cutBalanceCurrent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Amount to Cut:</label>
+                <input type="number" id="cutBalanceAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" step="0.01" min="0.01">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="cutBalance()" class="btn btn-warning flex-1">Cut Balance</button>
+                <button onclick="closeModal('cutBalanceModal')" class="btn btn-secondary flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ban User Modal -->
+    <div id="banUserModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Ban User</h3>
+                <button onclick="closeModal('banUserModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+                <input type="text" id="banUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User Name:</label>
+                <input type="text" id="banUserName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Ban Reason:</label>
+                <textarea id="banReason" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" rows="3" placeholder="Enter ban reason..."></textarea>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="banUser()" class="btn btn-danger flex-1">Ban User</button>
+                <button onclick="closeModal('banUserModal')" class="btn btn-secondary flex-1">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -192,9 +376,254 @@
                     </td>
                     <td class="py-3 px-4 text-sm">${formatDate(user.registration_date)}</td>
                     <td class="py-3 px-4 text-sm">${formatDate(user.last_activity)}</td>
+                    <td class="py-3 px-4">
+                        <div class="flex flex-wrap gap-1">
+                            <button onclick="openAddBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-success text-xs px-2 py-1">
+                                ➕ Add
+                            </button>
+                            <button onclick="openCutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-warning text-xs px-2 py-1">
+                                ➖ Cut
+                            </button>
+                            ${user.status === 'active' ? 
+                                `<button onclick="openBanUserModal(${user.id}, '${user.name}')" class="btn btn-danger text-xs px-2 py-1">🚫 Ban</button>` :
+                                `<button onclick="unbanUser(${user.id})" class="btn btn-success text-xs px-2 py-1">✅ Unban</button>`
+                            }
+                            <button onclick="openBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-primary text-xs px-2 py-1">
+                                ✏️ Edit
+                            </button>
+                        </div>
+                    </td>
                 `;
                 usersTableBody.appendChild(row);
             });
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openBalanceModal(userId, userName, currentBalance) {
+            document.getElementById('balanceUserId').value = userId;
+            document.getElementById('currentBalance').value = `${currentBalance.toFixed(2)} 💎`;
+            document.getElementById('newBalance').value = currentBalance.toFixed(2);
+            document.getElementById('balanceModalTitle').textContent = `Edit Balance - ${userName}`;
+            openModal('balanceModal');
+        }
+
+        function openAddBalanceModal(userId, userName, currentBalance) {
+            document.getElementById('addBalanceUserId').value = userId;
+            document.getElementById('addBalanceCurrent').value = `${currentBalance.toFixed(2)} 💎`;
+            document.getElementById('addBalanceAmount').value = '';
+            openModal('addBalanceModal');
+        }
+
+        function openCutBalanceModal(userId, userName, currentBalance) {
+            document.getElementById('cutBalanceUserId').value = userId;
+            document.getElementById('cutBalanceCurrent').value = `${currentBalance.toFixed(2)} 💎`;
+            document.getElementById('cutBalanceAmount').value = '';
+            openModal('cutBalanceModal');
+        }
+
+        function openBanUserModal(userId, userName) {
+            document.getElementById('banUserId').value = userId;
+            document.getElementById('banUserName').value = userName;
+            document.getElementById('banReason').value = '';
+            openModal('banUserModal');
+        }
+
+        // Action functions
+        async function updateUserBalance() {
+            const userId = document.getElementById('balanceUserId').value;
+            const newBalance = parseFloat(document.getElementById('newBalance').value);
+            
+            if (isNaN(newBalance) || newBalance < 0) {
+                showError('Please enter a valid balance amount');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/update_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        balance: newBalance,
+                        first_name: 'Updated via web',
+                        admin_id: 7574316340
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`Balance updated successfully for user ${userId}`);
+                    closeModal('balanceModal');
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    showError(result.message || 'Failed to update balance');
+                }
+            } catch (error) {
+                showError('Error updating balance: ' + error.message);
+            }
+        }
+
+        async function addBalance() {
+            const userId = document.getElementById('addBalanceUserId').value;
+            const amount = parseFloat(document.getElementById('addBalanceAmount').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showError('Please enter a valid amount');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add_balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        amount: amount,
+                        admin_id: 7574316340
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`Added ${amount} 💎 to user ${userId}`);
+                    closeModal('addBalanceModal');
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    showError(result.message || 'Failed to add balance');
+                }
+            } catch (error) {
+                showError('Error adding balance: ' + error.message);
+            }
+        }
+
+        async function cutBalance() {
+            const userId = document.getElementById('cutBalanceUserId').value;
+            const amount = parseFloat(document.getElementById('cutBalanceAmount').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showError('Please enter a valid amount');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/cut_balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        amount: amount,
+                        admin_id: 7574316340
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`Cut ${amount} 💎 from user ${userId}`);
+                    closeModal('cutBalanceModal');
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    showError(result.message || 'Failed to cut balance');
+                }
+            } catch (error) {
+                showError('Error cutting balance: ' + error.message);
+            }
+        }
+
+        async function banUser() {
+            const userId = document.getElementById('banUserId').value;
+            const reason = document.getElementById('banReason').value.trim();
+            
+            if (!reason) {
+                showError('Please enter a ban reason');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/ban_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        reason: reason,
+                        admin_id: 7574316340
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`User ${userId} banned successfully`);
+                    closeModal('banUserModal');
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    showError(result.message || 'Failed to ban user');
+                }
+            } catch (error) {
+                showError('Error banning user: ' + error.message);
+            }
+        }
+
+        async function unbanUser(userId) {
+            if (!confirm(`Are you sure you want to unban user ${userId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/unban_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        admin_id: 7574316340
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`User ${userId} unbanned successfully`);
+                    loadUsers();
+                    loadStatistics();
+                } else {
+                    showError(result.message || 'Failed to unban user');
+                }
+            } catch (error) {
+                showError('Error unbanning user: ' + error.message);
+            }
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.querySelector('div').textContent = message;
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.querySelector('div').textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
         }
 
         // Search functionality
@@ -230,6 +659,16 @@
                 loadStatistics();
                 loadUsers();
             }, 30000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         }
 
         // Initialize page

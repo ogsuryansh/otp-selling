@@ -217,74 +217,115 @@ app.get('/api/debug/mongodb', async (req, res) => {
 // Serve static pages
 app.get('/', (req, res) => {
     debugLog('Root route accessed');
-    try {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
-    } catch (error) {
-        debugLog('Error serving home page', error.message);
-        res.json({ 
-            message: 'OTP Bot Dashboard API',
-            pages: {
-                home: '/',
-                users: '/users',
-                admin: '/admin',
-                transactions: '/transactions',
-                statistics: '/statistics'
-            },
-            endpoints: {
-                health: '/api/health',
-                test: '/api/test',
-                users: '/api/users',
-                statistics: '/api/statistics',
-                transactions: '/api/transactions',
-                debug: {
-                    environment: '/api/debug/environment',
-                    logs: '/api/debug/logs',
-                    mongodb: '/api/debug/mongodb'
-                }
-            }
-        });
+    const indexPath = path.join(__dirname, '../public/index.html');
+    
+    // Check if file exists before sending
+    if (require('fs').existsSync(indexPath)) {
+        try {
+            res.sendFile(indexPath);
+        } catch (error) {
+            debugLog('Error serving home page', error.message);
+            serveApiInfo(res);
+        }
+    } else {
+        debugLog('Home page file not found, serving API info');
+        serveApiInfo(res);
     }
 });
 
 app.get('/users', (req, res) => {
     debugLog('Users page accessed');
-    try {
-        res.sendFile(path.join(__dirname, '../public/users.html'));
-    } catch (error) {
-        debugLog('Error serving users page', error.message);
-        res.status(500).json({ error: 'Failed to load users page' });
+    const usersPath = path.join(__dirname, '../public/users.html');
+    
+    if (require('fs').existsSync(usersPath)) {
+        try {
+            res.sendFile(usersPath);
+        } catch (error) {
+            debugLog('Error serving users page', error.message);
+            res.status(500).json({ error: 'Failed to load users page' });
+        }
+    } else {
+        debugLog('Users page file not found');
+        res.status(404).json({ error: 'Users page not found' });
     }
 });
 
 app.get('/admin', (req, res) => {
     debugLog('Admin page accessed');
-    try {
-        res.sendFile(path.join(__dirname, '../admin_panel.html'));
-    } catch (error) {
-        debugLog('Error serving admin page', error.message);
-        res.status(500).json({ error: 'Failed to load admin page' });
+    const adminPath = path.join(__dirname, '../admin_panel.html');
+    
+    if (require('fs').existsSync(adminPath)) {
+        try {
+            res.sendFile(adminPath);
+        } catch (error) {
+            debugLog('Error serving admin page', error.message);
+            res.status(500).json({ error: 'Failed to load admin page' });
+        }
+    } else {
+        debugLog('Admin page file not found');
+        res.status(404).json({ error: 'Admin page not found' });
     }
 });
 
 app.get('/transactions', (req, res) => {
     debugLog('Transactions page accessed');
-    try {
-        res.sendFile(path.join(__dirname, '../public/transactions.html'));
-    } catch (error) {
-        debugLog('Error serving transactions page', error.message);
-        res.status(500).json({ error: 'Failed to load transactions page' });
+    const transactionsPath = path.join(__dirname, '../public/transactions.html');
+    
+    if (require('fs').existsSync(transactionsPath)) {
+        try {
+            res.sendFile(transactionsPath);
+        } catch (error) {
+            debugLog('Error serving transactions page', error.message);
+            res.status(500).json({ error: 'Failed to load transactions page' });
+        }
+    } else {
+        debugLog('Transactions page file not found');
+        res.status(404).json({ error: 'Transactions page not found' });
     }
 });
 
 app.get('/statistics', (req, res) => {
     debugLog('Statistics page accessed');
-    try {
-        res.sendFile(path.join(__dirname, '../public/statistics.html'));
-    } catch (error) {
-        debugLog('Error serving statistics page', error.message);
-        res.status(500).json({ error: 'Failed to load statistics page' });
+    const statisticsPath = path.join(__dirname, '../public/statistics.html');
+    
+    if (require('fs').existsSync(statisticsPath)) {
+        try {
+            res.sendFile(statisticsPath);
+        } catch (error) {
+            debugLog('Error serving statistics page', error.message);
+            res.status(500).json({ error: 'Failed to load statistics page' });
+        }
+    } else {
+        debugLog('Statistics page file not found');
+        res.status(404).json({ error: 'Statistics page not found' });
     }
 });
+
+// Helper function to serve API info
+function serveApiInfo(res) {
+    res.json({ 
+        message: 'OTP Bot Dashboard API',
+        pages: {
+            home: '/',
+            users: '/users',
+            admin: '/admin',
+            transactions: '/transactions',
+            statistics: '/statistics'
+        },
+        endpoints: {
+            health: '/api/health',
+            test: '/api/test',
+            users: '/api/users',
+            statistics: '/api/statistics',
+            transactions: '/api/transactions',
+            debug: {
+                environment: '/api/debug/environment',
+                logs: '/api/debug/logs',
+                mongodb: '/api/debug/mongodb'
+            }
+        }
+    });
+}
 
 app.get('/api/users', async (req, res) => {
     try {

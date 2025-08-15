@@ -328,34 +328,38 @@
     <script>
         // 🔧 EMBEDDED ADMIN CONFIGURATION (NO EXTERNAL FILES NEEDED)
         // ⚠️ IMPORTANT: Update these credentials for production!
-        const ADMIN_CONFIG = {
+        let ADMIN_CONFIG = {
             credentials: {
-                username: 'YOUR_ADMIN_USERNAME', // Change this!
-                password: 'YOUR_ADMIN_PASSWORD', // Change this!
-                admin_id: 'YOUR_ADMIN_ID' // Change this!
+                username: 'admin', // Default fallback
+                password: 'admin123', // Default fallback
+                admin_id: '7574316340' // Default fallback
             },
             security: {
                 sessionTimeout: 24 * 60 * 60 * 1000 // 24 hours
             }
         };
 
-        // 🔐 PRODUCTION CREDENTIALS LOADING (Optional)
-        // Uncomment and configure if using environment variables
-        /*
+        // 🔐 PRODUCTION CREDENTIALS LOADING
         async function loadCredentialsFromEnv() {
             try {
-                // This would work with a backend API that provides credentials
+                logDebug('Loading credentials from environment...');
                 const response = await fetch('/api/admin/credentials');
                 if (response.ok) {
                     const envCredentials = await response.json();
-                    ADMIN_CONFIG.credentials = envCredentials;
-                    logDebug('Credentials loaded from environment');
+                    ADMIN_CONFIG = envCredentials;
+                    logDebug('Credentials loaded from environment successfully');
+                    logDebug(`Username: ${ADMIN_CONFIG.username}, Admin ID: ${ADMIN_CONFIG.admin_id}`);
+                } else {
+                    logDebug('Failed to load credentials from API, using defaults', 'warning');
                 }
             } catch (error) {
-                logDebug('Using embedded credentials (fallback)', 'warning');
+                logDebug('Error loading credentials from API, using defaults', 'warning');
+                logDebug(`Error: ${error.message}`, 'error');
             }
         }
-        */
+
+        // Load credentials on page load
+        loadCredentialsFromEnv();
 
         // 🐛 DEBUG SYSTEM
         let debugMode = false;
@@ -431,15 +435,15 @@
         function authenticateUser(username, password) {
             logDebug(`Attempting authentication for user: ${username}`);
             
-            if (username === ADMIN_CONFIG.credentials.username && 
-                password === ADMIN_CONFIG.credentials.password) {
+            if (username === ADMIN_CONFIG.username && 
+                password === ADMIN_CONFIG.password) {
                 
                 logDebug('Authentication successful, generating token');
                 
                 // Generate secure token
                 const tokenData = {
                     username: username,
-                    admin_id: ADMIN_CONFIG.credentials.admin_id,
+                    admin_id: ADMIN_CONFIG.admin_id,
                     timestamp: Date.now(),
                     expires: Date.now() + ADMIN_CONFIG.security.sessionTimeout
                 };
@@ -451,6 +455,7 @@
                 return true;
             } else {
                 logDebug('Authentication failed: invalid credentials', 'error');
+                logDebug(`Expected: ${ADMIN_CONFIG.username}, Got: ${username}`, 'error');
                 return false;
             }
         }

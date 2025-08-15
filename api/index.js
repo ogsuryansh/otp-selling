@@ -1279,6 +1279,32 @@ async function testApiConfiguration(api) {
     }
 }
 
+// Admin credentials endpoint (for frontend authentication)
+app.get('/api/admin/credentials', (req, res) => {
+    debugLog('Admin credentials endpoint called');
+    
+    // Return admin credentials from environment variables
+    const adminCredentials = {
+        username: process.env.ADMIN_USERNAME || 'admin',
+        password: process.env.ADMIN_PASSWORD || 'admin123',
+        admin_id: process.env.ADMIN_ID || '7574316340',
+        security: {
+            maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5,
+            lockoutDuration: parseInt(process.env.LOCKOUT_DURATION) || 15 * 60 * 1000,
+            sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 24 * 60 * 60 * 1000,
+            require2FA: process.env.REQUIRE_2FA === 'true' || false
+        }
+    };
+    
+    debugLog('Admin credentials loaded from environment', { 
+        username: adminCredentials.username,
+        hasPassword: !!adminCredentials.password,
+        admin_id: adminCredentials.admin_id
+    });
+    
+    res.json(adminCredentials);
+});
+
 app.use((err, req, res, next) => {
     debugLog('Unhandled error occurred', { 
         error: err.message, 

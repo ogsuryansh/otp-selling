@@ -4,17 +4,17 @@
 const ADMIN_CONFIG = {
     // Admin credentials (CHANGE THESE IN PRODUCTION!)
     credentials: {
-        username: 'admin',
-        password: 'admin123',
-        admin_id: '7574316340'
+        username: process.env.ADMIN_USERNAME || 'admin',
+        password: process.env.ADMIN_PASSWORD || 'admin123',
+        admin_id: process.env.ADMIN_ID || '7574316340'
     },
     
     // Security settings
     security: {
-        maxLoginAttempts: 5,
-        lockoutDuration: 15 * 60 * 1000, // 15 minutes
-        sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
-        require2FA: false // Set to true to enable 2FA
+        maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5,
+        lockoutDuration: parseInt(process.env.LOCKOUT_DURATION) || 15 * 60 * 1000, // 15 minutes
+        sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 24 * 60 * 60 * 1000, // 24 hours
+        require2FA: process.env.REQUIRE_2FA === 'true' || false // Set to true to enable 2FA
     },
     
     // API endpoints

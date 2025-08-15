@@ -3,257 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Bot Dashboard</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="responsive.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#667eea',
-                        secondary: '#764ba2',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Redirecting to Admin Panel...</title>
+    <meta http-equiv="refresh" content="0; url=admin_fixed.html">
     <style>
-        .glass {
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .redirect-box {
             background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
-        
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.5rem;
-            }
-            
-            .glass {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .stats-grid > div {
-                padding: 1rem 0.5rem;
-            }
-            
-            .stats-grid .text-2xl {
-                font-size: 1.25rem;
-            }
-            
-            .stats-grid .text-sm {
-                font-size: 0.75rem;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .features-grid {
-                gap: 0.75rem;
-            }
+        .manual-link {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
         }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 0.25rem;
-            }
-            
-            .glass {
-                padding: 0.75rem;
-            }
-            
-            .stats-grid > div {
-                padding: 0.75rem 0.5rem;
-            }
+        .manual-link:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-gray-800">
-    <div class="container mx-auto px-4 py-6 max-w-6xl">
-        <!-- Header -->
-        <div class="glass rounded-2xl p-6 mb-8 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">🤖 OTP Bot Dashboard</h1>
-            <p class="text-gray-200 mb-6">Manage your OTP bot system efficiently</p>
-            
-            <!-- Navigation -->
-            <div class="flex flex-wrap justify-center gap-3">
-                <a href="/users" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    👥 Users
-                </a>
-                <a href="/admin" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    ⚙️ Admin
-                </a>
-                <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    💳 Transactions
-                </a>
-                <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🖥️ Servers
-                </a>
-            </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stats-grid">
-            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/users'">
-                <div class="text-2xl mb-2">👥</div>
-                <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
-                <div class="text-gray-300 text-sm">Total Users</div>
-            </div>
-            
-            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/statistics'">
-                <div class="text-2xl mb-2">✅</div>
-                <div class="text-2xl font-bold text-white" id="activeUsers">-</div>
-                <div class="text-gray-300 text-sm">Active Users</div>
-            </div>
-            
-            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/transactions'">
-                <div class="text-2xl mb-2">💳</div>
-                <div class="text-2xl font-bold text-white" id="totalTransactions">-</div>
-                <div class="text-gray-300 text-sm">Transactions</div>
-            </div>
-            
-            <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.location.href='/statistics'">
-                <div class="text-2xl mb-2">💰</div>
-                <div class="text-2xl font-bold text-white" id="totalBalance">-</div>
-                <div class="text-gray-300 text-sm">Total Balance</div>
-            </div>
-        </div>
-
-        <!-- Features Grid -->
-        <div class="grid md:grid-cols-2 gap-6 mb-8 features-grid">
-            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="text-3xl mr-3">👥</div>
-                    <h3 class="text-xl font-semibold text-white">User Management</h3>
-                </div>
-                <p class="text-gray-300 text-sm mb-4">View and manage all user accounts, balances, and status</p>
-                <a href="/users" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
-                    View Users →
-                </a>
-            </div>
-            
-            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="text-3xl mr-3">⚙️</div>
-                    <h3 class="text-xl font-semibold text-white">Admin Panel</h3>
-                </div>
-                <p class="text-gray-300 text-sm mb-4">Full administrative control and system management</p>
-                <a href="/admin" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
-                    Access Admin →
-                </a>
-            </div>
-            
-            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="text-3xl mr-3">💳</div>
-                    <h3 class="text-xl font-semibold text-white">Transactions</h3>
-                </div>
-                <p class="text-gray-300 text-sm mb-4">Complete transaction history with filtering and search</p>
-                <a href="/transactions" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
-                    View Transactions →
-                </a>
-            </div>
-            
-            <div class="glass rounded-xl p-6 hover:scale-105 transition-transform duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="text-3xl mr-3">🖥️</div>
-                    <h3 class="text-xl font-semibold text-white">Server Management</h3>
-                </div>
-                <p class="text-gray-300 text-sm mb-4">Manage and monitor your OTP bot servers</p>
-                <a href="/servers" class="inline-block bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors">
-                    Manage Servers →
-                </a>
-            </div>
-        </div>
-
-        <!-- System Status -->
-        <div class="glass rounded-xl p-6 text-center">
-            <h3 class="text-xl font-semibold text-white mb-4">System Status</h3>
-            <div id="statusIndicator" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 text-green-300 mb-3">
-                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span class="text-sm font-medium">System Online</span>
-            </div>
-            <p class="text-gray-300 text-sm" id="statusDetails">All systems operational • Database connected • API responding</p>
-        </div>
+<body>
+    <div class="redirect-box">
+        <h1>🔄 Redirecting...</h1>
+        <div class="spinner"></div>
+        <p>Taking you to the admin panel...</p>
+        <p>If you're not redirected automatically, click below:</p>
+        <a href="admin_fixed.html" class="manual-link">🚀 Go to Admin Panel</a>
     </div>
 
     <script>
-        // Load quick statistics
-        async function loadQuickStats() {
-            try {
-                const response = await fetch('/api/statistics');
-                const stats = await response.json();
-                
-                document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
-                document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
-                document.getElementById('totalBalance').textContent = `${(stats.totalBalance || 0).toFixed(2)} 💎`;
-                document.getElementById('totalTransactions').textContent = stats.totalTransactions || 0;
-            } catch (error) {
-                console.error('Error loading quick stats:', error);
-            }
-        }
-
-        // Check system status
-        async function checkSystemStatus() {
-            try {
-                const response = await fetch('/api/health');
-                const health = await response.json();
-                
-                const statusIndicator = document.getElementById('statusIndicator');
-                const statusDetails = document.getElementById('statusDetails');
-                
-                if (health.status === 'OK') {
-                    statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 text-green-300 mb-3';
-                    statusIndicator.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Online</span>';
-                    statusDetails.textContent = 'All systems operational • Database connected • API responding';
-                } else {
-                    statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 text-red-300 mb-3';
-                    statusIndicator.innerHTML = '<div class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Offline</span>';
-                    statusDetails.textContent = 'Some systems may be experiencing issues';
-                }
-            } catch (error) {
-                console.error('Error checking system status:', error);
-                const statusIndicator = document.getElementById('statusIndicator');
-                const statusDetails = document.getElementById('statusDetails');
-                
-                statusIndicator.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 text-red-300 mb-3';
-                statusIndicator.innerHTML = '<div class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div><span class="text-sm font-medium">System Offline</span>';
-                statusDetails.textContent = 'Unable to connect to system services';
-            }
-        }
-
-        // Auto-refresh every 30 seconds
-        function startAutoRefresh() {
-            setInterval(() => {
-                loadQuickStats();
-                checkSystemStatus();
-            }, 30000);
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            loadQuickStats();
-            checkSystemStatus();
-            startAutoRefresh();
-        });
+        // Auto-redirect immediately
+        window.location.href = 'admin_fixed.html';
     </script>
 </body>
 </html>

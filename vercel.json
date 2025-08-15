@@ -1,60 +1,47 @@
 {
   "version": 2,
-  "name": "otp-bot-admin-panel",
   "builds": [
     {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/",
-      "dest": "/admin_fixed.html"
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/users",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/transactions",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/servers",
+      "dest": "/api/index.js"
     },
     {
       "src": "/admin",
       "dest": "/admin_fixed.html"
     },
     {
-      "src": "/admin-panel",
+      "src": "/",
       "dest": "/admin_fixed.html"
     },
     {
-      "src": "/login",
-      "dest": "/admin_fixed.html"
+      "src": "/debug-dashboard.html",
+      "dest": "/debug-dashboard.html"
     },
     {
-      "src": "/dashboard",
-      "dest": "/admin_fixed.html"
-    },
-    {
-      "src": "/users",
-      "dest": "/admin_fixed.html"
-    },
-    {
-      "src": "/transactions",
-      "dest": "/admin_fixed.html"
-    },
-    {
-      "src": "/servers",
-      "dest": "/admin_fixed.html"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "src": "/admin_panel.html",
+      "dest": "/admin_panel.html"
     }
   ],
   "headers": [

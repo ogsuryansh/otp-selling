@@ -74,11 +74,11 @@ vercel
 4. Configure DNS records as instructed
 
 ### **3.2 Route Configuration**
-The `vercel.json` file is already configured to:
-- Redirect `/` to admin panel
-- Redirect `/admin` to admin panel
-- Handle all navigation routes
-- Serve static files
+The `vercel.json` file is configured to:
+- **`/` (main domain)** → `admin_fixed.html` (admin panel)
+- **`/admin`** → `admin_fixed.html` (admin panel)
+- **API routes** → `api/index.js`
+- **Static files** → served directly
 
 ## 🔐 **Step 4: Security Configuration**
 
@@ -92,26 +92,26 @@ The `vercel.json` file is already configured to:
    ADMIN_ID=your_id
    ```
 
-### **4.2 Security Headers**
-Already configured in `vercel.json`:
-- XSS Protection
-- Content Type Options
-- Frame Options
-- Referrer Policy
+### **4.2 Security Features**
+- ✅ No default credentials displayed
+- ✅ Secure session management
+- ✅ XSS protection ready
+- ✅ CSRF protection ready
 
 ## 📱 **Step 5: Test Your Deployment**
 
 ### **5.1 Test URLs**
-- **Main Domain:** `https://your-domain.vercel.app/`
-- **Admin Panel:** `https://your-domain.vercel.app/admin`
+- **Main Domain:** `https://your-domain.vercel.app/` → Admin Panel
+- **Admin Panel:** `https://your-domain.vercel.app/admin` → Admin Panel
 - **Direct Access:** `https://your-domain.vercel.app/admin_fixed.html`
 
 ### **5.2 Test Features**
-1. ✅ Login with your credentials
-2. ✅ Navigate between sections
-3. ✅ Test logout functionality
-4. ✅ Check mobile responsiveness
-5. ✅ Verify debug panel works
+1. ✅ Main domain redirects to admin panel
+2. ✅ Login with your credentials
+3. ✅ Navigate between sections
+4. ✅ Test logout functionality
+5. ✅ Check mobile responsiveness
+6. ✅ Verify debug panel works
 
 ## 🔧 **Step 6: Monitoring & Maintenance**
 
@@ -130,8 +130,8 @@ Already configured in `vercel.json`:
 - [ ] ✅ Default credentials removed
 - [ ] ✅ Strong passwords set
 - [ ] ✅ HTTPS enabled
-- [ ] ✅ Security headers configured
-- [ ] ✅ Environment variables set
+- [ ] ✅ Main domain redirects to admin panel
+- [ ] ✅ Environment variables set (optional)
 - [ ] ✅ Access logging enabled
 - [ ] ✅ Regular credential rotation planned
 
@@ -155,26 +155,29 @@ your-domain.vercel.app/
 1. **404 Errors:**
    - Check `vercel.json` routes
    - Verify file paths
+   - Ensure `api/index.js` exists
 
 2. **Login Not Working:**
    - Check credentials in `admin_fixed.html`
    - Verify environment variables
 
-3. **Styling Issues:**
-   - Check CSS embedding
-   - Verify responsive design
+3. **Main Domain Not Working:**
+   - Check `vercel.json` route for `/`
+   - Verify `index.html` exists
+   - Check deployment logs
 
 4. **Deployment Failures:**
    - Check build logs
    - Verify file structure
+   - Ensure `api/index.js` is present
 
 ## 🎯 **Next Steps After Deployment**
 
-1. **Set up monitoring** for your admin panel
-2. **Configure alerts** for failed login attempts
-3. **Set up backup** for your credentials
-4. **Plan regular** security audits
-5. **Document access** procedures for your team
+1. **Test main domain** redirects to admin panel
+2. **Set up monitoring** for your admin panel
+3. **Configure alerts** for failed login attempts
+4. **Set up backup** for your credentials
+5. **Plan regular** security audits
 
 ---
 
@@ -182,9 +185,10 @@ your-domain.vercel.app/
 
 Your admin panel is now:
 - ✅ **Production-ready** with Vercel
-- ✅ **Secure** with proper headers
-- ✅ **Accessible** from main domain
-- ✅ **Protected** without default credentials
+- ✅ **Main domain opens admin panel**
+- ✅ **Secure** without default credentials
+- ✅ **Accessible** from root URL
 - ✅ **Scalable** for future growth
 
 **Live URL:** `https://your-domain.vercel.app/`
+**Admin Panel:** `https://your-domain.vercel.app/admin`

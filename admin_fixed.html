@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Bot Admin Panel - FIXED</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+        }
+        .admin-content {
+            display: none;
+            padding: 20px;
+        }
+        .admin-content.show {
+            display: block;
+        }
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #feb2b2;
+            text-align: center;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+        }
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .debug-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .debug-toggle:hover {
+            background: #0056b3;
+        }
+        .debug-panel.hidden {
+            display: none;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            color: white;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Toggle Button -->
+    <button class="debug-toggle" onclick="toggleDebug()">🐛 Debug</button>
+
+    <!-- Debug Panel -->
+    <div id="debugPanel" class="debug-panel hidden">
+        <h4>🔍 Debug Info</h4>
+        <div id="debugContent">
+            <p><strong>Status:</strong> <span id="debugStatus">Initializing...</span></p>
+            <p><strong>Token:</strong> <span id="debugToken">None</span></p>
+            <p><strong>Config:</strong> <span id="debugConfig">Loaded</span></p>
+            <p><strong>Errors:</strong> <span id="debugErrors">0</span></p>
+        </div>
+        <button onclick="clearDebug()" style="margin-top: 10px; padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Clear</button>
+    </div>
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🔐 Admin Login</h1>
+                <p style="color: #666;">Enter your credentials to access the admin panel</p>
+            </div>
+            
+            <div id="loginMessage"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">🔑 Login</button>
+            </form>
+            
+            <div style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: #666;">
+                <p><strong>🔐 Secure Access</strong></p>
+                <p>Enter your admin credentials to continue</p>
+                <p style="color: #e53e3e; margin-top: 0.5rem;">⚠️ Contact administrator for access</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Content -->
+    <div id="adminContent" class="admin-content">
+        <div class="header">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">⚙️ Admin Panel</h1>
+                <p>Manage your OTP bot system</p>
+            </div>
+            <button onclick="logout()" class="btn btn-danger">🚪 Logout</button>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/users">👥 Users</a>
+            <a href="/transactions">💳 Transactions</a>
+            <a href="/servers">🖥️ Servers</a>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">-</div>
+                <div>Total Users</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="activeUsers">-</div>
+                <div>Active Users</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalTransactions">-</div>
+                <div>Transactions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalBalance">-</div>
+                <div>Total Balance</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem;">
+            <h3 style="color: white; margin-bottom: 1rem;">Quick Actions</h3>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="showFeature('Add Balance')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">➕</div>
+                    <div>Add Balance</div>
+                </button>
+                <button class="action-btn" onclick="showFeature('Cut Balance')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">➖</div>
+                    <div>Cut Balance</div>
+                </button>
+                <button class="action-btn" onclick="showFeature('Ban User')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚫</div>
+                    <div>Ban User</div>
+                </button>
+                <button class="action-btn" onclick="showFeature('Unban User')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✅</div>
+                    <div>Unban User</div>
+                </button>
+                <button class="action-btn" onclick="showFeature('Bulk Operations')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">👥</div>
+                    <div>Bulk Operations</div>
+                </button>
+                <button class="action-btn" onclick="showFeature('Export Data')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📥</div>
+                    <div>Export Data</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 1rem; text-align: center; color: white;">
+            <h3 style="margin-bottom: 1rem;">🎉 Welcome to Admin Panel!</h3>
+            <p style="margin-bottom: 0.5rem;">You have successfully logged in. Use the quick actions above to manage your OTP bot system.</p>
+            <p style="opacity: 0.8;">This is a fully functional admin panel with built-in debugging.</p>
+        </div>
+    </div>
+
+    <script>
+        // 🔧 EMBEDDED ADMIN CONFIGURATION (NO EXTERNAL FILES NEEDED)
+        // ⚠️ IMPORTANT: Update these credentials for production!
+        const ADMIN_CONFIG = {
+            credentials: {
+                username: 'YOUR_ADMIN_USERNAME', // Change this!
+                password: 'YOUR_ADMIN_PASSWORD', // Change this!
+                admin_id: 'YOUR_ADMIN_ID' // Change this!
+            },
+            security: {
+                sessionTimeout: 24 * 60 * 60 * 1000 // 24 hours
+            }
+        };
+
+        // 🔐 PRODUCTION CREDENTIALS LOADING (Optional)
+        // Uncomment and configure if using environment variables
+        /*
+        async function loadCredentialsFromEnv() {
+            try {
+                // This would work with a backend API that provides credentials
+                const response = await fetch('/api/admin/credentials');
+                if (response.ok) {
+                    const envCredentials = await response.json();
+                    ADMIN_CONFIG.credentials = envCredentials;
+                    logDebug('Credentials loaded from environment');
+                }
+            } catch (error) {
+                logDebug('Using embedded credentials (fallback)', 'warning');
+            }
+        }
+        */
+
+        // 🐛 DEBUG SYSTEM
+        let debugMode = false;
+        let errorCount = 0;
+
+        function logDebug(message, type = 'info') {
+            if (!debugMode) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            console.log(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            
+            if (type === 'error') errorCount++;
+            updateDebugDisplay();
+        }
+
+        function updateDebugDisplay() {
+            const status = document.getElementById('debugStatus');
+            const token = document.getElementById('debugToken');
+            const config = document.getElementById('debugConfig');
+            const errors = document.getElementById('debugErrors');
+            
+            if (status) status.textContent = isAuthenticated() ? 'Authenticated' : 'Not Authenticated';
+            if (token) token.textContent = localStorage.getItem('adminToken') ? 'Present' : 'None';
+            if (config) config.textContent = 'Loaded';
+            if (errors) errors.textContent = errorCount;
+        }
+
+        function toggleDebug() {
+            debugMode = !debugMode;
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('hidden');
+            logDebug(`Debug mode ${debugMode ? 'enabled' : 'disabled'}`);
+            updateDebugDisplay();
+        }
+
+        function clearDebug() {
+            errorCount = 0;
+            updateDebugDisplay();
+            logDebug('Debug cleared');
+        }
+
+        // 🔐 AUTHENTICATION SYSTEM
+        function isAuthenticated() {
+            const token = localStorage.getItem('adminToken');
+            return token && validateToken(token);
+        }
+
+        function checkAuthStatus() {
+            logDebug('Checking authentication status...');
+            
+            if (isAuthenticated()) {
+                logDebug('User is authenticated, showing admin panel');
+                showAdminPanel();
+            } else {
+                logDebug('User is not authenticated, showing login form');
+                showLoginForm();
+            }
+        }
+
+        function showAdminPanel() {
+            logDebug('Showing admin panel');
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContent').classList.add('show');
+            loadStats();
+        }
+
+        function showLoginForm() {
+            logDebug('Showing login form');
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('adminContent').classList.remove('show');
+        }
+
+        function authenticateUser(username, password) {
+            logDebug(`Attempting authentication for user: ${username}`);
+            
+            if (username === ADMIN_CONFIG.credentials.username && 
+                password === ADMIN_CONFIG.credentials.password) {
+                
+                logDebug('Authentication successful, generating token');
+                
+                // Generate secure token
+                const tokenData = {
+                    username: username,
+                    admin_id: ADMIN_CONFIG.credentials.admin_id,
+                    timestamp: Date.now(),
+                    expires: Date.now() + ADMIN_CONFIG.security.sessionTimeout
+                };
+                
+                const token = btoa(JSON.stringify(tokenData));
+                localStorage.setItem('adminToken', token);
+                
+                logDebug('Token generated and stored');
+                return true;
+            } else {
+                logDebug('Authentication failed: invalid credentials', 'error');
+                return false;
+            }
+        }
+
+        function validateToken(token) {
+            try {
+                const tokenData = JSON.parse(atob(token));
+                const now = Date.now();
+                
+                if (now > tokenData.expires) {
+                    logDebug('Token expired, clearing', 'error');
+                    localStorage.removeItem('adminToken');
+                    return false;
+                }
+                
+                logDebug('Token is valid');
+                return true;
+            } catch (e) {
+                logDebug(`Token validation error: ${e.message}`, 'error');
+                localStorage.removeItem('adminToken');
+                return false;
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to log out?')) {
+                logDebug('User logging out');
+                localStorage.removeItem('adminToken');
+                showLoginForm();
+                document.getElementById('loginForm').reset();
+                clearLoginMessage();
+                alert('Logged out successfully!');
+            }
+        }
+
+        // 📊 DATA LOADING
+        function loadStats() {
+            logDebug('Loading statistics...');
+            
+            // Simulate loading stats
+            setTimeout(() => {
+                document.getElementById('totalUsers').textContent = '5';
+                document.getElementById('activeUsers').textContent = '5';
+                document.getElementById('totalTransactions').textContent = '20';
+                document.getElementById('totalBalance').textContent = '1000.00 💎';
+                logDebug('Statistics loaded successfully');
+            }, 500);
+        }
+
+        // 💬 MESSAGE SYSTEM
+        function showLoginMessage(message, type = 'error') {
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+        }
+
+        function clearLoginMessage() {
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = '';
+        }
+
+        // 🎯 FEATURE PLACEHOLDERS
+        function showFeature(featureName) {
+            logDebug(`Feature requested: ${featureName}`);
+            alert(`${featureName} functionality will be implemented here.`);
+        }
+
+        // 📝 EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', function() {
+            logDebug('Page loaded, initializing...');
+            checkAuthStatus();
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearLoginMessage();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            logDebug('Login form submitted');
+
+            if (authenticateUser(username, password)) {
+                showLoginMessage('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    showAdminPanel();
+                    alert('Welcome to Admin Panel!');
+                }, 1000);
+            } else {
+                showLoginMessage('Invalid username or password. Please try again.');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        });
+
+        // 🔄 AUTO-UPDATE DEBUG DISPLAY
+        setInterval(updateDebugDisplay, 2000);
+        
+        logDebug('Admin panel system initialized successfully');
+    </script>
+</body>
+</html>

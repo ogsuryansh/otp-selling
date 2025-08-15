@@ -1,0 +1,32 @@
+# 🔐 OTP Bot Admin Panel Environment Variables
+# Copy this file to .env and fill in your values
+
+# Admin Panel Credentials (REQUIRED - CHANGE THESE!)
+ADMIN_USERNAME=your_admin_username
+ADMIN_PASSWORD=your_secure_password_here
+ADMIN_ID=your_admin_id_here
+
+# Security Settings
+MAX_LOGIN_ATTEMPTS=5
+LOCKOUT_DURATION=900000
+SESSION_TIMEOUT=86400000
+REQUIRE_2FA=false
+
+# MongoDB Connection (if using backend)
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/otp_bot?retryWrites=true&w=majority
+MONGODB_DATABASE=otp_bot
+MONGODB_COLLECTION=users
+
+# Production Settings
+NODE_ENV=production
+DEBUG=false
+
+# ⚠️ IMPORTANT SECURITY NOTES:
+# 1. NEVER commit .env files to version control
+# 2. Use strong, unique passwords (12+ characters, mixed case, numbers, symbols)
+# 3. Change default credentials immediately
+# 4. Use different credentials for dev/staging/production
+# 5. Regularly rotate your credentials
+# 6. Monitor login attempts
+# 7. Use HTTPS in production
+# 8. Set up proper firewall rules

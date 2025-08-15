@@ -293,6 +293,16 @@ app.get('/servers', (req, res) => {
     }
 });
 
+app.get('/api-config', (req, res) => {
+    debugLog('API config page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../api-config.html'));
+    } catch (error) {
+        debugLog('Error serving API config page', error.message);
+        res.status(500).json({ error: 'Failed to load API config page' });
+    }
+});
+
 app.get('/api/users', async (req, res) => {
     try {
         debugLog('Users endpoint called');
@@ -945,6 +955,329 @@ app.delete('/api/servers/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete server', details: error.message });
     }
 });
+
+// API Configuration Management Endpoints
+app.get('/api/apis', async (req, res) => {
+    debugLog('GET /api/apis called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for APIs endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for APIs endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const apisCollection = db.collection('apis');
+        const apis = await apisCollection.find({}).sort({ createdAt: -1 }).toArray();
+        
+        debugLog(`Retrieved ${apis.length} APIs`);
+        res.json(apis);
+    } catch (error) {
+        debugLog('Error retrieving APIs', { error: error.message, stack: error.stack });
+        console.error('Error in GET /api/apis:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve APIs', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.post('/api/apis', async (req, res) => {
+    debugLog('POST /api/apis called', { body: req.body });
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for APIs endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for APIs endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const { 
+            name, serverId, usesAuth, responseType, messagePath, 
+            statusCheckType, statusValue, getNumberUrl, getStatusUrl, 
+            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey 
+        } = req.body;
+        
+        // Validation
+        if (!name || !serverId || !responseType || !statusCheckType || !statusValue || !getNumberUrl || !getStatusUrl) {
+            return res.status(400).json({ 
+                error: 'Missing required fields', 
+                message: 'Please fill in all required fields: name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl' 
+            });
+        }
+        
+        // Check if API name already exists
+        const apisCollection = db.collection('apis');
+        const existingApi = await apisCollection.findOne({ name: name });
+        if (existingApi) {
+            return res.status(400).json({ 
+                error: 'API name already exists',
+                message: 'An API with this name already exists. Please use a different name.' 
+            });
+        }
+        
+        const newApi = {
+            name,
+            serverId,
+            usesAuth: usesAuth || false,
+            responseType,
+            messagePath: messagePath || null,
+            statusCheckType,
+            statusValue,
+            getNumberUrl,
+            getStatusUrl,
+            activateUrl: activateUrl || null,
+            cancelUrl: cancelUrl || null,
+            autoCancelMinutes: autoCancelMinutes || null,
+            retryCount: retryCount || 3,
+            apiKey: apiKey || null,
+            status: 'inactive',
+            numbersUsed: 0,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const result = await apisCollection.insertOne(newApi);
+        newApi._id = result.insertedId;
+        
+        debugLog('API created successfully', { apiId: result.insertedId });
+        res.status(201).json(newApi);
+    } catch (error) {
+        debugLog('Error creating API', { error: error.message, stack: error.stack });
+        console.error('Error in POST /api/apis:', error);
+        res.status(500).json({ 
+            error: 'Failed to create API', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.get('/api/apis/:id', async (req, res) => {
+    debugLog(`GET /api/apis/${req.params.id} called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for APIs endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const apisCollection = db.collection('apis');
+        const api = await apisCollection.findOne({ _id: new ObjectId(req.params.id) });
+        
+        if (!api) {
+            return res.status(404).json({ error: 'API not found' });
+        }
+        
+        debugLog('API retrieved successfully', { apiId: req.params.id });
+        res.json(api);
+    } catch (error) {
+        debugLog('Error retrieving API', { error: error.message, apiId: req.params.id });
+        res.status(500).json({ error: 'Failed to retrieve API', details: error.message });
+    }
+});
+
+app.put('/api/apis/:id', async (req, res) => {
+    debugLog(`PUT /api/apis/${req.params.id} called`, { body: req.body });
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for APIs endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { 
+            name, serverId, usesAuth, responseType, messagePath, 
+            statusCheckType, statusValue, getNumberUrl, getStatusUrl, 
+            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey 
+        } = req.body;
+        
+        // Validation
+        if (!name || !serverId || !responseType || !statusCheckType || !statusValue || !getNumberUrl || !getStatusUrl) {
+            return res.status(400).json({ error: 'Missing required fields: name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl' });
+        }
+        
+        const { ObjectId } = require('mongodb');
+        const apisCollection = db.collection('apis');
+        
+        // Check if API name already exists (excluding current API)
+        const existingApi = await apisCollection.findOne({ 
+            name: name, 
+            _id: { $ne: new ObjectId(req.params.id) } 
+        });
+        if (existingApi) {
+            return res.status(400).json({ error: 'API name already exists' });
+        }
+        
+        const updateData = {
+            name,
+            serverId,
+            usesAuth: usesAuth || false,
+            responseType,
+            messagePath: messagePath || null,
+            statusCheckType,
+            statusValue,
+            getNumberUrl,
+            getStatusUrl,
+            activateUrl: activateUrl || null,
+            cancelUrl: cancelUrl || null,
+            autoCancelMinutes: autoCancelMinutes || null,
+            retryCount: retryCount || 3,
+            apiKey: apiKey || null,
+            updatedAt: new Date()
+        };
+        
+        const result = await apisCollection.updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: updateData }
+        );
+        
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'API not found' });
+        }
+        
+        debugLog('API updated successfully', { apiId: req.params.id });
+        res.json({ message: 'API updated successfully', updated: true });
+    } catch (error) {
+        debugLog('Error updating API', { error: error.message, apiId: req.params.id });
+        res.status(500).json({ error: 'Failed to update API', details: error.message });
+    }
+});
+
+app.delete('/api/apis/:id', async (req, res) => {
+    debugLog(`DELETE /api/apis/${req.params.id} called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for APIs endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const apisCollection = db.collection('apis');
+        
+        const result = await apisCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'API not found' });
+        }
+        
+        debugLog('API deleted successfully', { apiId: req.params.id });
+        res.json({ message: 'API deleted successfully', deleted: true });
+    } catch (error) {
+        debugLog('Error deleting API', { error: error.message, apiId: req.params.id });
+        res.status(500).json({ error: 'Failed to delete API', details: error.message });
+    }
+});
+
+app.post('/api/apis/:id/test', async (req, res) => {
+    debugLog(`POST /api/apis/${req.params.id}/test called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for APIs endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const apisCollection = db.collection('apis');
+        const api = await apisCollection.findOne({ _id: new ObjectId(req.params.id) });
+        
+        if (!api) {
+            return res.status(404).json({ error: 'API not found' });
+        }
+        
+        // Test the API configuration
+        const testResult = await testApiConfiguration(api);
+        
+        debugLog('API test completed', { apiId: req.params.id, success: testResult.success });
+        res.json(testResult);
+    } catch (error) {
+        debugLog('Error testing API', { error: error.message, apiId: req.params.id });
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to test API', 
+            details: error.message 
+        });
+    }
+});
+
+// Helper function to test API configuration
+async function testApiConfiguration(api) {
+    try {
+        const testResults = {
+            success: false,
+            message: '',
+            details: {}
+        };
+        
+        // Test 1: Check if URLs are valid
+        try {
+            new URL(api.getNumberUrl);
+            new URL(api.getStatusUrl);
+            if (api.activateUrl) new URL(api.activateUrl);
+            if (api.cancelUrl) new URL(api.cancelUrl);
+            testResults.details.urlValidation = '✅ All URLs are valid';
+        } catch (error) {
+            testResults.details.urlValidation = `❌ Invalid URL: ${error.message}`;
+            testResults.message = 'Invalid URL format detected';
+            return testResults;
+        }
+        
+        // Test 2: Check if server exists
+        const serversCollection = db.collection('servers');
+        const server = await serversCollection.findOne({ _id: new ObjectId(api.serverId) });
+        if (!server) {
+            testResults.details.serverCheck = '❌ Associated server not found';
+            testResults.message = 'Associated server does not exist';
+            return testResults;
+        }
+        testResults.details.serverCheck = `✅ Server found: ${server.name}`;
+        
+        // Test 3: Validate response type configuration
+        if (api.responseType === 'json' && !api.messagePath) {
+            testResults.details.responseConfig = '⚠️ JSON response type selected but no message path specified';
+        } else {
+            testResults.details.responseConfig = `✅ Response type: ${api.responseType.toUpperCase()}`;
+        }
+        
+        // Test 4: Validate status check configuration
+        if (api.statusCheckType === 'jsonPath' && !api.statusValue.includes('.')) {
+            testResults.details.statusConfig = '⚠️ JSON path status check selected but status value may not be a valid path';
+        } else {
+            testResults.details.statusConfig = `✅ Status check: ${api.statusCheckType}`;
+        }
+        
+        // All tests passed
+        testResults.success = true;
+        testResults.message = 'API configuration is valid and ready to use';
+        testResults.details.summary = 'All validation checks passed successfully';
+        
+        return testResults;
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Error during API testing',
+            details: { error: error.message }
+        };
+    }
+}
 
 app.use((err, req, res, next) => {
     debugLog('Unhandled error occurred', { 

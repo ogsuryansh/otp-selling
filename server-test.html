@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .success { background: #d4edda; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .test-button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .test-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Server Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. File Loading Test</h2>
+        <button class="test-button" onclick="testFileLoading()">Test File Loading</button>
+        <div id="fileTestResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Admin Panel Test</h2>
+        <button class="test-button" onclick="testAdminPanel()">Test Admin Panel</button>
+        <div id="adminTestResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Server Status</h2>
+        <button class="test-button" onclick="checkServerStatus()">Check Server Status</button>
+        <div id="serverStatusResult"></div>
+    </div>
+
+    <script>
+        // Test file loading
+        async function testFileLoading() {
+            const result = document.getElementById('fileTestResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                // Test if admin-credentials.js loads
+                const script = document.createElement('script');
+                script.src = 'admin-credentials.js';
+                
+                script.onload = function() {
+                    if (window.ADMIN_CREDENTIALS) {
+                        result.innerHTML = `
+                            <div class="success">
+                                <strong>✅ admin-credentials.js loaded successfully!</strong><br>
+                                Username: ${window.ADMIN_CREDENTIALS.username}<br>
+                                Admin ID: ${window.ADMIN_CREDENTIALS.admin_id}
+                            </div>
+                        `;
+                    } else {
+                        result.innerHTML = '<div class="error"><strong>❌ File loaded but ADMIN_CREDENTIALS not found</strong></div>';
+                    }
+                };
+                
+                script.onerror = function() {
+                    result.innerHTML = '<div class="error"><strong>❌ Failed to load admin-credentials.js</strong></div>';
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                result.innerHTML = `<div class="error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+        }
+
+        // Test admin panel
+        function testAdminPanel() {
+            const result = document.getElementById('adminTestResult');
+            
+            if (window.ADMIN_CREDENTIALS) {
+                result.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Admin credentials available!</strong><br>
+                        <a href="admin_panel_working.html" target="_blank">Open Working Admin Panel</a><br>
+                        <a href="admin_panel_production.html" target="_blank">Open Production Admin Panel</a>
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Admin credentials not loaded</strong><br>
+                        <a href="admin_panel_working.html" target="_blank">Try Working Admin Panel (embedded credentials)</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Check server status
+        async function checkServerStatus() {
+            const result = document.getElementById('serverStatusResult');
+            result.innerHTML = 'Checking...';
+            
+            try {
+                // Test if we can fetch a simple file
+                const response = await fetch('admin-credentials.js');
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Server is working!</strong><br>
+                            Status: ${response.status}<br>
+                            File size: ${response.headers.get('content-length') || 'Unknown'} bytes
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="error"><strong>❌ Server error:</strong> ${response.status}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error"><strong>❌ Network error:</strong> ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', function() {
+            setTimeout(testFileLoading, 1000);
+        });
+    </script>
+</body>
+</html>

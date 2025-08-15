@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Configuration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="responsive.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-section h3 {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            color: #e5e7eb;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.875rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-select option {
+            background: #1f2937;
+            color: #fff;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: #667eea;
+        }
+        
+        .checkbox-label {
+            color: #e5e7eb;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .help-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .api-list {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .api-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .api-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .status-testing {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">🔌 API Configuration</h1>
+            <p class="text-gray-200 mb-4">Connect and configure your number server APIs</p>
+            
+            <!-- Navigation -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🏠 Home
+                </a>
+                <a href="/admin" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    ⚙️ Admin
+                </a>
+                <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🖥️ Servers
+                </a>
+            </div>
+        </div>
+
+        <!-- API Configuration Section -->
+        <div class="glass rounded-xl p-6 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-white mb-4 md:mb-0">Number Server API Setup</h2>
+                <button onclick="openApiConfigModal()" class="btn-primary">
+                    ➕ Add New API
+                </button>
+            </div>
+            
+            <!-- API Statistics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">🔌</div>
+                    <div class="text-2xl font-bold text-white" id="totalApis">-</div>
+                    <div class="text-gray-300 text-sm">Total APIs</div>
+                </div>
+                
+                <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">🟢</div>
+                    <div class="text-2xl font-bold text-white" id="activeApis">-</div>
+                    <div class="text-gray-300 text-sm">Active APIs</div>
+                </div>
+                
+                <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">🔴</div>
+                    <div class="text-2xl font-bold text-white" id="inactiveApis">-</div>
+                    <div class="text-gray-300 text-sm">Inactive APIs</div>
+                </div>
+                
+                <div class="glass rounded-xl p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">📱</div>
+                    <div class="text-2xl font-bold text-white" id="totalNumbers">-</div>
+                    <div class="text-gray-300 text-sm">Numbers Used</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API List -->
+        <div class="glass rounded-xl p-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-white mb-4 md:mb-0">Configured APIs</h3>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="apiSearch" placeholder="Search APIs..." class="px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/20 focus:outline-none focus:border-white/40">
+                    <button onclick="refreshApis()" class="btn-secondary">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div id="apiList" class="api-list">
+                <div class="text-center p-8 text-gray-400">Loading APIs...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Configuration Modal -->
+    <div id="apiConfigModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-4xl w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-800" id="modalTitle">Add New API Configuration</h3>
+                    <button onclick="closeApiConfigModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="apiConfigForm" onsubmit="handleApiConfigSubmit(event)">
+                    <div class="form-grid">
+                        <!-- Basic Configuration -->
+                        <div class="form-section">
+                            <h3>🔧 Basic Configuration</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">API Name *</label>
+                                <input type="text" id="apiName" name="apiName" required 
+                                       class="form-input" placeholder="e.g., 5sim.net API">
+                                <div class="help-text">Give your API configuration a descriptive name</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Server *</label>
+                                <select id="serverId" name="serverId" required class="form-select">
+                                    <option value="">Select a server</option>
+                                </select>
+                                <div class="help-text">Choose which server this API will be associated with</div>
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="usesAuth" name="usesAuth" class="checkbox-input">
+                                <label for="usesAuth" class="checkbox-label">API uses Authorization Header</label>
+                            </div>
+                        </div>
+
+                        <!-- Response Configuration -->
+                        <div class="form-section">
+                            <h3>📄 Response Configuration</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">API Response Type *</label>
+                                <select id="responseType" name="responseType" required class="form-select">
+                                    <option value="text">Text</option>
+                                    <option value="json">JSON</option>
+                                    <option value="xml">XML</option>
+                                </select>
+                                <div class="help-text">Select the format of your API responses</div>
+                            </div>
+                            
+                            <div class="form-group" id="jsonPathGroup" style="display: none;">
+                                <label class="form-label">Message Text Path (JSON)</label>
+                                <input type="text" id="messagePath" name="messagePath" 
+                                       class="form-input" placeholder="e.g., data.message or message.text">
+                                <div class="help-text">JSON path to extract message text from response</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Success Status Check *</label>
+                                <select id="statusCheckType" name="statusCheckType" required class="form-select">
+                                    <option value="startsWith">Response starts with</option>
+                                    <option value="contains">Response contains</option>
+                                    <option value="equals">Response equals</option>
+                                    <option value="jsonPath">JSON path check</option>
+                                </select>
+                                <div class="help-text">How to determine if the API call was successful</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Success Status Value *</label>
+                                <input type="text" id="statusValue" name="statusValue" required 
+                                       class="form-input" placeholder="e.g., STATUS_OK or success">
+                                <div class="help-text">The value that indicates a successful API response</div>
+                            </div>
+                        </div>
+
+                        <!-- URL Configuration -->
+                        <div class="form-section">
+                            <h3>🔗 URL Configuration</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Get Number URL *</label>
+                                <input type="url" id="getNumberUrl" name="getNumberUrl" required 
+                                       class="form-input" placeholder="https://api.5sim.net/v1/user/buy/activation/...">
+                                <div class="help-text">URL to request a new phone number</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Get Message Status URL *</label>
+                                <input type="url" id="getStatusUrl" name="getStatusUrl" required 
+                                       class="form-input" placeholder="https://api.5sim.net/v1/user/check/...">
+                                <div class="help-text">URL to check if OTP message has been received</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Activate Next Message URL</label>
+                                <input type="url" id="activateUrl" name="activateUrl" 
+                                       class="form-input" placeholder="https://api.5sim.net/v1/user/finish/...">
+                                <div class="help-text">URL to activate/confirm the next message (optional)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Cancel Number URL</label>
+                                <input type="url" id="cancelUrl" name="cancelUrl" 
+                                       class="form-input" placeholder="https://api.5sim.net/v1/user/cancel/...">
+                                <div class="help-text">URL to cancel the number if needed (optional)</div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Configuration -->
+                        <div class="form-section">
+                            <h3>⚙️ Advanced Configuration</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Auto Cancel Number (minutes)</label>
+                                <input type="number" id="autoCancelMinutes" name="autoCancelMinutes" 
+                                       class="form-input" placeholder="10" min="1" max="60">
+                                <div class="help-text">Automatically cancel number after specified minutes (optional)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Retry Get Number (times)</label>
+                                <input type="number" id="retryCount" name="retryCount" 
+                                       class="form-input" placeholder="3" min="1" max="10">
+                                <div class="help-text">Number of times to retry getting a number if failed</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">API Key (if required)</label>
+                                <input type="password" id="apiKey" name="apiKey" 
+                                       class="form-input" placeholder="Your API key">
+                                <div class="help-text">API key for authentication (if your API requires it)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="btn-primary flex-1">
+                            <span id="submitButtonText">Add API Configuration</span>
+                        </button>
+                        <button type="button" onclick="closeApiConfigModal()" class="btn-secondary flex-1">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test API Modal -->
+    <div id="testApiModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-2xl w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Test API Connection</h3>
+                    <button onclick="closeTestModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <div id="testResults" class="space-y-4">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                        <p class="mt-2 text-gray-600">Testing API connection...</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeTestModal()" class="btn-secondary flex-1">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let apis = [];
+        let servers = [];
+        let editingApiId = null;
+        let testingApiId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApis();
+            loadServers();
+            setupSearch();
+            setupFormHandlers();
+        });
+
+        // Load APIs from server
+        async function loadApis() {
+            try {
+                const response = await fetch('/api/apis');
+                if (response.ok) {
+                    apis = await response.json();
+                    updateApiList();
+                    updateApiStats();
+                } else {
+                    console.error('Failed to load APIs');
+                    showError('Failed to load APIs');
+                }
+            } catch (error) {
+                console.error('Error loading APIs:', error);
+                showError('Error loading APIs');
+            }
+        }
+
+        // Load servers for dropdown
+        async function loadServers() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    servers = await response.json();
+                    updateServerDropdown();
+                } else {
+                    console.error('Failed to load servers');
+                }
+            } catch (error) {
+                console.error('Error loading servers:', error);
+            }
+        }
+
+        // Update API list display
+        function updateApiList() {
+            const apiList = document.getElementById('apiList');
+            if (apis.length === 0) {
+                apiList.innerHTML = '<div class="text-center p-8 text-gray-400">No APIs configured yet</div>';
+                return;
+            }
+
+            apiList.innerHTML = apis.map(api => `
+                <div class="api-card">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-lg font-semibold text-white">${api.name}</h4>
+                                <span class="api-status ${getStatusClass(api.status)}">
+                                    ${getStatusIcon(api.status)} ${api.status}
+                                </span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Server: ${getServerName(api.serverId)}</p>
+                            <p class="text-gray-300 text-sm">Response Type: ${api.responseType.toUpperCase()}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="testApi('${api._id}')" class="btn-secondary text-sm">
+                                🧪 Test
+                            </button>
+                            <button onclick="editApi('${api._id}')" class="btn-secondary text-sm">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="deleteApi('${api._id}')" class="btn-secondary text-sm bg-red-500/20 text-red-300 border-red-500/30">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update API statistics
+        function updateApiStats() {
+            document.getElementById('totalApis').textContent = apis.length;
+            document.getElementById('activeApis').textContent = apis.filter(a => a.status === 'active').length;
+            document.getElementById('inactiveApis').textContent = apis.filter(a => a.status === 'inactive').length;
+            document.getElementById('totalNumbers').textContent = apis.reduce((sum, api) => sum + (api.numbersUsed || 0), 0);
+        }
+
+        // Update server dropdown
+        function updateServerDropdown() {
+            const serverSelect = document.getElementById('serverId');
+            serverSelect.innerHTML = '<option value="">Select a server</option>' + 
+                servers.map(server => `<option value="${server._id}">${server.name} (${server.code})</option>`).join('');
+        }
+
+        // Get server name by ID
+        function getServerName(serverId) {
+            const server = servers.find(s => s._id === serverId);
+            return server ? server.name : 'Unknown Server';
+        }
+
+        // Get status class for styling
+        function getStatusClass(status) {
+            switch (status) {
+                case 'active': return 'status-active';
+                case 'inactive': return 'status-inactive';
+                case 'testing': return 'status-testing';
+                default: return 'status-inactive';
+            }
+        }
+
+        // Get status icon
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'active': return '🟢';
+                case 'inactive': return '🔴';
+                case 'testing': return '🟡';
+                default: return '⚪';
+            }
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('apiSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredApis = apis.filter(api => 
+                    api.name.toLowerCase().includes(searchTerm) ||
+                    getServerName(api.serverId).toLowerCase().includes(searchTerm)
+                );
+                updateApiListWithData(filteredApis);
+            });
+        }
+
+        // Update list with filtered data
+        function updateApiListWithData(apiData) {
+            const apiList = document.getElementById('apiList');
+            if (apiData.length === 0) {
+                apiList.innerHTML = '<div class="text-center p-8 text-gray-400">No APIs found</div>';
+                return;
+            }
+
+            apiList.innerHTML = apiData.map(api => `
+                <div class="api-card">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-lg font-semibold text-white">${api.name}</h4>
+                                <span class="api-status ${getStatusClass(api.status)}">
+                                    ${getStatusIcon(api.status)} ${api.status}
+                                </span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Server: ${getServerName(api.serverId)}</p>
+                            <p class="text-gray-300 text-sm">Response Type: ${api.responseType.toUpperCase()}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="testApi('${api._id}')" class="btn-secondary text-sm">
+                                🧪 Test
+                            </button>
+                            <button onclick="editApi('${api._id}')" class="btn-secondary text-sm">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="deleteApi('${api._id}')" class="btn-secondary text-sm bg-red-500/20 text-red-300 border-red-500/30">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Setup form handlers
+        function setupFormHandlers() {
+            const responseType = document.getElementById('responseType');
+            const jsonPathGroup = document.getElementById('jsonPathGroup');
+            
+            responseType.addEventListener('change', function() {
+                if (this.value === 'json') {
+                    jsonPathGroup.style.display = 'block';
+                } else {
+                    jsonPathGroup.style.display = 'none';
+                }
+            });
+        }
+
+        // Open API config modal
+        function openApiConfigModal() {
+            editingApiId = null;
+            document.getElementById('modalTitle').textContent = 'Add New API Configuration';
+            document.getElementById('submitButtonText').textContent = 'Add API Configuration';
+            document.getElementById('apiConfigForm').reset();
+            document.getElementById('jsonPathGroup').style.display = 'none';
+            document.getElementById('apiConfigModal').style.display = 'block';
+        }
+
+        // Edit API
+        function editApi(apiId) {
+            const api = apis.find(a => a._id === apiId);
+            if (!api) return;
+
+            editingApiId = apiId;
+            document.getElementById('modalTitle').textContent = 'Edit API Configuration';
+            document.getElementById('submitButtonText').textContent = 'Update API Configuration';
+            
+            // Populate form fields
+            document.getElementById('apiName').value = api.name;
+            document.getElementById('serverId').value = api.serverId;
+            document.getElementById('usesAuth').checked = api.usesAuth || false;
+            document.getElementById('responseType').value = api.responseType;
+            document.getElementById('messagePath').value = api.messagePath || '';
+            document.getElementById('statusCheckType').value = api.statusCheckType;
+            document.getElementById('statusValue').value = api.statusValue;
+            document.getElementById('getNumberUrl').value = api.getNumberUrl;
+            document.getElementById('getStatusUrl').value = api.getStatusUrl;
+            document.getElementById('activateUrl').value = api.activateUrl || '';
+            document.getElementById('cancelUrl').value = api.cancelUrl || '';
+            document.getElementById('autoCancelMinutes').value = api.autoCancelMinutes || '';
+            document.getElementById('retryCount').value = api.retryCount || '';
+            document.getElementById('apiKey').value = api.apiKey || '';
+            
+            // Show/hide JSON path group
+            if (api.responseType === 'json') {
+                document.getElementById('jsonPathGroup').style.display = 'block';
+            }
+            
+            document.getElementById('apiConfigModal').style.display = 'block';
+        }
+
+        // Handle API config form submission
+        async function handleApiConfigSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const apiData = {
+                name: formData.get('apiName'),
+                serverId: formData.get('serverId'),
+                usesAuth: formData.get('usesAuth') === 'on',
+                responseType: formData.get('responseType'),
+                messagePath: formData.get('messagePath'),
+                statusCheckType: formData.get('statusCheckType'),
+                statusValue: formData.get('statusValue'),
+                getNumberUrl: formData.get('getNumberUrl'),
+                getStatusUrl: formData.get('getStatusUrl'),
+                activateUrl: formData.get('activateUrl'),
+                cancelUrl: formData.get('cancelUrl'),
+                autoCancelMinutes: formData.get('autoCancelMinutes') ? parseInt(formData.get('autoCancelMinutes')) : null,
+                retryCount: formData.get('retryCount') ? parseInt(formData.get('retryCount')) : null,
+                apiKey: formData.get('apiKey'),
+                status: 'inactive'
+            };
+
+            try {
+                const url = editingApiId ? `/api/apis/${editingApiId}` : '/api/apis';
+                const method = editingApiId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(apiData)
+                });
+
+                if (response.ok) {
+                    closeApiConfigModal();
+                    loadApis();
+                    showSuccess(editingApiId ? 'API configuration updated successfully!' : 'API configuration added successfully!');
+                } else {
+                    const error = await response.json();
+                    showError(error.message || 'Failed to save API configuration');
+                }
+            } catch (error) {
+                console.error('Error saving API configuration:', error);
+                showError('Error saving API configuration');
+            }
+        }
+
+        // Test API
+        async function testApi(apiId) {
+            testingApiId = apiId;
+            document.getElementById('testApiModal').style.display = 'block';
+            
+            try {
+                const response = await fetch(`/api/apis/${apiId}/test`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('testResults').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">${result.success ? '✅' : '❌'}</div>
+                            <h4 class="font-semibold text-gray-800">${result.success ? 'Test Successful' : 'Test Failed'}</h4>
+                            <p class="text-gray-600">${result.message}</p>
+                        </div>
+                        ${result.details ? `
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-2">Test Details:</h5>
+                                <pre class="text-sm text-gray-600 overflow-x-auto">${JSON.stringify(result.details, null, 2)}</pre>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('testResults').innerHTML = `
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">❌</div>
+                        <h4 class="font-semibold text-gray-800">Test Failed</h4>
+                        <p class="text-gray-600">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Delete API
+        function deleteApi(apiId) {
+            if (confirm('Are you sure you want to delete this API configuration? This action cannot be undone.')) {
+                fetch(`/api/apis/${apiId}`, {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.ok) {
+                        loadApis();
+                        showSuccess('API configuration deleted successfully!');
+                    } else {
+                        showError('Failed to delete API configuration');
+                    }
+                }).catch(error => {
+                    console.error('Error deleting API:', error);
+                    showError('Error deleting API configuration');
+                });
+            }
+        }
+
+        // Close modals
+        function closeApiConfigModal() {
+            document.getElementById('apiConfigModal').style.display = 'none';
+            editingApiId = null;
+        }
+
+        function closeTestModal() {
+            document.getElementById('testApiModal').style.display = 'none';
+            testingApiId = null;
+        }
+
+        // Refresh APIs
+        function refreshApis() {
+            loadApis();
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            alert(message);
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const apiConfigModal = document.getElementById('apiConfigModal');
+            const testApiModal = document.getElementById('testApiModal');
+            
+            if (event.target === apiConfigModal) {
+                closeApiConfigModal();
+            }
+            if (event.target === testApiModal) {
+                closeTestModal();
+            }
+        }
+    </script>
+</body>
+</html>

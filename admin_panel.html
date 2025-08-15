@@ -6,6 +6,7 @@
     <title>OTP Bot Admin Panel</title>
             <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="responsive.css">
+    <script src="admin-config.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -26,6 +27,109 @@
         }
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Login Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: #4a5568;
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: #718096;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #feb2b2;
+            text-align: center;
+        }
+        
+        .admin-content {
+            display: none;
+        }
+        
+        .admin-content.show {
+            display: block;
         }
         
         /* Responsive styles */
@@ -87,28 +191,68 @@
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-800">
-    <div class="container mx-auto px-4 py-6 max-w-7xl">
-        <!-- Header -->
-        <div class="glass rounded-2xl p-6 mb-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">⚙️ Admin Panel</h1>
-            <p class="text-gray-200 mb-4">Manage your OTP bot system</p>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 Admin Login</h1>
+                <p>Enter your credentials to access the admin panel</p>
+            </div>
             
-            <!-- Navigation -->
-            <div class="flex flex-wrap justify-center gap-3">
-                <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🏠 Home
-                </a>
-                <a href="/users" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    👥 Users
-                </a>
-                <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    💳 Transactions
-                </a>
-                <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🖥️ Servers
-                </a>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter password">
+                </div>
+                
+                <button type="submit" class="login-btn">🔑 Login</button>
+            </form>
+            
+            <div style="margin-top: 1rem; text-align: center; color: #718096; font-size: 0.875rem;">
+                <p><strong>Default Credentials:</strong></p>
+                <p>Username: <code>admin</code></p>
+                <p>Password: <code>admin123</code></p>
+                <p><em>⚠️ Change these in your .env file!</em></p>
             </div>
         </div>
+    </div>
+
+    <!-- Admin Panel Content (Hidden until authenticated) -->
+    <div id="adminContent" class="admin-content">
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            <!-- Header -->
+            <div class="glass rounded-2xl p-6 mb-6 text-center">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">⚙️ Admin Panel</h1>
+                        <p class="text-gray-200 mb-4">Manage your OTP bot system</p>
+                    </div>
+                    <button onclick="logout()" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                        🚪 Logout
+                    </button>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                        🏠 Home
+                    </a>
+                    <a href="/users" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                        👥 Users
+                    </a>
+                    <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                        💳 Transactions
+                    </a>
+                    <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                        🖥️ Servers
+                    </a>
+                </div>
+            </div>
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 stats-grid">
@@ -580,6 +724,24 @@
         }
 
         // Form submissions
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Authenticate user
+            const result = authenticateUser(username, password);
+            
+            if (result.success) {
+                showAdminPanel();
+                alert('Login successful! Welcome to Admin Panel.');
+            } else {
+                alert(result.message || 'Login failed. Invalid credentials.');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        });
+
         document.getElementById('addBalanceForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const userId = document.getElementById('addBalanceUserId').value;
@@ -1182,8 +1344,96 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            refreshData();
+            // Check if already authenticated
+            checkAuthStatus();
         });
+
+        // Check authentication status
+        function checkAuthStatus() {
+            if (validateToken()) {
+                // User is authenticated, show admin panel
+                showAdminPanel();
+            } else {
+                // User is not authenticated, show login
+                showLoginForm();
+            }
+        }
+
+        // Show admin panel
+        function showAdminPanel() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContent').classList.add('show');
+            // Only call refreshData if it exists
+            if (typeof refreshData === 'function') {
+                refreshData();
+            }
+        }
+
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('adminContent').classList.remove('show');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to log out?')) {
+                localStorage.removeItem('adminToken');
+                showLoginForm();
+                document.getElementById('loginForm').reset();
+                alert('Logged out successfully!');
+            }
+        }
+
+        // Authentication function using config
+        function authenticateUser(username, password) {
+            const config = window.ADMIN_CONFIG || ADMIN_CONFIG;
+            const validUsername = config.credentials.username;
+            const validPassword = config.credentials.password;
+            
+            if (username === validUsername && password === validPassword) {
+                // Generate a secure token with expiration
+                const tokenData = {
+                    username: username,
+                    admin_id: config.credentials.admin_id,
+                    timestamp: Date.now(),
+                    expires: Date.now() + config.security.sessionTimeout
+                };
+                
+                const token = btoa(JSON.stringify(tokenData));
+                localStorage.setItem('adminToken', token);
+                localStorage.setItem('adminLoginTime', Date.now().toString());
+                
+                return { success: true, token: token, admin_id: config.credentials.admin_id };
+            } else {
+                return { success: false, message: 'Invalid username or password' };
+            }
+        }
+
+        // Validate token and check expiration
+        function validateToken() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) return false;
+            
+            try {
+                const tokenData = JSON.parse(atob(token));
+                const now = Date.now();
+                
+                if (now > tokenData.expires) {
+                    // Token expired, clear it
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminLoginTime');
+                    return false;
+                }
+                
+                return true;
+            } catch (e) {
+                // Invalid token, clear it
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminLoginTime');
+                return false;
+            }
+        }
     </script>
 </body>
 </html>

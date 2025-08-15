@@ -8,6 +8,14 @@
     {
       "src": "*.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -36,12 +44,40 @@
       "dest": "/admin_fixed.html"
     },
     {
+      "src": "/deploy-test",
+      "dest": "/deploy-test.html"
+    },
+    {
       "src": "/debug-dashboard.html",
       "dest": "/debug-dashboard.html"
     },
     {
       "src": "/admin_panel.html",
       "dest": "/admin_panel.html"
+    },
+    {
+      "src": "/admin_fixed.html",
+      "dest": "/admin_fixed.html"
+    },
+    {
+      "src": "/debug-tool.html",
+      "dest": "/debug-tool.html"
+    },
+    {
+      "src": "/test-admin.html",
+      "dest": "/test-admin.html"
+    },
+    {
+      "src": "/admin_panel_working.html",
+      "dest": "/admin_panel_working.html"
+    },
+    {
+      "src": "/admin_panel_production.html",
+      "dest": "/admin_panel_production.html"
+    },
+    {
+      "src": "/server-test.html",
+      "dest": "/server-test.html"
     }
   ],
   "headers": [

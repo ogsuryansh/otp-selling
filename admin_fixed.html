@@ -326,6 +326,10 @@
     </div>
 
     <script>
+        // 🐛 DEBUG SYSTEM (MUST BE FIRST!)
+        let debugMode = false;
+        let errorCount = 0;
+
         // 🔧 EMBEDDED ADMIN CONFIGURATION (NO EXTERNAL FILES NEEDED)
         // ⚠️ IMPORTANT: Update these credentials for production!
         let ADMIN_CONFIG = {
@@ -357,13 +361,6 @@
                 logDebug(`Error: ${error.message}`, 'error');
             }
         }
-
-        // Load credentials on page load
-        loadCredentialsFromEnv();
-
-        // 🐛 DEBUG SYSTEM
-        let debugMode = false;
-        let errorCount = 0;
 
         function logDebug(message, type = 'info') {
             if (!debugMode) return;
@@ -525,7 +522,10 @@
         // 📝 EVENT LISTENERS
         document.addEventListener('DOMContentLoaded', function() {
             logDebug('Page loaded, initializing...');
-            checkAuthStatus();
+            // Load credentials first, then check auth status
+            loadCredentialsFromEnv().then(() => {
+                checkAuthStatus();
+            });
         });
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {

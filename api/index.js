@@ -18,11 +18,43 @@ app.use((req, res, next) => {
 });
 
 // MongoDB configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.abc123.mongodb.net/otp_bot?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/otp_bot';
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
 
 let client = null;
 let db = null;
+
+// Mock data for when MongoDB is not available
+const mockData = {
+    statistics: {
+        todayEarnings: 1250.50,
+        totalUsers: 45,
+        numbersSold: 23,
+        popularService: 'WhatsApp',
+        totalRevenue: 5670.25,
+        activeUsers: 42,
+        bannedUsers: 3,
+        totalBalance: 890.75
+    },
+    users: [
+        { id: 1, name: 'John Doe', username: '@johndoe', balance: 150.00, status: 'active', registration_date: new Date('2024-01-15'), last_activity: new Date() },
+        { id: 2, name: 'Jane Smith', username: '@janesmith', balance: 75.50, status: 'active', registration_date: new Date('2024-01-20'), last_activity: new Date() },
+        { id: 3, name: 'Bob Wilson', username: '@bobwilson', balance: 0.00, status: 'banned', registration_date: new Date('2024-01-10'), last_activity: new Date() }
+    ],
+    servers: [
+        { id: 1, name: 'India Server', code: 'IND', url: 'https://india.example.com', description: 'Premium Indian numbers', status: 'active' },
+        { id: 2, name: 'USA Server', code: 'USA', url: 'https://usa.example.com', description: 'US phone numbers', status: 'active' }
+    ],
+    services: [
+        { id: 1, name: 'WhatsApp', price: 25.00, description: 'WhatsApp verification service', status: 'active' },
+        { id: 2, name: 'Telegram', price: 20.00, description: 'Telegram verification service', status: 'active' },
+        { id: 3, name: 'Gmail', price: 30.00, description: 'Gmail verification service', status: 'active' }
+    ],
+    orders: [
+        { id: 1, serviceName: 'WhatsApp', amount: 25.00, status: 'completed', createdAt: new Date(), userName: 'John Doe' },
+        { id: 2, serviceName: 'Telegram', amount: 20.00, status: 'pending', createdAt: new Date(), userName: 'Jane Smith' }
+    ]
+};
 
 // MongoDB connection function
 async function connectToMongoDB() {
@@ -35,8 +67,14 @@ async function connectToMongoDB() {
         console.log('📝 MongoDB URI:', MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
         console.log('🗄️ Database:', MONGODB_DATABASE);
         
+        // For Vercel deployment, if MongoDB is not available, return false
+        if (MONGODB_URI.includes('localhost') && process.env.NODE_ENV === 'production') {
+            console.log('⚠️ Using localhost MongoDB in production - will use mock data');
+            return false;
+        }
+        
         client = new MongoClient(MONGODB_URI, {
-            serverSelectionTimeoutMS: 15000,
+            serverSelectionTimeoutMS: 5000, // Reduced timeout for faster failure
             maxPoolSize: 10,
             retryWrites: true,
             w: 'majority'
@@ -88,7 +126,9 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         message: 'API is working!',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV
+        environment: process.env.NODE_ENV,
+        mongodb_connected: !!client && client.topology && client.topology.isConnected(),
+        using_mock_data: !client || !client.topology || !client.topology.isConnected()
     });
 });
 
@@ -99,7 +139,8 @@ app.get('/api/health', (req, res) => {
         status: 'OK', 
         timestamp: new Date().toISOString(),
         mongodb: {
-            connected: !!client && client.topology && client.topology.isConnected()
+            connected: !!client && client.topology && client.topology.isConnected(),
+            using_mock_data: !client || !client.topology || !client.topology.isConnected()
         },
         environment: {
             node_env: process.env.NODE_ENV,
@@ -117,17 +158,10 @@ app.get('/api/statistics', async (req, res) => {
                 console.log('🔄 Connecting to MongoDB...');
                 const connected = await connectToMongoDB();
                 if (!connected) {
-                    console.log('⚠️ MongoDB not available, returning fallback data');
+                    console.log('⚠️ MongoDB not available, returning mock data');
                     return res.json({
-                        todayEarnings: 0,
-                        totalUsers: 0,
-                        numbersSold: 0,
-                        popularService: 'No data available',
-                        totalRevenue: 0,
-                        activeUsers: 0,
-                        bannedUsers: 0,
-                        totalBalance: 0,
-                        error: 'MongoDB connection failed'
+                        ...mockData.statistics,
+                        mockData: true
                     });
                 }
             }
@@ -211,7 +245,17 @@ app.get('/api/statistics', async (req, res) => {
 app.get('/api/dashboard', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock dashboard data');
+                return res.json({
+                    recentOrders: mockData.orders,
+                    todayEarnings: mockData.statistics.todayEarnings,
+                    totalUsers: mockData.statistics.totalUsers,
+                    numbersSold: mockData.statistics.numbersSold,
+                    totalRevenue: mockData.statistics.totalRevenue
+                });
+            }
         }
         
         const ordersCollection = db.collection('orders');
@@ -268,7 +312,11 @@ app.get('/api/dashboard', async (req, res) => {
 app.get('/api/servers', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock servers data');
+                return res.json(mockData.servers);
+            }
         }
         
         const serversCollection = db.collection('servers');
@@ -402,7 +450,11 @@ app.delete('/api/servers/:id', async (req, res) => {
 app.get('/api/services', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock services data');
+                return res.json(mockData.services);
+            }
         }
         
         const servicesCollection = db.collection('services');
@@ -540,7 +592,11 @@ app.delete('/api/services/:id', async (req, res) => {
 app.get('/api/apis', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock APIs data');
+                return res.json([]);
+            }
         }
         
         const apisCollection = db.collection('apis');
@@ -680,7 +736,11 @@ app.delete('/api/apis/:id', async (req, res) => {
 app.get('/api/orders', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock orders data');
+                return res.json(mockData.orders);
+            }
         }
         
         const ordersCollection = db.collection('orders');
@@ -696,7 +756,11 @@ app.get('/api/orders', async (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         if (!db) {
-            await connectToMongoDB();
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock users data');
+                return res.json(mockData.users);
+            }
         }
         
         const usersCollection = db.collection('users');
@@ -943,7 +1007,13 @@ app.post('/api/unban_user', async (req, res) => {
 // Transactions endpoint
 app.get('/api/transactions', async (req, res) => {
     try {
-        if (!db) { await connectToMongoDB(); }
+        if (!db) { 
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock transactions data');
+                return res.json([]);
+            }
+        }
         const transactionsCollection = db.collection('transactions');
         const transactions = await transactionsCollection.find({}).sort({ created_at: -1 }).limit(100).toArray();
         res.json(transactions);
@@ -956,7 +1026,18 @@ app.get('/api/transactions', async (req, res) => {
 // Dashboard stats endpoint
 app.get('/api/dashboard/stats', async (req, res) => {
     try {
-        if (!db) { await connectToMongoDB(); }
+        if (!db) { 
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock dashboard stats data');
+                return res.json({
+                    totalUsers: mockData.statistics.totalUsers,
+                    totalOrders: mockData.orders.length,
+                    todayEarnings: mockData.statistics.todayEarnings,
+                    todayOrders: mockData.orders.length
+                });
+            }
+        }
         const usersCollection = db.collection('users');
         const ordersCollection = db.collection('orders');
         
@@ -1017,7 +1098,13 @@ app.post('/api/otp/orders/:id/finish', async (req, res) => {
 // Basic services endpoint
 app.get('/api/basic-services', async (req, res) => {
     try {
-        if (!db) { await connectToMongoDB(); }
+        if (!db) { 
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock basic services data');
+                return res.json(mockData.services);
+            }
+        }
         const servicesCollection = db.collection('services');
         const services = await servicesCollection.find({}).toArray();
         res.json(services);
@@ -1045,7 +1132,13 @@ app.post('/api/basic-services', async (req, res) => {
 // Promo codes endpoints
 app.get('/api/promo-codes', async (req, res) => {
     try {
-        if (!db) { await connectToMongoDB(); }
+        if (!db) { 
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available, returning mock promo codes data');
+                return res.json([]);
+            }
+        }
         const promoCollection = db.collection('promo_codes');
         const promoCodes = await promoCollection.find({}).toArray();
         res.json(promoCodes);

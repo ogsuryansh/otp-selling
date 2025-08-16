@@ -21,6 +21,13 @@ app.use((req, res, next) => {
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/otp_bot';
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
 
+// Debug environment variables
+console.log('🔧 Environment Debug:');
+console.log('📝 MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
+console.log('📝 MONGODB_DATABASE:', process.env.MONGODB_DATABASE);
+console.log('📝 NODE_ENV:', process.env.NODE_ENV);
+console.log('📝 Actual URI:', MONGODB_URI);
+
 let client = null;
 let db = null;
 
@@ -67,9 +74,9 @@ async function connectToMongoDB() {
         console.log('📝 MongoDB URI:', MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
         console.log('🗄️ Database:', MONGODB_DATABASE);
         
-        // For Vercel deployment, if MongoDB is not available, return false
-        if (MONGODB_URI.includes('localhost') && process.env.NODE_ENV === 'production') {
-            console.log('⚠️ Using localhost MongoDB in production - will use mock data');
+        // Check if we have a valid MongoDB URI
+        if (!MONGODB_URI || MONGODB_URI.includes('localhost')) {
+            console.log('⚠️ Invalid MongoDB URI - will use mock data');
             return false;
         }
         

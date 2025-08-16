@@ -98,7 +98,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "MONGODB_URI": "mongodb://localhost:27017/otp_bot",
+    "MONGODB_URI": "mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.zdudgbg.mongodb.net/otp_bot?retryWrites=true&w=majority&appName=Cluster0",
     "MONGODB_DATABASE": "otp_bot",
     "MONGODB_COLLECTION": "users"
   }

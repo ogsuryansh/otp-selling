@@ -31,37 +31,7 @@ console.log('📝 Actual URI:', MONGODB_URI);
 let client = null;
 let db = null;
 
-// Mock data for when MongoDB is not available
-const mockData = {
-    statistics: {
-        todayEarnings: 1250.50,
-        totalUsers: 45,
-        numbersSold: 23,
-        popularService: 'WhatsApp',
-        totalRevenue: 5670.25,
-        activeUsers: 42,
-        bannedUsers: 3,
-        totalBalance: 890.75
-    },
-    users: [
-        { id: 1, name: 'John Doe', username: '@johndoe', balance: 150.00, status: 'active', registration_date: new Date('2024-01-15'), last_activity: new Date() },
-        { id: 2, name: 'Jane Smith', username: '@janesmith', balance: 75.50, status: 'active', registration_date: new Date('2024-01-20'), last_activity: new Date() },
-        { id: 3, name: 'Bob Wilson', username: '@bobwilson', balance: 0.00, status: 'banned', registration_date: new Date('2024-01-10'), last_activity: new Date() }
-    ],
-    servers: [
-        { id: 1, name: 'India Server', code: 'IND', url: 'https://india.example.com', description: 'Premium Indian numbers', status: 'active' },
-        { id: 2, name: 'USA Server', code: 'USA', url: 'https://usa.example.com', description: 'US phone numbers', status: 'active' }
-    ],
-    services: [
-        { id: 1, name: 'WhatsApp', price: 25.00, description: 'WhatsApp verification service', status: 'active' },
-        { id: 2, name: 'Telegram', price: 20.00, description: 'Telegram verification service', status: 'active' },
-        { id: 3, name: 'Gmail', price: 30.00, description: 'Gmail verification service', status: 'active' }
-    ],
-    orders: [
-        { id: 1, serviceName: 'WhatsApp', amount: 25.00, status: 'completed', createdAt: new Date(), userName: 'John Doe' },
-        { id: 2, serviceName: 'Telegram', amount: 20.00, status: 'pending', createdAt: new Date(), userName: 'Jane Smith' }
-    ]
-};
+
 
 // MongoDB connection function
 async function connectToMongoDB() {
@@ -159,19 +129,16 @@ app.get('/api/health', (req, res) => {
 
 // Dashboard statistics endpoint
 app.get('/api/statistics', async (req, res) => {
-            console.log('📊 Statistics endpoint called');
-        try {
-            if (!db) {
-                console.log('🔄 Connecting to MongoDB...');
-                const connected = await connectToMongoDB();
-                if (!connected) {
-                    console.log('⚠️ MongoDB not available, returning mock data');
-                    return res.json({
-                        ...mockData.statistics,
-                        mockData: true
-                    });
-                }
+    console.log('📊 Statistics endpoint called');
+    try {
+        if (!db) {
+            console.log('🔄 Connecting to MongoDB...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
+        }
         
         const serversCollection = db.collection('servers');
         const servicesCollection = db.collection('services');
@@ -254,14 +221,8 @@ app.get('/api/dashboard', async (req, res) => {
         if (!db) {
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock dashboard data');
-                return res.json({
-                    recentOrders: mockData.orders,
-                    todayEarnings: mockData.statistics.todayEarnings,
-                    totalUsers: mockData.statistics.totalUsers,
-                    numbersSold: mockData.statistics.numbersSold,
-                    totalRevenue: mockData.statistics.totalRevenue
-                });
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         
@@ -321,8 +282,8 @@ app.get('/api/servers', async (req, res) => {
         if (!db) {
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock servers data');
-                return res.json(mockData.servers);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         
@@ -459,8 +420,8 @@ app.get('/api/services', async (req, res) => {
         if (!db) {
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock services data');
-                return res.json(mockData.services);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         
@@ -745,8 +706,8 @@ app.get('/api/orders', async (req, res) => {
         if (!db) {
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock orders data');
-                return res.json(mockData.orders);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         
@@ -765,8 +726,8 @@ app.get('/api/users', async (req, res) => {
         if (!db) {
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock users data');
-                return res.json(mockData.users);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         
@@ -1017,13 +978,45 @@ app.get('/api/transactions', async (req, res) => {
         if (!db) { 
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock transactions data');
-                return res.json([]);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
+        
+        // Get transactions from multiple collections to show comprehensive bot activity
         const transactionsCollection = db.collection('transactions');
+        const usersCollection = db.collection('users');
+        const ordersCollection = db.collection('orders');
+        
+        // Get all transactions
         const transactions = await transactionsCollection.find({}).sort({ created_at: -1 }).limit(100).toArray();
-        res.json(transactions);
+        
+        // Get user data for transactions
+        const userIds = [...new Set(transactions.map(t => t.user_id))];
+        const users = await usersCollection.find({ user_id: { $in: userIds } }).toArray();
+        const userMap = users.reduce((map, user) => {
+            map[user.user_id] = user;
+            return map;
+        }, {});
+        
+        // Enhance transactions with user data and proper formatting
+        const enhancedTransactions = transactions.map(txn => {
+            const user = userMap[txn.user_id] || {};
+            return {
+                id: txn._id || txn.id || `TXN${txn.user_id}${Date.now()}`,
+                user_id: txn.user_id,
+                user: user.first_name || user.username || `User ${txn.user_id}`,
+                type: txn.type || 'unknown',
+                amount: txn.amount || 0,
+                description: txn.description || txn.reason || 'Transaction',
+                source: txn.source || 'unknown',
+                admin_id: txn.admin_id,
+                created_at: txn.created_at || txn.timestamp || new Date().toISOString(),
+                status: txn.status || 'completed'
+            };
+        });
+        
+        res.json(enhancedTransactions);
     } catch (error) {
         console.error('Error getting transactions:', error);
         res.status(500).json({ error: 'Failed to load transactions' });
@@ -1036,13 +1029,8 @@ app.get('/api/dashboard/stats', async (req, res) => {
         if (!db) { 
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock dashboard stats data');
-                return res.json({
-                    totalUsers: mockData.statistics.totalUsers,
-                    totalOrders: mockData.orders.length,
-                    todayEarnings: mockData.statistics.todayEarnings,
-                    todayOrders: mockData.orders.length
-                });
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         const usersCollection = db.collection('users');
@@ -1142,8 +1130,8 @@ app.get('/api/promo-codes', async (req, res) => {
         if (!db) { 
             const connected = await connectToMongoDB();
             if (!connected) {
-                console.log('⚠️ MongoDB not available, returning mock promo codes data');
-                return res.json([]);
+                console.log('⚠️ MongoDB not available');
+                return res.status(500).json({ error: 'Database connection failed' });
             }
         }
         const promoCollection = db.collection('promo_codes');
@@ -1194,6 +1182,27 @@ app.delete('/api/promo-codes/:id', async (req, res) => {
     } catch (error) {
         console.error('Error deleting promo code:', error);
         res.status(500).json({ error: 'Failed to delete promo code' });
+    }
+});
+
+app.get('/api/promo-codes/:id', async (req, res) => {
+    try {
+        if (!db) { 
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                return res.status(500).json({ error: 'Database not available' });
+            }
+        }
+        const promoCollection = db.collection('promo_codes');
+        const { id } = req.params;
+        const promoCode = await promoCollection.findOne({ _id: id });
+        if (!promoCode) {
+            return res.status(404).json({ error: 'Promo code not found' });
+        }
+        res.json(promoCode);
+    } catch (error) {
+        console.error('Error getting promo code:', error);
+        res.status(500).json({ error: 'Failed to get promo code' });
     }
 });
 

@@ -3,81 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promo Codes - OTP Bot</title>
+    <title>Promo Codes - OTP Bot Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#667eea',
-                        secondary: '#764ba2',
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6'
                     }
                 }
             }
         }
     </script>
-    <link rel="stylesheet" href="../assets/css/main.css">
 </head>
-<body class="gradient-bg min-h-screen text-gray-800">
-    <div class="container mx-auto px-4 py-6 max-w-7xl">
-        <!-- Header -->
-        <div class="glass rounded-2xl p-6 mb-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">🎫 Promo Codes</h1>
-            <p class="text-gray-200 mb-4">Manage promotional codes and discounts</p>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 mr-8">
+                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
+                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">APIs</a>
+                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Orders</a>
+                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
             
-            <!-- Navigation -->
-            <div class="flex flex-wrap justify-center gap-3">
-                <a href="../" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🏠 Home
-                </a>
-                <a href="../dashboard/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    📊 Dashboard
-                </a>
-                <a href="../admin/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    ⚙️ Admin
-                </a>
+            <!-- Mobile menu -->
+            <div class="mobile-menu hidden md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
+                    <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
+                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
+                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Main Content -->
-        <div class="glass rounded-xl p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold text-white">Promo Code Management</h2>
-                <button onclick="openAddPromoModal()" class="btn-primary">➕ Add Promo Code</button>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Promo Codes</h1>
+                <p class="text-gray-600 mt-2">Create promo codes that add money directly to user balance</p>
             </div>
+            <button onclick="openAddPromoModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md flex items-center">
+                <span class="mr-2">➕</span>
+                Create Promo Code
+            </button>
+        </div>
 
-            <!-- Search and Filters -->
-            <div class="flex flex-col md:flex-row gap-4 mb-6">
-                <input type="text" id="promoSearch" placeholder="Search promo codes..." class="form-input flex-1">
-                <select id="statusFilter" class="form-select md:w-48">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="expired">Expired</option>
-                    <option value="used">Used</option>
-                </select>
-                <button onclick="refreshPromoCodes()" class="btn-secondary">🔄 Refresh</button>
+        <!-- Promo Codes List -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Active Promo Codes</h3>
             </div>
-
-            <!-- Promo Codes Table -->
-            <div class="table-container">
-                <table class="table">
-                    <thead>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>Code</th>
-                            <th>Discount</th>
-                            <th>Uses</th>
-                            <th>Status</th>
-                            <th>Expires</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage Limit</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Used Count</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="promoCodesTable">
+                    <tbody class="bg-white divide-y divide-gray-200" id="promoCodesTable">
                         <tr>
-                            <td colspan="7" class="text-center p-8 text-gray-400">
-                                <div class="spinner"></div>
-                                <p class="mt-2">Loading promo codes...</p>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No promo codes found. Create your first promo code to get started.
                             </td>
                         </tr>
                     </tbody>
@@ -85,366 +106,382 @@
             </div>
         </div>
 
-        <!-- Statistics -->
-        <div class="glass rounded-xl p-6 mt-6">
-            <h3 class="text-xl font-semibold text-white mb-4">📊 Promo Code Statistics</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">🎫</div>
-                    <div class="text-2xl font-bold text-white" id="totalPromos">-</div>
-                    <div class="text-gray-300 text-sm">Total Codes</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">✅</div>
-                    <div class="text-2xl font-bold text-white" id="activePromos">-</div>
-                    <div class="text-gray-300 text-sm">Active Codes</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">💰</div>
-                    <div class="text-2xl font-bold text-white" id="totalDiscount">-</div>
-                    <div class="text-gray-300 text-sm">Total Discount</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">👥</div>
-                    <div class="text-2xl font-bold text-white" id="totalUses">-</div>
-                    <div class="text-gray-300 text-sm">Total Uses</div>
+        <!-- Direct Web Links Section -->
+        <div class="bg-white rounded-lg shadow mt-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
+                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">📊</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                            <p class="text-sm text-gray-600">Main admin dashboard</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🖥️</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Servers</h4>
+                            <p class="text-sm text-gray-600">Manage OTP servers</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🔧</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Services</h4>
+                            <p class="text-sm text-gray-600">Manage OTP services</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
+                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🔌</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">APIs</h4>
+                            <p class="text-sm text-gray-600">Manage API connections</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">📋</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Orders</h4>
+                            <p class="text-sm text-gray-600">View all orders</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/users" class="flex items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
+                        <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">👥</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Users</h4>
+                            <p class="text-sm text-gray-600">Manage users</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
+                        <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">💰</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Transactions</h4>
+                            <p class="text-sm text-gray-600">View transactions</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
+                        <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🎫</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Promo Codes</h4>
+                            <p class="text-sm text-gray-600">Manage promo codes</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
+                        <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">⚙️</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">API Config</h4>
+                            <p class="text-sm text-gray-600">Configure APIs</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Promo Code Modal -->
-    <div id="addPromoModal" class="modal">
-        <div class="modal-content mx-4 my-8 max-w-md w-full fade-in">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800">Add Promo Code</h3>
-                    <button onclick="closeModal('addPromoModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <!-- Add/Edit Promo Code Modal -->
+    <div id="promoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Create Promo Code</h3>
+                    <button onclick="closePromoModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
                 
-                <form id="addPromoForm" onsubmit="handleAddPromo(event)" data-validate>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Promo Code</label>
-                            <input type="text" id="promoCode" required class="form-input" placeholder="e.g., WELCOME20">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Discount (%)</label>
-                            <input type="number" id="promoDiscount" required min="1" max="100" class="form-input" placeholder="20">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Max Uses</label>
-                            <input type="number" id="promoMaxUses" required min="1" class="form-input" placeholder="100">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Expires At</label>
-                            <input type="datetime-local" id="promoExpires" class="form-input">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Description</label>
-                            <textarea id="promoDescription" class="form-textarea" placeholder="Optional description"></textarea>
-                        </div>
+                <form id="promoForm" class="space-y-4">
+                    <input type="hidden" id="promoId" name="promoId">
+                    
+                    <div>
+                        <label for="promoCode" class="block text-sm font-medium text-gray-700">Promo Code</label>
+                        <input type="text" id="promoCode" name="promoCode" placeholder="WELCOME50" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
                     </div>
                     
-                    <div class="flex gap-3 mt-6">
-                        <button type="submit" class="btn-primary flex-1">Add Promo Code</button>
-                        <button type="button" onclick="closeModal('addPromoModal')" class="btn-secondary flex-1">Cancel</button>
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount to Add (₹)</label>
+                        <input type="number" id="amount" name="amount" step="0.01" placeholder="50.00" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                        <p class="text-xs text-gray-500 mt-1">This amount will be added directly to user's balance when they use the code</p>
+                    </div>
+                    
+                    <div>
+                        <label for="usageLimit" class="block text-sm font-medium text-gray-700">Usage Limit</label>
+                        <input type="number" id="usageLimit" name="usageLimit" placeholder="100" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                        <p class="text-xs text-gray-500 mt-1">Maximum number of times this code can be used</p>
+                    </div>
+                    
+                    <div>
+                        <label for="expiryDate" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                        <input type="datetime-local" id="expiryDate" name="expiryDate" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="description" name="description" rows="3" placeholder="Welcome bonus for new users" 
+                                  class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="status" name="status" required 
+                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closePromoModal()" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">
+                            Save Promo Code
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Promo Code Modal -->
-    <div id="editPromoModal" class="modal">
-        <div class="modal-content mx-4 my-8 max-w-md w-full fade-in">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800">Edit Promo Code</h3>
-                    <button onclick="closeModal('editPromoModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-                </div>
-                
-                <form id="editPromoForm" onsubmit="handleEditPromo(event)" data-validate>
-                    <input type="hidden" id="editPromoId">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Promo Code</label>
-                            <input type="text" id="editPromoCode" required class="form-input">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Discount (%)</label>
-                            <input type="number" id="editPromoDiscount" required min="1" max="100" class="form-input">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Max Uses</label>
-                            <input type="number" id="editPromoMaxUses" required min="1" class="form-input">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Expires At</label>
-                            <input type="datetime-local" id="editPromoExpires" class="form-input">
-                        </div>
-                        <div>
-                            <label class="text-gray-700 text-sm font-medium">Description</label>
-                            <textarea id="editPromoDescription" class="form-textarea"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3 mt-6">
-                        <button type="submit" class="btn-primary flex-1">Update Promo Code</button>
-                        <button type="button" onclick="closeModal('editPromoModal')" class="btn-secondary flex-1">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="../assets/js/main.js"></script>
     <script>
-        // Promo codes specific functionality
-        let promoCodes = [];
-        let editingPromoId = null;
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
 
-        // Load promo codes on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPromoCodes();
-            setupSearchAndFilters();
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
 
-        // Load promo codes
-        async function loadPromoCodes() {
+        // Promo modal functions
+        function openAddPromoModal() {
+            document.getElementById('modalTitle').textContent = 'Create Promo Code';
+            document.getElementById('promoForm').reset();
+            document.getElementById('promoId').value = '';
+            document.getElementById('promoModal').classList.remove('hidden');
+        }
+
+        function closePromoModal() {
+            document.getElementById('promoModal').classList.add('hidden');
+        }
+
+        function editPromo(id) {
+            document.getElementById('modalTitle').textContent = 'Edit Promo Code';
+            document.getElementById('promoId').value = id;
+            // Load promo data for editing
+            loadPromoForEditing(id);
+            document.getElementById('promoModal').classList.remove('hidden');
+        }
+
+        async function loadPromoForEditing(id) {
             try {
-                const response = await OTPUtils.apiRequest('/api/promo-codes');
-                promoCodes = response;
-                updatePromoCodesTable();
-                updatePromoStats();
+                const response = await fetch(`/api/promo-codes/${id}`);
+                if (response.ok) {
+                    const promo = await response.json();
+                    document.getElementById('promoCode').value = promo.code || '';
+                    document.getElementById('amount').value = promo.amount || '';
+                    document.getElementById('usageLimit').value = promo.usageLimit || '';
+                    document.getElementById('expiryDate').value = promo.expiryDate || '';
+                    document.getElementById('description').value = promo.description || '';
+                    document.getElementById('status').value = promo.status || 'active';
+                }
             } catch (error) {
-                console.error('Error loading promo codes:', error);
-                OTPUtils.showError('Failed to load promo codes');
+                console.error('Error loading promo for editing:', error);
             }
         }
 
-        // Update promo codes table
-        function updatePromoCodesTable() {
+        async function deletePromo(promoId) {
+            if (confirm('Are you sure you want to delete this promo code?')) {
+                try {
+                    const response = await fetch(`/api/promo-codes/${promoId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        loadPromoCodes();
+                    } else {
+                        const error = await response.json();
+                        alert('Error: ' + (error.message || 'Failed to delete promo code'));
+                    }
+                } catch (error) {
+                    console.error('Error deleting promo code:', error);
+                    alert('Error deleting promo code. Please try again.');
+                }
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('promoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const promoId = formData.get('promoId');
+            const promoData = {
+                code: formData.get('promoCode'),
+                amount: parseFloat(formData.get('amount')),
+                usageLimit: parseInt(formData.get('usageLimit')),
+                expiryDate: formData.get('expiryDate'),
+                description: formData.get('description'),
+                status: formData.get('status')
+            };
+            
+            try {
+                let response;
+                if (promoId) {
+                    // Update existing promo code
+                    response = await fetch(`/api/promo-codes/${promoId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(promoData)
+                    });
+                } else {
+                    // Create new promo code
+                    response = await fetch('/api/promo-codes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(promoData)
+                    });
+                }
+                
+                if (response.ok) {
+                    closePromoModal();
+                    loadPromoCodes();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'Failed to save promo code'));
+                }
+            } catch (error) {
+                console.error('Error saving promo code:', error);
+                alert('Error saving promo code. Please try again.');
+            }
+        });
+
+        // Load promo codes data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPromoCodes();
+        });
+
+        async function loadPromoCodes() {
+            try {
+                const response = await fetch('/api/promo-codes');
+                if (response.ok) {
+                    const promoCodes = await response.json();
+                    updatePromoCodesList(promoCodes);
+                } else {
+                    console.error('Failed to load promo codes');
+                }
+            } catch (error) {
+                console.error('Promo codes loading failed:', error);
+                // Use mock data for now
+                const mockPromoCodes = [
+                    {
+                        id: '1',
+                        code: 'WELCOME50',
+                        amount: 50,
+                        usageLimit: 100,
+                        usedCount: 25,
+                        status: 'active',
+                        expiryDate: '2024-12-31T23:59:59',
+                        description: 'Welcome bonus for new users'
+                    },
+                    {
+                        id: '2',
+                        code: 'BONUS100',
+                        amount: 100,
+                        usageLimit: 50,
+                        usedCount: 10,
+                        status: 'active',
+                        expiryDate: '2024-06-30T23:59:59',
+                        description: 'Special bonus code'
+                    }
+                ];
+                updatePromoCodesList(mockPromoCodes);
+            }
+        }
+
+        function updatePromoCodesList(promoCodes) {
             const tbody = document.getElementById('promoCodesTable');
             
             if (promoCodes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center p-8 text-gray-400">No promo codes found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No promo codes found. Create your first promo code to get started.</td></tr>';
                 return;
             }
-
-            tbody.innerHTML = promoCodes.map(promo => `
-                <tr>
-                    <td class="font-mono">${promo.code}</td>
-                    <td>${promo.discount}%</td>
-                    <td>${promo.uses}/${promo.maxUses}</td>
-                    <td>
-                        <span class="status-${getPromoStatus(promo)} px-2 py-1 rounded text-xs">
-                            ${getPromoStatus(promo)}
-                        </span>
-                    </td>
-                    <td>${promo.expiresAt ? OTPUtils.formatDate(promo.expiresAt) : 'Never'}</td>
-                    <td>${OTPUtils.formatDate(promo.createdAt)}</td>
-                    <td>
-                        <div class="flex gap-2">
-                            <button onclick="editPromo('${promo._id}')" class="btn-secondary text-xs">Edit</button>
-                            <button onclick="copyPromoCode('${promo.code}')" class="btn-secondary text-xs">Copy</button>
-                            <button onclick="deletePromo('${promo._id}')" class="btn-danger text-xs">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Get promo status
-        function getPromoStatus(promo) {
-            if (promo.uses >= promo.maxUses) return 'used';
-            if (promo.expiresAt && new Date(promo.expiresAt) < new Date()) return 'expired';
-            return 'active';
-        }
-
-        // Update promo statistics
-        function updatePromoStats() {
-            const totalPromos = promoCodes.length;
-            const activePromos = promoCodes.filter(p => getPromoStatus(p) === 'active').length;
-            const totalDiscount = promoCodes.reduce((sum, promo) => sum + (promo.discount * promo.uses), 0);
-            const totalUses = promoCodes.reduce((sum, promo) => sum + promo.uses, 0);
-
-            document.getElementById('totalPromos').textContent = totalPromos;
-            document.getElementById('activePromos').textContent = activePromos;
-            document.getElementById('totalDiscount').textContent = `$${totalDiscount}`;
-            document.getElementById('totalUses').textContent = totalUses;
-        }
-
-        // Setup search and filters
-        function setupSearchAndFilters() {
-            const searchInput = document.getElementById('promoSearch');
-            const statusFilter = document.getElementById('statusFilter');
-
-            const debouncedSearch = OTPUtils.debounce(() => {
-                filterPromoCodes();
-            }, 300);
-
-            searchInput.addEventListener('input', debouncedSearch);
-            statusFilter.addEventListener('change', filterPromoCodes);
-        }
-
-        // Filter promo codes
-        function filterPromoCodes() {
-            const searchTerm = document.getElementById('promoSearch').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-
-            const filtered = promoCodes.filter(promo => {
-                const matchesSearch = promo.code.toLowerCase().includes(searchTerm) ||
-                                    (promo.description && promo.description.toLowerCase().includes(searchTerm));
+            
+            tbody.innerHTML = promoCodes.map(promo => {
+                const expiryDate = new Date(promo.expiryDate);
+                const isExpired = expiryDate < new Date();
+                const statusClass = promo.status === 'active' && !isExpired ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const statusText = isExpired ? 'Expired' : promo.status;
                 
-                const matchesStatus = !statusFilter || getPromoStatus(promo) === statusFilter;
-                
-                return matchesSearch && matchesStatus;
-            });
-
-            updatePromoCodesTableWithData(filtered);
+                return `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🎫</span>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">${promo.code}</div>
+                                    <div class="text-sm text-gray-500">${promo.description}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${promo.amount}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${promo.usageLimit}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${promo.usedCount || 0}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(promo.expiryDate).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="editPromo('${promo.id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
+                            <button onclick="deletePromo('${promo.id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        // Update table with filtered data
-        function updatePromoCodesTableWithData(data) {
-            const tbody = document.getElementById('promoCodesTable');
-            
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center p-8 text-gray-400">No promo codes found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = data.map(promo => `
-                <tr>
-                    <td class="font-mono">${promo.code}</td>
-                    <td>${promo.discount}%</td>
-                    <td>${promo.uses}/${promo.maxUses}</td>
-                    <td>
-                        <span class="status-${getPromoStatus(promo)} px-2 py-1 rounded text-xs">
-                            ${getPromoStatus(promo)}
-                        </span>
-                    </td>
-                    <td>${promo.expiresAt ? OTPUtils.formatDate(promo.expiresAt) : 'Never'}</td>
-                    <td>${OTPUtils.formatDate(promo.createdAt)}</td>
-                    <td>
-                        <div class="flex gap-2">
-                            <button onclick="editPromo('${promo._id}')" class="btn-secondary text-xs">Edit</button>
-                            <button onclick="copyPromoCode('${promo.code}')" class="btn-secondary text-xs">Copy</button>
-                            <button onclick="deletePromo('${promo._id}')" class="btn-danger text-xs">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Add promo code
-        async function handleAddPromo(event) {
-            event.preventDefault();
-            
-            const promoData = {
-                code: document.getElementById('promoCode').value,
-                discount: parseInt(document.getElementById('promoDiscount').value),
-                maxUses: parseInt(document.getElementById('promoMaxUses').value),
-                expiresAt: document.getElementById('promoExpires').value || null,
-                description: document.getElementById('promoDescription').value
-            };
-
-            try {
-                await OTPUtils.apiRequest('/api/promo-codes', {
-                    method: 'POST',
-                    body: JSON.stringify(promoData)
-                });
-
-                OTPUtils.closeModal('addPromoModal');
-                document.getElementById('addPromoForm').reset();
-                loadPromoCodes();
-                OTPUtils.showSuccess('Promo code added successfully!');
-            } catch (error) {
-                console.error('Error adding promo code:', error);
-                OTPUtils.showError('Failed to add promo code');
-            }
-        }
-
-        // Edit promo code
-        function editPromo(promoId) {
-            const promo = promoCodes.find(p => p._id === promoId);
-            if (!promo) return;
-
-            editingPromoId = promoId;
-            
-            document.getElementById('editPromoId').value = promo._id;
-            document.getElementById('editPromoCode').value = promo.code;
-            document.getElementById('editPromoDiscount').value = promo.discount;
-            document.getElementById('editPromoMaxUses').value = promo.maxUses;
-            document.getElementById('editPromoExpires').value = promo.expiresAt ? promo.expiresAt.slice(0, 16) : '';
-            document.getElementById('editPromoDescription').value = promo.description || '';
-
-            OTPUtils.openModal('editPromoModal');
-        }
-
-        // Handle edit promo
-        async function handleEditPromo(event) {
-            event.preventDefault();
-            
-            const promoData = {
-                code: document.getElementById('editPromoCode').value,
-                discount: parseInt(document.getElementById('editPromoDiscount').value),
-                maxUses: parseInt(document.getElementById('editPromoMaxUses').value),
-                expiresAt: document.getElementById('editPromoExpires').value || null,
-                description: document.getElementById('editPromoDescription').value
-            };
-
-            try {
-                await OTPUtils.apiRequest(`/api/promo-codes/${editingPromoId}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(promoData)
-                });
-
-                OTPUtils.closeModal('editPromoModal');
-                loadPromoCodes();
-                OTPUtils.showSuccess('Promo code updated successfully!');
-            } catch (error) {
-                console.error('Error updating promo code:', error);
-                OTPUtils.showError('Failed to update promo code');
-            }
-        }
-
-        // Delete promo code
-        async function deletePromo(promoId) {
-            if (!confirm('Are you sure you want to delete this promo code? This action cannot be undone.')) {
-                return;
-            }
-
-            try {
-                await OTPUtils.apiRequest(`/api/promo-codes/${promoId}`, {
-                    method: 'DELETE'
-                });
-
-                loadPromoCodes();
-                OTPUtils.showSuccess('Promo code deleted successfully!');
-            } catch (error) {
-                console.error('Error deleting promo code:', error);
-                OTPUtils.showError('Failed to delete promo code');
-            }
-        }
-
-        // Copy promo code
-        function copyPromoCode(code) {
-            OTPUtils.copyToClipboard(code);
-        }
-
-        // Refresh promo codes
-        function refreshPromoCodes() {
+        // Load promo codes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
             loadPromoCodes();
-        }
-
-        // Modal functions
-        function openAddPromoModal() {
-            OTPUtils.openModal('addPromoModal');
-        }
+        });
     </script>
 </body>
 </html>

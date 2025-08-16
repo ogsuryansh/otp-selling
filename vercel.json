@@ -1,0 +1,98 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.ico",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.jpg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.jpeg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.gif",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.svg",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/admin/$1"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/dashboard/index.html"
+    },
+    {
+      "src": "/services",
+      "dest": "/services/index.html"
+    },
+    {
+      "src": "/servers",
+      "dest": "/servers/index.html"
+    },
+    {
+      "src": "/users",
+      "dest": "/users/index.html"
+    },
+    {
+      "src": "/transactions",
+      "dest": "/transactions/index.html"
+    },
+    {
+      "src": "/promo-codes",
+      "dest": "/promo-codes/index.html"
+    },
+    {
+      "src": "/api-config",
+      "dest": "/api-config/index.html"
+    },
+    {
+      "src": "/api-config/connection",
+      "dest": "/api-config/api-connection.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

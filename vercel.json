@@ -44,112 +44,56 @@
   ],
   "routes": [
     {
-      "src": "/api/test",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/statistics",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/dashboard",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/users",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/servers",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/services",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/apis",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/orders",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/transactions",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/promo-codes",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/basic-services",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/otp/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/import/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
     {
       "src": "/admin/(.*)",
-      "dest": "/admin/$1"
+      "dest": "/api/index.js"
     },
     {
       "src": "/dashboard",
-      "dest": "/dashboard/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/services",
-      "dest": "/services/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/servers",
-      "dest": "/servers/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/users",
-      "dest": "/users/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/transactions",
-      "dest": "/transactions/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/promo-codes",
-      "dest": "/promo-codes/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/api-config",
-      "dest": "/api-config/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/api-config/connection",
-      "dest": "/api-config/api-connection.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/test-api",
-      "dest": "/test-api.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/",
-      "dest": "/index.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/api/index.js"
     }
   ],
   "env": {

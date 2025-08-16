@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Bot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: 2px solid #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            border-color: #5a6268;
+            transform: translateY(-1px);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            background: #fff;
+            color: #333;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            background: #fff;
+            color: #333;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-inactive { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">🤖 OTP Bot Dashboard</h1>
+            <p class="text-gray-200 mb-4">Complete management system for your OTP services</p>
+            
+            <!-- Navigation -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🏠 Home
+                </a>
+                <a href="/admin" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    ⚙️ Admin
+                </a>
+                <a href="/api-config" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🔌 API Config
+                </a>
+            </div>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="glass rounded-xl p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-white mb-4">📊 Dashboard Overview</h2>
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="card text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
+                    <div class="text-gray-300 text-sm">Total Users</div>
+                </div>
+                
+                <div class="card text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">🔌</div>
+                    <div class="text-2xl font-bold text-white" id="totalApis">-</div>
+                    <div class="text-gray-300 text-sm">Active APIs</div>
+                </div>
+                
+                <div class="card text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">📱</div>
+                    <div class="text-2xl font-bold text-white" id="totalOrders">-</div>
+                    <div class="text-gray-300 text-sm">Total Orders</div>
+                </div>
+                
+                <div class="card text-center hover:scale-105 transition-transform duration-300">
+                    <div class="text-2xl mb-2">💰</div>
+                    <div class="text-2xl font-bold text-white" id="totalRevenue">-</div>
+                    <div class="text-gray-300 text-sm">Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Tabs -->
+        <div class="glass rounded-xl p-6 mb-6">
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button class="tab-button active" onclick="showTab('users')">👥 Users</button>
+                <button class="tab-button" onclick="showTab('auto-import')">📥 Auto Import</button>
+                <button class="tab-button" onclick="showTab('servers')">🖥️ Servers</button>
+                <button class="tab-button" onclick="showTab('services')">🔧 Services</button>
+                <button class="tab-button" onclick="showTab('api-connect')">🔌 Connect API</button>
+                <button class="tab-button" onclick="showTab('bot-settings')">⚙️ Bot Settings</button>
+                <button class="tab-button" onclick="showTab('my-services')">📋 My Services</button>
+                <button class="tab-button" onclick="showTab('promo-codes')">🎫 Promo Codes</button>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users" class="tab-content active">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-white">User Management</h3>
+                    <button onclick="openAddUserModal()" class="btn-primary">➕ Add User</button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-white">
+                        <thead>
+                            <tr class="border-b border-white/20">
+                                <th class="text-left p-3">Username</th>
+                                <th class="text-left p-3">Email</th>
+                                <th class="text-left p-3">Status</th>
+                                <th class="text-left p-3">Balance</th>
+                                <th class="text-left p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr><td colspan="5" class="text-center p-4 text-gray-400">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Auto Import Tab -->
+            <div id="auto-import" class="tab-content">
+                <h3 class="text-xl font-semibold text-white mb-4">Auto Import API Services</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card">
+                        <h4 class="text-lg font-semibold text-white mb-3">📥 Import from File</h4>
+                        <input type="file" id="importFile" accept=".json,.csv" class="form-input mb-3">
+                        <button onclick="importFromFile()" class="btn-primary w-full">Import Services</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h4 class="text-lg font-semibold text-white mb-3">🔗 Import from URL</h4>
+                        <input type="url" id="importUrl" placeholder="https://api.example.com/services" class="form-input mb-3">
+                        <button onclick="importFromUrl()" class="btn-primary w-full">Import Services</button>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="text-lg font-semibold text-white mb-3">📋 Import History</h4>
+                    <div id="importHistory" class="space-y-2">
+                        <div class="text-gray-400 text-center">No import history yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servers Tab -->
+            <div id="servers" class="tab-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-white">Server Management</h3>
+                    <button onclick="openAddServerModal()" class="btn-primary">➕ Add Server</button>
+                </div>
+                
+                <div id="serversList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="text-center p-8 text-gray-400">Loading servers...</div>
+                </div>
+            </div>
+
+            <!-- Services Tab -->
+            <div id="services" class="tab-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-white">Service Management</h3>
+                    <button onclick="openAddServiceModal()" class="btn-primary">➕ Add Service</button>
+                </div>
+                
+                <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="text-center p-8 text-gray-400">Loading services...</div>
+                </div>
+            </div>
+
+            <!-- API Connect Tab -->
+            <div id="api-connect" class="tab-content">
+                <h3 class="text-xl font-semibold text-white mb-4">🔌 Connect an OTP API</h3>
+                <p class="text-gray-300 text-sm mb-6">Choose a server and add an SMS/OTP API to all the services available in that server.</p>
+                
+                <form id="otpApiForm" class="space-y-6">
+                    <!-- Server Selection -->
+                    <div>
+                        <label class="block text-white mb-2">Select Server</label>
+                        <select id="otpApiServerId" class="form-select w-full" required>
+                            <option value="">Select a server</option>
+                            <option value="india">India Server</option>
+                        </select>
+                    </div>
+
+                    <!-- API Name -->
+                    <div>
+                        <label class="block text-white mb-2">API Name *</label>
+                        <input type="text" id="otpApiName" class="form-input w-full" required placeholder="My Api">
+                    </div>
+
+                    <!-- Authorization Headers -->
+                    <div>
+                        <label class="block text-white mb-2">Does your API uses Authorization Headers?</label>
+                        <select id="otpApiUsesAuth" class="form-select w-full">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+
+                    <!-- API Response Type -->
+                    <div>
+                        <label class="block text-white mb-2">API response type</label>
+                        <select id="otpApiResponseType" class="form-select w-full" required>
+                            <option value="text">Text</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                        </select>
+                    </div>
+
+                    <!-- API URLs -->
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-white mb-2">API Get Number URL *</label>
+                            <input type="url" id="otpApiGetNumberUrl" class="form-input w-full" required placeholder="https://api.myservice.com/handler?apikey=123xx...&method=get-number">
+                        </div>
+                        <div>
+                            <label class="block text-white mb-2">API Get Message/Status URL *</label>
+                            <input type="url" id="otpApiGetStatusUrl" class="form-input w-full" required placeholder="https://api.myservice.com/handler?apikey=123xx...&method=getMsg">
+                        </div>
+                    </div>
+
+                    <!-- Status Check Configuration -->
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h4 class="text-white font-medium mb-3">How to know that get status url has sent is a success message indicating user has received his otp. Also what is the path to message text if response type is json.</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-white mb-2">ⓘ If Response StartsWith: *</label>
+                                <input type="text" id="otpApiStatusSuccess" class="form-input w-full" placeholder="STATUS_SUCCESS">
+                            </div>
+                            <div>
+                                <label class="block text-white mb-2">Message Text Path (JSON)</label>
+                                <input type="text" id="otpApiMessagePath" class="form-input w-full" placeholder="data.message">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional API URLs -->
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-white mb-2">API Activate Next Message URL</label>
+                            <input type="url" id="otpApiActivateUrl" class="form-input w-full" placeholder="https://api.myservice.com/handler?apikey=123xx...&method=next">
+                        </div>
+                        <div>
+                            <label class="block text-white mb-2">API Cancel Number URL *</label>
+                            <input type="url" id="otpApiCancelUrl" class="form-input w-full" required placeholder="https://api.myservice.com/handler?apikey=123xx...&method=cancel-number">
+                        </div>
+                    </div>
+
+                    <!-- Auto Cancel and Retry -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-white mb-2">API AutoCancel Number in Minutes *</label>
+                            <input type="number" id="otpApiAutoCancelMinutes" min="1" class="form-input w-full" required placeholder="5">
+                        </div>
+                        <div>
+                            <label class="block text-white mb-2">API Retry Get Number URL __ times *</label>
+                            <input type="number" id="otpApiRetryCount" min="0" class="form-input w-full" required placeholder="0">
+                        </div>
+                    </div>
+
+                    <!-- Services Preview -->
+                    <div class="bg-white/5 p-4 rounded-lg">
+                        <h4 class="text-white font-medium mb-3">Your Selected Server will include following services:</h4>
+                        <div id="otpApiServicesPreview" class="text-gray-300 text-sm">
+                            <p>Select a server to see available services</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full">
+                        🔌 Connect OTP API
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bot Settings Tab -->
+            <div id="bot-settings" class="tab-content">
+                <h3 class="text-xl font-semibold text-white mb-4">Bot Configuration</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card">
+                        <h4 class="text-lg font-semibold text-white mb-3">🤖 General Settings</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-white text-sm">Bot Token</label>
+                                <input type="password" id="botToken" placeholder="Enter bot token" class="form-input">
+                            </div>
+                            <div>
+                                <label class="text-white text-sm">Webhook URL</label>
+                                <input type="url" id="webhookUrl" placeholder="https://your-domain.com/webhook" class="form-input">
+                            </div>
+                            <button onclick="saveBotSettings()" class="btn-primary w-full">Save Settings</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h4 class="text-lg font-semibold text-white mb-3">⚙️ Advanced Settings</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-white text-sm">Max Retries</label>
+                                <input type="number" id="maxRetries" value="3" min="1" max="10" class="form-input">
+                            </div>
+                            <div>
+                                <label class="text-white text-sm">Timeout (seconds)</label>
+                                <input type="number" id="timeout" value="30" min="5" max="300" class="form-input">
+                            </div>
+                            <div>
+                                <label class="text-white text-sm">Rate Limit (requests/min)</label>
+                                <input type="number" id="rateLimit" value="10" min="1" max="100" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Services Tab -->
+            <div id="my-services" class="tab-content">
+                <h3 class="text-xl font-semibold text-white mb-4">My Services</h3>
+                
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="serviceSearch" placeholder="Search services..." class="form-input flex-1">
+                    <button onclick="refreshServices()" class="btn-secondary">🔄 Refresh</button>
+                </div>
+                
+                <div id="myServicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="text-center p-8 text-gray-400">Loading services...</div>
+                </div>
+            </div>
+
+            <!-- Promo Codes Tab -->
+            <div id="promo-codes" class="tab-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-white">Promo Code Management</h3>
+                    <button onclick="openAddPromoModal()" class="btn-primary">➕ Add Promo Code</button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-white">
+                        <thead>
+                            <tr class="border-b border-white/20">
+                                <th class="text-left p-3">Code</th>
+                                <th class="text-left p-3">Discount</th>
+                                <th class="text-left p-3">Uses</th>
+                                <th class="text-left p-3">Expires</th>
+                                <th class="text-left p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promoCodesTable">
+                            <tr><td colspan="5" class="text-center p-4 text-gray-400">Loading promo codes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-md w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Add New User</h3>
+                    <button onclick="closeModal('addUserModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="addUserForm" onsubmit="handleAddUser(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Username</label>
+                            <input type="text" id="newUsername" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Email</label>
+                            <input type="email" id="newEmail" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Password</label>
+                            <input type="password" id="newPassword" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Initial Balance</label>
+                            <input type="number" id="initialBalance" value="0" min="0" step="0.01" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="btn-primary flex-1">Add User</button>
+                        <button type="button" onclick="closeModal('addUserModal')" class="btn-secondary flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Server Modal -->
+    <div id="addServerModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-md w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Add New Server</h3>
+                    <button onclick="closeModal('addServerModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="addServerForm" onsubmit="handleAddServer(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Server Name</label>
+                            <input type="text" id="serverName" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Server Code</label>
+                            <input type="text" id="serverCode" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Description</label>
+                            <textarea id="serverDescription" class="form-input" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="btn-primary flex-1">Add Server</button>
+                        <button type="button" onclick="closeModal('addServerModal')" class="btn-secondary flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Service Modal -->
+    <div id="addServiceModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-2xl w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800">Add Service</h3>
+                        <p class="text-gray-600 text-sm mt-1">Select a server and add a service to it. You can later connect an API to this service. Users will be buying this service using their 💎</p>
+                    </div>
+                    <button onclick="closeModal('addServiceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="addServiceForm" onsubmit="handleAddService(event)">
+                    <div class="space-y-6">
+                        <!-- Server Selection -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Select Server</label>
+                            <select id="serviceServerId" required class="form-input w-full">
+                                <option value="">Select a server</option>
+                                <option value="india">India Server</option>
+                            </select>
+                        </div>
+
+                        <!-- Service ID -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service ID *</label>
+                            <input type="text" id="serviceId" required class="form-input w-full" placeholder="Other">
+                        </div>
+
+                        <!-- Service Name -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service Name *</label>
+                            <input type="text" id="serviceName" required class="form-input w-full" placeholder="My Service">
+                        </div>
+
+                        <!-- Service Logo -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service Logo *</label>
+                            <input type="text" id="serviceLogo" required class="form-input w-full" placeholder="Service Logo Url">
+                        </div>
+
+                        <!-- Service Code -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service Code *</label>
+                            <input type="text" id="serviceCode" required class="form-input w-full" placeholder="Serv1">
+                        </div>
+
+                        <!-- Service Description -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service Description *</label>
+                            <textarea id="serviceDescription" required class="form-input w-full" rows="3" placeholder="My Small Service Description..."></textarea>
+                        </div>
+
+                        <!-- Service Price -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Service Price *</label>
+                            <input type="number" id="servicePrice" required min="0" step="0.01" class="form-input w-full" placeholder="10">
+                        </div>
+
+                        <!-- Disable Cancellation -->
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Disable Cancellation till __ minutes</label>
+                            <input type="number" id="serviceCancellationTime" min="0" class="form-input w-full" placeholder="0">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-8">
+                        <button type="submit" class="btn-primary flex-1">Add Service</button>
+                        <button type="button" onclick="closeModal('addServiceModal')" class="btn-secondary flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Promo Code Modal -->
+    <div id="addPromoModal" class="modal">
+        <div class="modal-content mx-4 my-8 max-w-md w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Add Promo Code</h3>
+                    <button onclick="closeModal('addPromoModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="addPromoForm" onsubmit="handleAddPromo(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Promo Code</label>
+                            <input type="text" id="promoCode" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Discount (%)</label>
+                            <input type="number" id="promoDiscount" required min="1" max="100" class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Max Uses</label>
+                            <input type="number" id="promoMaxUses" required min="1" class="form-input">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 text-sm font-medium">Expires At</label>
+                            <input type="datetime-local" id="promoExpires" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="btn-primary flex-1">Add Promo Code</button>
+                        <button type="button" onclick="closeModal('addPromoModal')" class="btn-secondary flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTab = 'users';
+        let users = [];
+        let servers = [];
+        let services = [];
+        let promoCodes = [];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded');
+            loadDashboardData();
+        });
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadUsers(),
+                    loadServers(),
+                    loadServices(),
+                    loadPromoCodes(),
+                    loadDashboardStats()
+                ]);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Error loading dashboard data');
+            }
+        }
+
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+                    document.getElementById('totalApis').textContent = stats.totalApis || 0;
+                    document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
+                    document.getElementById('totalRevenue').textContent = `$${stats.totalRevenue || 0}`;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    users = await response.json();
+                    updateUsersTable();
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Update users table
+        function updateUsersTable() {
+            const tbody = document.getElementById('usersTable');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No users found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr class="border-b border-white/10">
+                    <td class="p-3">${user.username}</td>
+                    <td class="p-3">${user.email}</td>
+                    <td class="p-3">
+                        <span class="status-${user.status} px-2 py-1 rounded text-xs">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="p-3">$${user.balance || 0}</td>
+                    <td class="p-3">
+                        <button onclick="editUser('${user._id}')" class="btn-secondary text-xs mr-2">Edit</button>
+                        <button onclick="deleteUser('${user._id}')" class="btn-secondary text-xs bg-red-500/20 text-red-300">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load servers
+        async function loadServers() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    servers = await response.json();
+                    updateServersList();
+                }
+            } catch (error) {
+                console.error('Error loading servers:', error);
+            }
+        }
+
+        // Update servers list
+        function updateServersList() {
+            const container = document.getElementById('serversList');
+            if (servers.length === 0) {
+                container.innerHTML = '<div class="text-center p-8 text-gray-400">No servers found</div>';
+                return;
+            }
+
+            container.innerHTML = servers.map(server => `
+                <div class="card">
+                    <h4 class="text-lg font-semibold text-white mb-2">${server.name}</h4>
+                    <p class="text-gray-300 text-sm mb-2">Code: ${server.code}</p>
+                    <p class="text-gray-300 text-sm mb-3">${server.description || 'No description'}</p>
+                    <div class="flex gap-2">
+                        <button onclick="editServer('${server._id}')" class="btn-secondary text-xs">Edit</button>
+                        <button onclick="deleteServer('${server._id}')" class="btn-secondary text-xs bg-red-500/20 text-red-300">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load services
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/basic-services');
+                if (response.ok) {
+                    services = await response.json();
+                    updateServicesList();
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        // Update services list
+        function updateServicesList() {
+            const container = document.getElementById('servicesList');
+            if (services.length === 0) {
+                container.innerHTML = '<div class="text-center p-8 text-gray-400">No services found</div>';
+                return;
+            }
+
+            container.innerHTML = services.map(service => `
+                <div class="card">
+                    <h4 class="text-lg font-semibold text-white mb-2">${service.name}</h4>
+                    <p class="text-gray-300 text-sm mb-2">Code: ${service.code}</p>
+                    <p class="text-gray-300 text-sm mb-2">Price: $${service.price}</p>
+                    <p class="text-gray-300 text-sm mb-3">${service.description || 'No description'}</p>
+                    <div class="flex gap-2">
+                        <button onclick="editService('${service._id}')" class="btn-secondary text-xs">Edit</button>
+                        <button onclick="deleteService('${service._id}')" class="btn-secondary text-xs bg-red-500/20 text-red-300">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load promo codes
+        async function loadPromoCodes() {
+            try {
+                const response = await fetch('/api/promo-codes');
+                if (response.ok) {
+                    promoCodes = await response.json();
+                    updatePromoCodesTable();
+                }
+            } catch (error) {
+                console.error('Error loading promo codes:', error);
+            }
+        }
+
+        // Update promo codes table
+        function updatePromoCodesTable() {
+            const tbody = document.getElementById('promoCodesTable');
+            if (promoCodes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No promo codes found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = promoCodes.map(promo => `
+                <tr class="border-b border-white/10">
+                    <td class="p-3">${promo.code}</td>
+                    <td class="p-3">${promo.discount}%</td>
+                    <td class="p-3">${promo.uses}/${promo.maxUses}</td>
+                    <td class="p-3">${promo.expiresAt ? new Date(promo.expiresAt).toLocaleDateString() : 'Never'}</td>
+                    <td class="p-3">
+                        <button onclick="editPromo('${promo._id}')" class="btn-secondary text-xs mr-2">Edit</button>
+                        <button onclick="deletePromo('${promo._id}')" class="btn-secondary text-xs bg-red-500/20 text-red-300">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+        }
+
+        // Modal functions
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'block';
+        }
+
+        function openAddServerModal() {
+            document.getElementById('addServerModal').style.display = 'block';
+        }
+
+        function openAddServiceModal() {
+            document.getElementById('addServiceModal').style.display = 'block';
+        }
+
+        function openAddPromoModal() {
+            document.getElementById('addPromoModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Form handlers
+        async function handleAddUser(event) {
+            event.preventDefault();
+            
+            const userData = {
+                username: document.getElementById('newUsername').value,
+                email: document.getElementById('newEmail').value,
+                password: document.getElementById('newPassword').value,
+                balance: parseFloat(document.getElementById('initialBalance').value) || 0
+            };
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    closeModal('addUserModal');
+                    loadUsers();
+                    showSuccess('User added successfully!');
+                } else {
+                    showError('Failed to add user');
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+                showError('Error adding user');
+            }
+        }
+
+        async function handleAddServer(event) {
+            event.preventDefault();
+            
+            const serverData = {
+                name: document.getElementById('serverName').value,
+                code: document.getElementById('serverCode').value,
+                description: document.getElementById('serverDescription').value
+            };
+
+            try {
+                const response = await fetch('/api/servers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(serverData)
+                });
+
+                if (response.ok) {
+                    closeModal('addServerModal');
+                    loadServers();
+                    showSuccess('Server added successfully!');
+                } else {
+                    showError('Failed to add server');
+                }
+            } catch (error) {
+                console.error('Error adding server:', error);
+                showError('Error adding server');
+            }
+        }
+
+        async function handleAddService(event) {
+            event.preventDefault();
+            
+            const serviceData = {
+                serverId: document.getElementById('serviceServerId').value,
+                serviceId: document.getElementById('serviceId').value,
+                name: document.getElementById('serviceName').value,
+                logo: document.getElementById('serviceLogo').value,
+                code: document.getElementById('serviceCode').value,
+                description: document.getElementById('serviceDescription').value,
+                price: parseFloat(document.getElementById('servicePrice').value),
+                cancellationTime: parseInt(document.getElementById('serviceCancellationTime').value) || 0
+            };
+
+            try {
+                const response = await fetch('/api/basic-services', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(serviceData)
+                });
+
+                if (response.ok) {
+                    closeModal('addServiceModal');
+                    loadServices();
+                    showSuccess('Service added successfully!');
+                    // Reset form
+                    document.getElementById('addServiceForm').reset();
+                } else {
+                    showError('Failed to add service');
+                }
+            } catch (error) {
+                console.error('Error adding service:', error);
+                showError('Error adding service');
+            }
+        }
+
+        async function handleAddPromo(event) {
+            event.preventDefault();
+            
+            const promoData = {
+                code: document.getElementById('promoCode').value,
+                discount: parseInt(document.getElementById('promoDiscount').value),
+                maxUses: parseInt(document.getElementById('promoMaxUses').value),
+                expiresAt: document.getElementById('promoExpires').value || null
+            };
+
+            try {
+                const response = await fetch('/api/promo-codes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(promoData)
+                });
+
+                if (response.ok) {
+                    closeModal('addPromoModal');
+                    loadPromoCodes();
+                    showSuccess('Promo code added successfully!');
+                } else {
+                    showError('Failed to add promo code');
+                }
+            } catch (error) {
+                console.error('Error adding promo code:', error);
+                showError('Error adding promo code');
+            }
+        }
+
+        // Auto import functions
+        async function importFromFile() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('Please select a file');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/import/file', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    showSuccess('Services imported successfully!');
+                    loadServices();
+                } else {
+                    showError('Failed to import services');
+                }
+            } catch (error) {
+                console.error('Error importing from file:', error);
+                showError('Error importing from file');
+            }
+        }
+
+        async function importFromUrl() {
+            const url = document.getElementById('importUrl').value;
+            
+            if (!url) {
+                showError('Please enter a URL');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/import/url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                if (response.ok) {
+                    showSuccess('Services imported successfully!');
+                    loadServices();
+                } else {
+                    showError('Failed to import services');
+                }
+            } catch (error) {
+                console.error('Error importing from URL:', error);
+                showError('Error importing from URL');
+            }
+        }
+
+        // OTP API form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const otpApiForm = document.getElementById('otpApiForm');
+            if (otpApiForm) {
+                otpApiForm.addEventListener('submit', handleOtpApiSubmit);
+            }
+
+            // Load servers for OTP API form
+            loadServersForOtpApi();
+        });
+
+        // OTP API form submission handler
+        async function handleOtpApiSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                serverId: document.getElementById('otpApiServerId').value,
+                name: document.getElementById('otpApiName').value,
+                usesAuth: document.getElementById('otpApiUsesAuth').value === 'true',
+                responseType: document.getElementById('otpApiResponseType').value,
+                getNumberUrl: document.getElementById('otpApiGetNumberUrl').value,
+                getStatusUrl: document.getElementById('otpApiGetStatusUrl').value,
+                statusSuccess: document.getElementById('otpApiStatusSuccess').value,
+                messagePath: document.getElementById('otpApiMessagePath').value,
+                activateUrl: document.getElementById('otpApiActivateUrl').value,
+                cancelUrl: document.getElementById('otpApiCancelUrl').value,
+                autoCancelMinutes: parseInt(document.getElementById('otpApiAutoCancelMinutes').value),
+                retryCount: parseInt(document.getElementById('otpApiRetryCount').value)
+            };
+
+            try {
+                const response = await fetch('/api/apis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showSuccess('OTP API connected successfully!');
+                    document.getElementById('otpApiForm').reset();
+                    loadServicesPreview();
+                } else {
+                    const errorData = await response.json();
+                    showError('Failed to connect OTP API: ' + (errorData.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error connecting OTP API:', error);
+                showError('Error connecting OTP API: ' + error.message);
+            }
+        }
+
+        // Load servers for OTP API form
+        async function loadServersForOtpApi() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    const servers = await response.json();
+                    const serverSelect = document.getElementById('otpApiServerId');
+                    if (serverSelect) {
+                        serverSelect.innerHTML = '<option value="">Select a server</option>';
+                        servers.forEach(server => {
+                            const option = document.createElement('option');
+                            option.value = server._id || server.id || server.code;
+                            option.textContent = server.name || server.code;
+                            serverSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading servers:', error);
+            }
+        }
+
+        // Load services preview when server is selected
+        async function loadServicesPreview() {
+            const serverId = document.getElementById('otpApiServerId').value;
+            if (!serverId) {
+                document.getElementById('otpApiServicesPreview').innerHTML = '<p>Select a server to see available services</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/basic-services');
+                if (response.ok) {
+                    const services = await response.json();
+                    const serverServices = services.filter(service => service.serverId === serverId);
+                    
+                    if (serverServices.length > 0) {
+                        const servicesList = serverServices.map(service => 
+                            `<div class="flex items-center space-x-2 mb-2">
+                                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                <span>${service.name} (${service.code})</span>
+                            </div>`
+                        ).join('');
+                        
+                        document.getElementById('otpApiServicesPreview').innerHTML = servicesList;
+                    } else {
+                        document.getElementById('otpApiServicesPreview').innerHTML = '<p class="text-yellow-400">No services found for this server</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading services preview:', error);
+                document.getElementById('otpApiServicesPreview').innerHTML = '<p class="text-red-400">Error loading services</p>';
+            }
+        }
+
+        // Add event listener for server selection change
+        document.addEventListener('DOMContentLoaded', function() {
+            const serverSelect = document.getElementById('otpApiServerId');
+            if (serverSelect) {
+                serverSelect.addEventListener('change', loadServicesPreview);
+            }
+        });
+
+        // Bot settings functions
+        async function saveBotSettings() {
+            const settings = {
+                botToken: document.getElementById('botToken').value,
+                webhookUrl: document.getElementById('webhookUrl').value,
+                maxRetries: parseInt(document.getElementById('maxRetries').value),
+                timeout: parseInt(document.getElementById('timeout').value),
+                rateLimit: parseInt(document.getElementById('rateLimit').value)
+            };
+
+            try {
+                const response = await fetch('/api/bot/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    showSuccess('Bot settings saved successfully!');
+                } else {
+                    showError('Failed to save bot settings');
+                }
+            } catch (error) {
+                console.error('Error saving bot settings:', error);
+                showError('Error saving bot settings');
+            }
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            alert(message);
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = ['addUserModal', 'addServerModal', 'addServiceModal', 'addPromoModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

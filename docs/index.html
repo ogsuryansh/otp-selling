@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - OTP Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">📚 Documentation</h1>
+            <p class="text-gray-200 mb-4">Complete guides and documentation for OTP Bot System</p>
+            
+            <!-- Navigation -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="../" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    🏠 Home
+                </a>
+                <a href="../dashboard/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    📊 Dashboard
+                </a>
+                <a href="../admin/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    ⚙️ Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- Documentation Categories -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Setup & Installation -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">🚀 Setup & Installation</h3>
+                <div class="space-y-3">
+                    <a href="ADMIN_SETUP_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📋 Admin Setup Guide
+                    </a>
+                    <a href="OTP_SETUP_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📱 OTP Setup Guide
+                    </a>
+                    <a href="MONGODB_SETUP_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🗄️ MongoDB Setup
+                    </a>
+                    <a href="BOT_INTEGRATION_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🤖 Bot Integration
+                    </a>
+                </div>
+            </div>
+
+            <!-- API & Configuration -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">🔌 API & Configuration</h3>
+                <div class="space-y-3">
+                    <a href="API_CONFIGURATION_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        ⚙️ API Configuration
+                    </a>
+                    <a href="OTP_INTEGRATION_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📞 OTP Integration
+                    </a>
+                    <a href="DYNAMIC_API_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🔄 Dynamic API Guide
+                    </a>
+                    <a href="ADVANCED_FEATURES_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🚀 Advanced Features
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deployment -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">🌐 Deployment</h3>
+                <div class="space-y-3">
+                    <a href="DEPLOYMENT_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📦 Deployment Guide
+                    </a>
+                    <a href="DEPLOYMENT_VERCEL.md" class="block text-gray-300 hover:text-white transition-colors">
+                        ☁️ Vercel Deployment
+                    </a>
+                    <a href="DEPLOYMENT_SUMMARY.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📋 Deployment Summary
+                    </a>
+                    <a href="VERCEL_DEPLOYMENT_FIX.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🔧 Vercel Fixes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Development -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">💻 Development</h3>
+                <div class="space-y-3">
+                    <a href="LOCAL_DEVELOPMENT_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🏠 Local Development
+                    </a>
+                    <a href="MULTI_PAGE_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📄 Multi-Page Guide
+                    </a>
+                    <a href="RESPONSIVE_FIXES_SUMMARY.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📱 Responsive Fixes
+                    </a>
+                    <a href="QUICK_FIX_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        ⚡ Quick Fixes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Server Management -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">🖥️ Server Management</h3>
+                <div class="space-y-3">
+                    <a href="SERVER_MANAGEMENT_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        ⚙️ Server Management
+                    </a>
+                    <a href="DEPLOYMENT_DEBUG_GUIDE.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🐛 Debug Guide
+                    </a>
+                    <a href="PRODUCTION_README.md" class="block text-gray-300 hover:text-white transition-colors">
+                        🚀 Production Guide
+                    </a>
+                </div>
+            </div>
+
+            <!-- Node.js -->
+            <div class="card">
+                <h3 class="text-xl font-semibold text-white mb-4">🟢 Node.js</h3>
+                <div class="space-y-3">
+                    <a href="README_NODEJS.md" class="block text-gray-300 hover:text-white transition-colors">
+                        📖 Node.js Guide
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Start Guide -->
+        <div class="glass rounded-xl p-6 mt-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">⚡ Quick Start Guide</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-3">1. Initial Setup</h3>
+                    <ol class="text-gray-300 space-y-2 text-sm">
+                        <li>1. Install dependencies: <code class="bg-white/10 px-2 py-1 rounded">npm install</code></li>
+                        <li>2. Configure environment variables</li>
+                        <li>3. Set up MongoDB database</li>
+                        <li>4. Configure bot settings</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-3">2. API Configuration</h3>
+                    <ol class="text-gray-300 space-y-2 text-sm">
+                        <li>1. Add SMS service providers</li>
+                        <li>2. Configure API endpoints</li>
+                        <li>3. Test API connections</li>
+                        <li>4. Set up rate limiting</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="glass rounded-xl p-6 mt-6">
+            <h2 class="text-2xl font-semibold text-white mb-4">🆘 Need Help?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-3xl mb-2">📖</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Documentation</h3>
+                    <p class="text-gray-300 text-sm">Browse through our comprehensive guides</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Troubleshooting</h3>
+                    <p class="text-gray-300 text-sm">Common issues and solutions</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">💬</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Support</h3>
+                    <p class="text-gray-300 text-sm">Get help from our community</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -3,66 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting to Admin Panel...</title>
-    <meta http-equiv="refresh" content="0; url=admin_fixed.html">
+    <title>OTP Bot - Home</title>
+    <!-- Removed Tailwind CDN for production; using compiled CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            text-align: center;
         }
-        .redirect-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 1rem;
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .manual-link {
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            text-decoration: none;
-            color: white;
-            display: inline-block;
-        }
-        .manual-link:hover {
-            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
-<body>
-    <div class="redirect-box">
-        <h1>🔄 Redirecting...</h1>
-        <div class="spinner"></div>
-        <p>Taking you to the admin panel...</p>
-        <p>If you're not redirected automatically, click below:</p>
-        <a href="admin_fixed.html" class="manual-link">🚀 Go to Admin Panel</a>
+<body class="gradient-bg min-h-screen text-gray-200">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-6 text-center">
+            <h1 class="text-3xl font-bold text-white mb-2">🤖 OTP Bot System</h1>
+            <p class="text-gray-300 mb-4">Complete SMS OTP Management Solution</p>
+        </div>
+
+        <!-- Main Navigation Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <!-- Dashboard -->
+            <a href="dashboard/index.html" class="nav-card">
+                <div class="text-3xl mb-3">📊</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Dashboard</h3>
+                <p class="text-gray-300 text-xs">System overview</p>
+            </a>
+
+            <!-- Admin Panel -->
+            <a href="admin/index.html" class="nav-card">
+                <div class="text-3xl mb-3">⚙️</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Admin Panel</h3>
+                <p class="text-gray-300 text-xs">System admin</p>
+            </a>
+
+            <!-- API Configuration -->
+            <a href="api-config/index.html" class="nav-card">
+                <div class="text-3xl mb-3">🔌</div>
+                <h3 class="text-lg font-semibold text-white mb-1">API Config</h3>
+                <p class="text-gray-300 text-xs">SMS APIs</p>
+            </a>
+
+            <!-- Services -->
+            <a href="services/index.html" class="nav-card">
+                <div class="text-3xl mb-3">🔧</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Services</h3>
+                <p class="text-gray-300 text-xs">OTP services</p>
+            </a>
+
+            <!-- Users -->
+            <a href="users/index.html" class="nav-card">
+                <div class="text-3xl mb-3">👥</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Users</h3>
+                <p class="text-gray-300 text-xs">User management</p>
+            </a>
+
+            <!-- Servers -->
+            <a href="servers/index.html" class="nav-card">
+                <div class="text-3xl mb-3">🖥️</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Servers</h3>
+                <p class="text-gray-300 text-xs">Server config</p>
+            </a>
+
+            <!-- Transactions -->
+            <a href="transactions/index.html" class="nav-card">
+                <div class="text-3xl mb-3">💰</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Transactions</h3>
+                <p class="text-gray-300 text-xs">Payment history</p>
+            </a>
+
+            <!-- Promo Codes -->
+            <a href="promo-codes/index.html" class="nav-card">
+                <div class="text-3xl mb-3">🎫</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Promo Codes</h3>
+                <p class="text-gray-300 text-xs">Discounts</p>
+            </a>
+
+            <!-- Documentation -->
+            <a href="docs/index.html" class="nav-card">
+                <div class="text-3xl mb-3">📚</div>
+                <h3 class="text-lg font-semibold text-white mb-1">Documentation</h3>
+                <p class="text-gray-300 text-xs">Guides</p>
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="glass rounded-xl p-6 mt-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">📈 Quick Statistics</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
+                    <div class="text-gray-300 text-sm">Total Users</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-2xl mb-2">🔌</div>
+                    <div class="text-2xl font-bold text-white" id="totalApis">-</div>
+                    <div class="text-gray-300 text-sm">Active APIs</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-2xl mb-2">📱</div>
+                    <div class="text-2xl font-bold text-white" id="totalOrders">-</div>
+                    <div class="text-gray-300 text-sm">Total Orders</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-2xl mb-2">💰</div>
+                    <div class="text-2xl font-bold text-white" id="totalRevenue">-</div>
+                    <div class="text-gray-300 text-sm">Revenue</div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="assets/js/main.js"></script>
     <script>
-        // Auto-redirect immediately
-        window.location.href = 'admin_fixed.html';
+        // Load quick statistics when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuickStats();
+        });
+
+        async function loadQuickStats() {
+            try {
+                // Show loading state
+                const statElements = ['totalUsers', 'totalApis', 'totalOrders', 'totalRevenue'];
+                statElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = '...';
+                });
+
+                // Fetch statistics from API
+                const response = await fetch('/api/statistics');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update statistics display
+                const stats = data;
+                    
+                    // Update total users
+                    const totalUsersElement = document.getElementById('totalUsers');
+                    if (totalUsersElement) {
+                        totalUsersElement.textContent = stats.totalUsers || 0;
+                    }
+                    
+                    // Update total APIs (using active users as proxy)
+                    const totalApisElement = document.getElementById('totalApis');
+                    if (totalApisElement) {
+                        totalApisElement.textContent = stats.activeUsers || 0;
+                    }
+                    
+                    // Update total orders (using total transactions)
+                    const totalOrdersElement = document.getElementById('totalOrders');
+                    if (totalOrdersElement) {
+                        totalOrdersElement.textContent = stats.totalTransactions || 0;
+                    }
+                    
+                                         // Update total revenue (using total balance)
+                     const totalRevenueElement = document.getElementById('totalRevenue');
+                     if (totalRevenueElement) {
+                         const revenue = stats.totalBalance || 0;
+                         totalRevenueElement.textContent = new Intl.NumberFormat('en-US', {
+                             style: 'currency',
+                             currency: 'USD'
+                         }).format(revenue);
+                     }
+                 
+                 console.log('Quick statistics loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading quick statistics:', error);
+                
+                // Show error state
+                const statElements = ['totalUsers', 'totalApis', 'totalOrders', 'totalRevenue'];
+                statElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = 'Error';
+                });
+                
+                // Show error toast if available
+                if (window.Utils && window.Utils.showToast) {
+                    Utils.showToast('Failed to load statistics', 'error');
+                }
+            }
+        }
+
+        // Refresh statistics every 30 seconds
+        setInterval(loadQuickStats, 30000);
     </script>
 </body>
 </html>

@@ -1,0 +1,31 @@
+# Local Development Environment Variables
+# Copy this to .env.local for local development
+
+NODE_ENV=development
+DEBUG=true
+PORT=3000
+
+# MongoDB Configuration (for local testing)
+MONGODB_URI=mongodb://localhost:27017/otp_bot
+MONGODB_DATABASE=otp_bot
+MONGODB_COLLECTION=users
+
+# Admin Panel Configuration
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+ADMIN_ID=7574316340
+
+# OTP Service API Keys (add your actual keys here)
+FIVESIM_API_KEY=your_5sim_api_key_here
+SMS_ACTIVATE_API_KEY=your_sms_activate_api_key_here
+SMSHUB_API_KEY=your_smshub_api_key_here
+
+# Security Settings
+MAX_LOGIN_ATTEMPTS=5
+LOCKOUT_DURATION=900000
+SESSION_TIMEOUT=86400000
+REQUIRE_2FA=false
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=60000
+MAX_REQUESTS_PER_MINUTE=10

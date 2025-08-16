@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Bot Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="admin-config.js"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Login Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: #4a5568;
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: #718096;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Admin Content */
+        .admin-content {
+            display: none;
+        }
+        
+        /* Tab Styles */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Tab button styles */
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Action Card Styles */
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .action-card .title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-card .description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Form Styles */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 Admin Login</h1>
+                <p>Enter your credentials to access the admin panel</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter password">
+                </div>
+                
+                <button type="submit" class="login-btn">🔑 Login</button>
+            </form>
+            
+            <div style="margin-top: 1rem; text-align: center; color: #718096; font-size: 0.875rem;">
+                <p><strong>Default Credentials:</strong></p>
+                <p>Username: <code>admin</code></p>
+                <p>Password: <code>admin123</code></p>
+                <p><em>⚠️ Change these in your .env file!</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Content (Hidden until authenticated) -->
+    <div id="adminContent" class="admin-content">
+        <div class="container mx-auto px-4 py-6 max-w-7xl">
+            <!-- Simple Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">⚙️ Admin Panel</h1>
+                <p class="text-xl text-gray-200 mb-6">Simple & Easy Management</p>
+                <button onclick="logout()" class="glass px-6 py-3 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-lg font-medium">
+                    🚪 Logout
+                </button>
+            </div>
+            
+            <!-- Main Action Grid - Simple & Clear -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 action-grid">
+                
+                <!-- 1. ADD SERVER -->
+                <div class="action-card" onclick="showTab('addServer')">
+                    <div class="icon">🖥️</div>
+                    <div class="title">Add Server</div>
+                    <div class="description">Create a new server to host your OTP services</div>
+                </div>
+                
+                <!-- 2. ADD SERVICES -->
+                <div class="action-card" onclick="showTab('addServices')">
+                    <div class="icon">➕</div>
+                    <div class="title">Add Services</div>
+                    <div class="description">Create new services that users can buy</div>
+                </div>
+                
+                <!-- 3. CONNECT API -->
+                <div class="action-card" onclick="showTab('connectApi')">
+                    <div class="icon">🔌</div>
+                    <div class="title">Connect API</div>
+                    <div class="description">Connect your SMS/OTP API to services</div>
+                </div>
+                
+                <!-- 4. MANAGE USERS -->
+                <div class="action-card" onclick="showTab('users')">
+                    <div class="icon">👥</div>
+                    <div class="title">Manage Users</div>
+                    <div class="description">View, ban, unban, and manage user accounts</div>
+                </div>
+                
+                <!-- 5. VIEW STATS -->
+                <div class="action-card" onclick="showTab('dashboard')">
+                    <div class="icon">📊</div>
+                    <div class="title">View Stats</div>
+                    <div class="description">See system statistics and transactions</div>
+                </div>
+                
+                <!-- 6. PROMO CODES -->
+                <div class="action-card" onclick="showTab('promoCode')">
+                    <div class="icon">🎫</div>
+                    <div class="title">Promo Codes</div>
+                    <div class="description">Create discount codes for users</div>
+                </div>
+                
+            </div>
+            
+            <!-- Tab Content Area -->
+            <div id="tabContent" class="mt-8">
+                
+                <!-- Add Server Tab -->
+                <div id="addServer" class="tab-content">
+                    <div class="glass rounded-xl p-8 max-w-2xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">🖥️ Add New Server</h2>
+                        <form id="serverForm" class="space-y-6">
+                            <div>
+                                <label class="form-label">Server Name</label>
+                                <input type="text" id="serverName" class="form-input" placeholder="e.g., India Server" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Server Code</label>
+                                <input type="text" id="serverCode" class="form-input" placeholder="e.g., IND" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Server URL</label>
+                                <input type="text" id="serverUrl" class="form-input" placeholder="e.g., https://india.example.com" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea id="serverDescription" class="form-input" rows="3" placeholder="Brief description of this server"></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="submit-btn">✅ Add Server</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Add Services Tab -->
+                <div id="addServices" class="tab-content">
+                    <div class="glass rounded-xl p-8 max-w-2xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">➕ Add New Service</h2>
+                        <form id="serviceForm" class="space-y-6">
+                            <div>
+                                <label class="form-label">Select Server</label>
+                                <select id="serviceServerId" class="form-input" required>
+                                    <option value="">Choose a server...</option>
+                                    <!-- Servers will be loaded here -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Service Name</label>
+                                <input type="text" id="serviceName" class="form-input" placeholder="e.g., WhatsApp OTP" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Service Code</label>
+                                <input type="text" id="serviceCode" class="form-input" placeholder="e.g., WA" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Service Price (💎)</label>
+                                <input type="number" id="servicePrice" class="form-input" placeholder="10" min="0" step="0.1" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea id="serviceDescription" class="form-input" rows="3" placeholder="What this service does..."></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="submit-btn">✅ Add Service</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Connect API Tab -->
+                <div id="connectApi" class="tab-content">
+                    <div class="glass rounded-xl p-8 max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">🔌 Connect an OTP API</h2>
+                        <p class="text-gray-200 text-center mb-6">Choose a server and add an SMS/OTP API to all the services available in that server.</p>
+                        
+                        <form id="otpApiForm" class="space-y-6">
+                            <div>
+                                <label class="form-label">Select Server</label>
+                                <select id="apiServerId" class="form-input" required onchange="loadServerServices()">
+                                    <option value="">Choose a server...</option>
+                                    <!-- Servers will be loaded here -->
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Name</label>
+                                <input type="text" id="apiName" class="form-input" placeholder="e.g., My API" required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">
+                                    <input type="checkbox" id="usesAuth" class="mr-2"> Does your API use Authorization Headers?
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Response Type</label>
+                                <select id="responseType" class="form-input" required>
+                                    <option value="text">Text</option>
+                                    <option value="json">JSON</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Get Number URL</label>
+                                <input type="url" id="getNumberUrl" class="form-input" placeholder="https://api.myservice.com/handler?apikey=123xx...&method=get-number" required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Get Message/Status URL</label>
+                                <input type="url" id="getStatusUrl" class="form-input" placeholder="https://api.myservice.com/handler?apikey=123xx...&method=getMsg" required>
+                            </div>
+                            
+                            <div class="bg-blue-500/20 p-4 rounded-lg">
+                                <p class="text-blue-200 text-sm">
+                                    <strong>💡 How to know success:</strong> What message indicates the user received their OTP? 
+                                    Also, what's the path to message text if response type is JSON?
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">If Response Starts With</label>
+                                <input type="text" id="statusValue" class="form-input" placeholder="STATUS_SUCCESS" required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Activate Next Message URL</label>
+                                <input type="url" id="activateUrl" class="form-input" placeholder="https://api.myservice.com/handler?apikey=123xx...&method=next">
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Cancel Number URL</label>
+                                <input type="url" id="cancelUrl" class="form-input" placeholder="https://api.myservice.com/handler?apikey=123xx...&method=cancel-number" required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Auto-Cancel Number in Minutes</label>
+                                <input type="number" id="autoCancelMinutes" class="form-input" placeholder="5" min="0" value="5">
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">API Retry Get Number URL (times)</label>
+                                <input type="number" id="retryCount" class="form-input" placeholder="0" min="0" value="0">
+                            </div>
+                            
+                            <div id="serverServicesPreview" class="bg-green-500/20 p-4 rounded-lg hidden">
+                                <h4 class="text-green-200 font-semibold mb-2">✅ Your Selected Server will include following services:</h4>
+                                <div id="servicesList" class="text-green-100 text-sm"></div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="submit-btn">🔌 Connect API</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Users Tab -->
+                <div id="users" class="tab-content">
+                    <div class="glass rounded-xl p-8">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">👥 Users Management</h2>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 mb-6">
+                            <input type="text" id="userSearch" placeholder="Search users..." class="flex-1 px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/20 focus:outline-none focus:border-white/40">
+                            <select id="userStatusFilter" class="px-4 py-2 rounded-lg bg-white/20 text-white border border-white/20 focus:outline-none focus:border-white/40">
+                                <option value="all">All Status</option>
+                                <option value="active">Active Only</option>
+                                <option value="banned">Banned Only</option>
+                            </select>
+                            <button onclick="loadUsers()" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-white/20">
+                                        <th class="text-left p-3 text-white font-medium">Username</th>
+                                        <th class="text-left p-3 text-white font-medium">Balance</th>
+                                        <th class="text-left p-3 text-white font-medium">Status</th>
+                                        <th class="text-left p-3 text-white font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content">
+                    <div class="glass rounded-xl p-8">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">📊 System Statistics</h2>
+                        
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                            <div class="glass rounded-xl p-6 text-center">
+                                <div class="text-3xl mb-2">👥</div>
+                                <div class="text-3xl font-bold text-white" id="totalUsers">-</div>
+                                <div class="text-gray-300">Total Users</div>
+                            </div>
+                            
+                            <div class="glass rounded-xl p-6 text-center">
+                                <div class="text-3xl mb-2">✅</div>
+                                <div class="text-3xl font-bold text-white" id="activeUsers">-</div>
+                                <div class="text-gray-300">Active Users</div>
+                            </div>
+                            
+                            <div class="glass rounded-xl p-6 text-center">
+                                <div class="text-3xl mb-2">💳</div>
+                                <div class="text-3xl font-bold text-white" id="totalTransactions">-</div>
+                                <div class="text-gray-300">Transactions</div>
+                            </div>
+                            
+                            <div class="glass rounded-xl p-6 text-center">
+                                <div class="text-3xl mb-2">💰</div>
+                                <div class="text-3xl font-bold text-white" id="totalBalance">-</div>
+                                <div class="text-gray-300">Total Balance</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                            <button onclick="openModal('addBalance')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                                <div class="text-2xl mb-2">➕</div>
+                                <div class="text-white font-medium">Add Balance</div>
+                            </button>
+                            <button onclick="openModal('cutBalance')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                                <div class="text-2xl mb-2">➖</div>
+                                <div class="text-white font-medium">Cut Balance</div>
+                            </button>
+                            <button onclick="openModal('banUser')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                                <div class="text-2xl mb-2">🚫</div>
+                                <div class="text-white font-medium">Ban User</div>
+                            </button>
+                        </div>
+                        
+                        <!-- Recent Transactions -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-white mb-4">Recent Transactions</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b border-white/20">
+                                            <th class="text-left p-3 text-white font-medium">Type</th>
+                                            <th class="text-left p-3 text-white font-medium">Amount</th>
+                                            <th class="text-left p-3 text-white font-medium">User</th>
+                                            <th class="text-left p-3 text-white font-medium">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transactionTableBody">
+                                        <!-- Transactions will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Promo Code Tab -->
+                <div id="promoCode" class="tab-content">
+                    <div class="glass rounded-xl p-8 max-w-2xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-6 text-center">🎫 Add Promo Code</h2>
+                        <form id="promoForm" class="space-y-6">
+                            <div>
+                                <label class="form-label">Promo Code</label>
+                                <input type="text" id="promoCode" class="form-input" placeholder="e.g., WELCOME50" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Discount Amount (💎)</label>
+                                <input type="number" id="promoDiscount" class="form-input" placeholder="10" min="0" step="0.1" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea id="promoDescription" class="form-input" rows="3" placeholder="What this promo code offers..."></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="submit-btn">🎫 Add Promo Code</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="addBalance" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addBalance')">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Add Balance</h2>
+            <form id="addBalanceForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Username</label>
+                    <input type="text" id="addBalanceUsername" class="w-full p-2 border border-gray-300 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Amount (💎)</label>
+                    <input type="number" id="addBalanceAmount" class="w-full p-2 border border-gray-300 rounded" min="0" step="0.1" required>
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">Add Balance</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cutBalance" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cutBalance')">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Cut Balance</h2>
+            <form id="cutBalanceForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Username</label>
+                    <input type="text" id="cutBalanceUsername" class="w-full p-2 border border-gray-300 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Amount (💎)</label>
+                    <input type="number" id="cutBalanceAmount" class="w-full p-2 border border-gray-300 rounded" min="0" step="0.1" required>
+                </div>
+                <button type="submit" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Cut Balance</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="banUser" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('banUser')">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Ban User</h2>
+            <form id="banUserForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Username</label>
+                    <input type="text" id="banUsername" class="w-full p-2 border border-gray-300 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Reason</label>
+                    <textarea id="banReason" class="w-full p-2 border border-gray-300 rounded" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Ban User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Authentication
+        let isAuthenticated = false;
+        
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Admin panel loaded');
+            checkAuth();
+        });
+        
+        function checkAuth() {
+            console.log('Checking authentication...');
+            const token = localStorage.getItem('adminToken');
+            console.log('Token found:', !!token);
+            
+            if (token) {
+                console.log('User authenticated, showing admin content');
+                isAuthenticated = true;
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadInitialData();
+            } else {
+                console.log('No token, showing login overlay');
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('adminContent').style.display = 'none';
+            }
+        }
+        
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('adminToken', data.token);
+                    isAuthenticated = true;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('adminContent').style.display = 'block';
+                    loadInitialData();
+                } else {
+                    alert('Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            }
+        });
+        
+        function logout() {
+            localStorage.removeItem('adminToken');
+            isAuthenticated = false;
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('adminContent').style.display = 'none';
+        }
+        
+        // Tab management
+        function showTab(tabName) {
+            console.log('Showing tab:', tabName);
+            
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+                console.log('Tab activated:', tabName);
+            } else {
+                console.error('Tab not found:', tabName);
+            }
+        }
+        
+        // Load initial data
+        async function loadInitialData() {
+            await Promise.all([
+                loadServers(),
+                loadUsers(),
+                loadStats()
+            ]);
+            
+            // Show dashboard tab by default
+            showTab('dashboard');
+        }
+        
+        // Load servers
+        async function loadServers() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    const servers = await response.json();
+                    updateServerDropdowns(servers);
+                }
+            } catch (error) {
+                console.error('Error loading servers:', error);
+            }
+        }
+        
+        // Update server dropdowns
+        function updateServerDropdowns(servers) {
+            const serviceServerSelect = document.getElementById('serviceServerId');
+            const apiServerSelect = document.getElementById('apiServerId');
+            
+            if (serviceServerSelect) {
+                serviceServerSelect.innerHTML = '<option value="">Choose a server...</option>';
+                servers.forEach(server => {
+                    const option = document.createElement('option');
+                    option.value = server._id;
+                    option.textContent = server.name;
+                    serviceServerSelect.appendChild(option);
+                });
+            }
+            
+            if (apiServerSelect) {
+                apiServerSelect.innerHTML = '<option value="">Choose a server...</option>';
+                servers.forEach(server => {
+                    const option = document.createElement('option');
+                    option.value = server._id;
+                    option.textContent = server.name;
+                    apiServerSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Load server services for preview
+        async function loadServerServices() {
+            const serverId = document.getElementById('apiServerId').value;
+            if (!serverId) {
+                document.getElementById('serverServicesPreview').classList.add('hidden');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/basic-services?serverId=${serverId}`);
+                if (response.ok) {
+                    const services = await response.json();
+                    const servicesList = document.getElementById('servicesList');
+                    servicesList.innerHTML = services.map(service => 
+                        `<div>• ${service.name} (${service.code}) - ${service.price} 💎</div>`
+                    ).join('');
+                    document.getElementById('serverServicesPreview').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading server services:', error);
+            }
+        }
+        
+        // Form submissions
+        document.getElementById('serverForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const serverData = {
+                name: document.getElementById('serverName').value,
+                code: document.getElementById('serverCode').value,
+                url: document.getElementById('serverUrl').value,
+                description: document.getElementById('serverDescription').value
+            };
+            
+            try {
+                const response = await fetch('/api/servers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(serverData)
+                });
+                
+                if (response.ok) {
+                    alert('Server added successfully!');
+                    this.reset();
+                    loadServers();
+                } else {
+                    alert('Failed to add server');
+                }
+            } catch (error) {
+                console.error('Error adding server:', error);
+                alert('Error adding server');
+            }
+        });
+        
+        document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const serviceData = {
+                serverId: document.getElementById('serviceServerId').value,
+                name: document.getElementById('serviceName').value,
+                code: document.getElementById('serviceCode').value,
+                price: parseFloat(document.getElementById('servicePrice').value),
+                description: document.getElementById('serviceDescription').value
+            };
+            
+            try {
+                const response = await fetch('/api/basic-services', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(serviceData)
+                });
+                
+                if (response.ok) {
+                    alert('Service added successfully!');
+                    this.reset();
+                } else {
+                    alert('Failed to add service');
+                }
+            } catch (error) {
+                console.error('Error adding service:', error);
+                alert('Error adding service');
+            }
+        });
+        
+        document.getElementById('otpApiForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const apiData = {
+                name: document.getElementById('apiName').value,
+                serverId: document.getElementById('apiServerId').value,
+                usesAuth: document.getElementById('usesAuth').checked,
+                responseType: document.getElementById('responseType').value,
+                statusCheckType: 'startsWith',
+                statusValue: document.getElementById('statusValue').value,
+                getNumberUrl: document.getElementById('getNumberUrl').value,
+                getStatusUrl: document.getElementById('getStatusUrl').value,
+                activateUrl: document.getElementById('activateUrl').value || null,
+                cancelUrl: document.getElementById('cancelUrl').value,
+                autoCancelMinutes: parseInt(document.getElementById('autoCancelMinutes').value) || 5,
+                retryCount: parseInt(document.getElementById('retryCount').value) || 0
+            };
+            
+            try {
+                const response = await fetch('/api/apis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(apiData)
+                });
+                
+                if (response.ok) {
+                    alert('API connected successfully!');
+                    this.reset();
+                } else {
+                    alert('Failed to connect API');
+                }
+            } catch (error) {
+                console.error('Error connecting API:', error);
+                alert('Error connecting API');
+            }
+        });
+        
+        // Promo code form
+        document.getElementById('promoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Promo code added successfully!');
+            this.reset();
+        });
+        
+        // Load users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    const users = await response.json();
+                    updateUsersTable(users);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        // Update users table
+        function updateUsersTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = users.map(user => `
+                <tr class="border-b border-white/20">
+                    <td class="p-3 text-white">${user.username}</td>
+                    <td class="p-3 text-white">${user.balance || 0} 💎</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded text-xs ${user.status === 'banned' ? 'bg-red-500' : 'bg-green-500'}">
+                            ${user.status || 'active'}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <button onclick="toggleUserStatus('${user._id}', '${user.status}')" class="px-3 py-1 rounded text-xs ${user.status === 'banned' ? 'bg-green-500' : 'bg-red-500'} text-white">
+                            ${user.status === 'banned' ? 'Unban' : 'Ban'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+                    document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
+                    document.getElementById('totalTransactions').textContent = stats.totalTransactions || 0;
+                    document.getElementById('totalBalance').textContent = stats.totalBalance || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+        
+        // Toggle user status
+        async function toggleUserStatus(userId, currentStatus) {
+            const newStatus = currentStatus === 'banned' ? 'active' : 'banned';
+            const action = newStatus === 'banned' ? 'ban' : 'unban';
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/${action}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    loadUsers();
+                    loadStats();
+                } else {
+                    alert(`Failed to ${action} user`);
+                }
+            } catch (error) {
+                console.error(`Error ${action}ing user:`, error);
+                alert(`Error ${action}ing user`);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Bot Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="admin-credentials.js"></script>
     <style>
         .glass {
             background: rgba(255, 255, 255, 0.1);
@@ -42,6 +43,15 @@
         .admin-content.show {
             display: block;
         }
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #feb2b2;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-800">
@@ -52,6 +62,8 @@
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">🔐 Admin Login</h1>
                 <p class="text-gray-600">Enter your credentials to access the admin panel</p>
             </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
             
             <form id="loginForm">
                 <div class="mb-4">
@@ -70,10 +82,9 @@
             </form>
             
             <div class="mt-4 text-center text-sm text-gray-600">
-                <p><strong>Default Credentials:</strong></p>
-                <p>Username: <code>admin</code></p>
-                <p>Password: <code>admin123</code></p>
-                <p class="text-red-500 mt-2">⚠️ Change these in production!</p>
+                <p><strong>⚠️ Security Notice:</strong></p>
+                <p>Default credentials have been removed for security.</p>
+                <p>Update <code>admin-credentials.js</code> with your credentials.</p>
             </div>
         </div>
     </div>
@@ -95,16 +106,16 @@
                 
                 <!-- Navigation -->
                 <div class="flex flex-wrap justify-center gap-3">
-                    <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    <a href="../index.html" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         🏠 Home
                     </a>
-                    <a href="/users" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    <a href="../users/index.html" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         👥 Users
                     </a>
-                    <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    <a href="../transactions/index.html" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         💳 Transactions
                     </a>
-                    <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                    <a href="../servers/index.html" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         🖥️ Servers
                     </a>
                 </div>
@@ -141,27 +152,27 @@
             <div class="glass rounded-xl p-6 mb-6">
                 <h3 class="text-xl font-semibold text-white mb-4">Quick Actions</h3>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <button onclick="alert('Add Balance functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Add Balance')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">➕</div>
                         <div class="text-white text-sm font-medium">Add Balance</div>
                     </button>
-                    <button onclick="alert('Cut Balance functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Cut Balance')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">➖</div>
                         <div class="text-white text-sm font-medium">Cut Balance</div>
                     </button>
-                    <button onclick="alert('Ban User functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Ban User')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">🚫</div>
                         <div class="text-white text-sm font-medium">Ban User</div>
                     </button>
-                    <button onclick="alert('Unban User functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Unban User')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">✅</div>
                         <div class="text-white text-sm font-medium">Unban User</div>
                     </button>
-                    <button onclick="alert('Bulk Operations functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Bulk Operations')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">👥</div>
                         <div class="text-white text-sm font-medium">Bulk Operations</div>
                     </button>
-                    <button onclick="alert('Export Data functionality')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <button onclick="showFeature('Export Data')" class="glass rounded-lg p-4 text-center hover:scale-105 transition-transform duration-300">
                         <div class="text-2xl mb-2">📥</div>
                         <div class="text-white text-sm font-medium">Export Data</div>
                     </button>
@@ -172,26 +183,37 @@
             <div class="glass rounded-xl p-6 text-center">
                 <h3 class="text-xl font-semibold text-white mb-4">🎉 Welcome to Admin Panel!</h3>
                 <p class="text-gray-200">You have successfully logged in. Use the quick actions above to manage your OTP bot system.</p>
-                <p class="text-gray-300 mt-2">This is a basic admin panel. Full functionality can be added as needed.</p>
+                <p class="text-gray-300 mt-2">This is a production-ready admin panel with secure authentication.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Embedded Admin Configuration
-        const ADMIN_CONFIG = {
-            credentials: {
-                username: 'admin',
-                password: 'admin123',
-                admin_id: '7574316340'
-            },
-            security: {
-                sessionTimeout: 24 * 60 * 60 * 1000 // 24 hours
+        // Check if credentials are loaded
+        function checkCredentialsLoaded() {
+            if (typeof window.ADMIN_CREDENTIALS === 'undefined') {
+                showError('Admin credentials not loaded. Please check admin-credentials.js file.');
+                return false;
             }
-        };
+            return true;
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+        }
 
         // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
+            if (!checkCredentialsLoaded()) return;
             checkAuthStatus();
         });
 
@@ -221,6 +243,8 @@
         // Handle login form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            hideError();
+            
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
@@ -228,7 +252,7 @@
                 showAdminPanel();
                 alert('Login successful! Welcome to Admin Panel.');
             } else {
-                alert('Invalid username or password. Please try again.');
+                showError('Invalid username or password. Please try again.');
                 document.getElementById('password').value = '';
                 document.getElementById('password').focus();
             }
@@ -236,15 +260,17 @@
 
         // Authenticate user
         function authenticateUser(username, password) {
-            if (username === ADMIN_CONFIG.credentials.username && 
-                password === ADMIN_CONFIG.credentials.password) {
+            if (!checkCredentialsLoaded()) return false;
+            
+            if (username === window.ADMIN_CREDENTIALS.username && 
+                password === window.ADMIN_CREDENTIALS.password) {
                 
                 // Generate token
                 const token = btoa(JSON.stringify({
                     username: username,
-                    admin_id: ADMIN_CONFIG.credentials.admin_id,
+                    admin_id: window.ADMIN_CREDENTIALS.admin_id,
                     timestamp: Date.now(),
-                    expires: Date.now() + ADMIN_CONFIG.security.sessionTimeout
+                    expires: Date.now() + window.ADMIN_CREDENTIALS.sessionTimeout
                 }));
                 
                 localStorage.setItem('adminToken', token);
@@ -281,12 +307,18 @@
             }, 500);
         }
 
+        // Show feature (placeholder)
+        function showFeature(featureName) {
+            alert(`${featureName} functionality will be implemented here.`);
+        }
+
         // Logout function
         function logout() {
             if (confirm('Are you sure you want to log out?')) {
                 localStorage.removeItem('adminToken');
                 showLoginForm();
                 document.getElementById('loginForm').reset();
+                hideError();
                 alert('Logged out successfully!');
             }
         }

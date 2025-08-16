@@ -6,6 +6,9 @@ const cors = require('cors');
 const path = require('path');
 const { MongoClient } = require('mongodb');
 
+// Import OTP routes
+const otpRoutes = require('./otp');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -115,6 +118,13 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static files
+app.use(express.static(path.join(__dirname, '..')));
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
+app.use('/css', express.static(path.join(__dirname, '../assets/css')));
+app.use('/js', express.static(path.join(__dirname, '../assets/js')));
+app.use('/images', express.static(path.join(__dirname, '../assets/images')));
 
 // MongoDB data operations
 async function loadUsers() {
@@ -256,7 +266,7 @@ app.get('/', (req, res) => {
 app.get('/users', (req, res) => {
     debugLog('Users page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../users.html'));
+        res.sendFile(path.join(__dirname, '../users/index.html'));
     } catch (error) {
         debugLog('Error serving users page', error.message);
         res.status(500).json({ error: 'Failed to load users page' });
@@ -266,17 +276,27 @@ app.get('/users', (req, res) => {
 app.get('/admin', (req, res) => {
     debugLog('Admin page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../admin_panel.html'));
+        res.sendFile(path.join(__dirname, '../admin/index.html'));
     } catch (error) {
         debugLog('Error serving admin page', error.message);
         res.status(500).json({ error: 'Failed to load admin page' });
     }
 });
 
+app.get('/admin_fixed.html', (req, res) => {
+    debugLog('Admin fixed page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../admin/admin_fixed.html'));
+    } catch (error) {
+        debugLog('Error serving admin fixed page', error.message);
+        res.status(500).json({ error: 'Failed to load admin fixed page' });
+    }
+});
+
 app.get('/transactions', (req, res) => {
     debugLog('Transactions page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../transactions.html'));
+        res.sendFile(path.join(__dirname, '../transactions/index.html'));
     } catch (error) {
         debugLog('Error serving transactions page', error.message);
         res.status(500).json({ error: 'Failed to load transactions page' });
@@ -286,7 +306,7 @@ app.get('/transactions', (req, res) => {
 app.get('/servers', (req, res) => {
     debugLog('Servers page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../servers.html'));
+        res.sendFile(path.join(__dirname, '../servers/index.html'));
     } catch (error) {
         debugLog('Error serving servers page', error.message);
         res.status(500).json({ error: 'Failed to load servers page' });
@@ -296,10 +316,20 @@ app.get('/servers', (req, res) => {
 app.get('/api-config', (req, res) => {
     debugLog('API config page accessed');
     try {
-        res.sendFile(path.join(__dirname, '../api-config.html'));
+        res.sendFile(path.join(__dirname, '../api-config/index.html'));
     } catch (error) {
         debugLog('Error serving API config page', error.message);
         res.status(500).json({ error: 'Failed to load API config page' });
+    }
+});
+
+app.get('/otp-dashboard', (req, res) => {
+    debugLog('OTP Dashboard page accessed');
+    try {
+        res.sendFile(path.join(__dirname, '../otp-dashboard.html'));
+    } catch (error) {
+        debugLog('Error serving OTP dashboard page', error.message);
+        res.status(500).json({ error: 'Failed to load OTP dashboard page' });
     }
 });
 
@@ -1010,14 +1040,20 @@ app.post('/api/apis', async (req, res) => {
         const { 
             name, serverId, usesAuth, responseType, messagePath, 
             statusCheckType, statusValue, getNumberUrl, getStatusUrl, 
-            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey 
+            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey,
+            // New OTP API fields
+            statusSuccess, cancelUrl: cancelUrlAlt
         } = req.body;
         
+        // Map new field names to existing ones for backward compatibility
+        const mappedStatusValue = statusSuccess || statusValue;
+        const mappedCancelUrl = cancelUrlAlt || cancelUrl;
+        
         // Validation
-        if (!name || !serverId || !responseType || !statusCheckType || !statusValue || !getNumberUrl || !getStatusUrl) {
+        if (!name || !serverId || !responseType || !getNumberUrl || !getStatusUrl || !mappedCancelUrl) {
             return res.status(400).json({ 
                 error: 'Missing required fields', 
-                message: 'Please fill in all required fields: name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl' 
+                message: 'Please fill in all required fields: name, serverId, responseType, getNumberUrl, getStatusUrl, cancelUrl' 
             });
         }
         
@@ -1037,14 +1073,14 @@ app.post('/api/apis', async (req, res) => {
             usesAuth: usesAuth || false,
             responseType,
             messagePath: messagePath || null,
-            statusCheckType,
-            statusValue,
+            statusCheckType: 'startsWith', // Default for OTP APIs
+            statusValue: mappedStatusValue || 'STATUS_SUCCESS',
             getNumberUrl,
             getStatusUrl,
             activateUrl: activateUrl || null,
-            cancelUrl: cancelUrl || null,
-            autoCancelMinutes: autoCancelMinutes || null,
-            retryCount: retryCount || 3,
+            cancelUrl: mappedCancelUrl,
+            autoCancelMinutes: autoCancelMinutes || 5,
+            retryCount: retryCount || 0,
             apiKey: apiKey || null,
             status: 'inactive',
             numbersUsed: 0,
@@ -1105,12 +1141,18 @@ app.put('/api/apis/:id', async (req, res) => {
         const { 
             name, serverId, usesAuth, responseType, messagePath, 
             statusCheckType, statusValue, getNumberUrl, getStatusUrl, 
-            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey 
+            activateUrl, cancelUrl, autoCancelMinutes, retryCount, apiKey,
+            // New OTP API fields
+            statusSuccess, cancelUrl: cancelUrlAlt
         } = req.body;
         
+        // Map new field names to existing ones for backward compatibility
+        const mappedStatusValue = statusSuccess || statusValue;
+        const mappedCancelUrl = cancelUrlAlt || cancelUrl;
+        
         // Validation
-        if (!name || !serverId || !responseType || !statusCheckType || !statusValue || !getNumberUrl || !getStatusUrl) {
-            return res.status(400).json({ error: 'Missing required fields: name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl' });
+        if (!name || !serverId || !responseType || !getNumberUrl || !getStatusUrl || !mappedCancelUrl) {
+            return res.status(400).json({ error: 'Missing required fields: name, serverId, responseType, getNumberUrl, getStatusUrl, cancelUrl' });
         }
         
         const { ObjectId } = require('mongodb');
@@ -1131,14 +1173,14 @@ app.put('/api/apis/:id', async (req, res) => {
             usesAuth: usesAuth || false,
             responseType,
             messagePath: messagePath || null,
-            statusCheckType,
-            statusValue,
+            statusCheckType: statusCheckType || 'startsWith',
+            statusValue: mappedStatusValue || 'STATUS_SUCCESS',
             getNumberUrl,
             getStatusUrl,
             activateUrl: activateUrl || null,
-            cancelUrl: cancelUrl || null,
-            autoCancelMinutes: autoCancelMinutes || null,
-            retryCount: retryCount || 3,
+            cancelUrl: mappedCancelUrl,
+            autoCancelMinutes: autoCancelMinutes || 5,
+            retryCount: retryCount || 0,
             apiKey: apiKey || null,
             updatedAt: new Date()
         };
@@ -1305,6 +1347,958 @@ app.get('/api/admin/credentials', (req, res) => {
     res.json(adminCredentials);
 });
 
+// Import and use OTP Number API endpoints (focused on phone numbers only)
+try {
+    const OTPNumberService = require('./services/otp-number-service');
+    const otpNumberService = new OTPNumberService();
+    
+    // OTP Number API endpoints - Phone numbers only, no mail functionality
+    app.get('/api/otp-number/countries', async (req, res) => {
+        try {
+            const { provider = '5sim' } = req.query;
+            
+            const countries = await otpNumberService.getCountries(provider);
+            
+            res.json({
+                success: true,
+                data: {
+                    countries,
+                    provider,
+                    total: countries.length
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting countries:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve countries'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/products', async (req, res) => {
+        try {
+            const { provider = '5sim', country = 'russia' } = req.query;
+            
+            const products = await otpNumberService.getProducts(provider, country);
+            
+            res.json({
+                success: true,
+                data: {
+                    products,
+                    country,
+                    provider,
+                    total: products.length
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting products:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve products'
+            });
+        }
+    });
+
+    app.post('/api/otp-number/buy', async (req, res) => {
+        try {
+            const { provider = '5sim', country = 'russia', product = 'any', operator = 'any' } = req.body;
+            const userId = req.headers['x-user-id'];
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            if (!country || !product) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Missing required fields',
+                    message: 'Country and product are required'
+                });
+            }
+            
+            const order = await otpNumberService.buyNumber(provider, country, product, operator, userId);
+            
+            res.json({
+                success: true,
+                data: {
+                    order,
+                    message: `Phone number purchased successfully! Number: ${order.phone}`
+                }
+            });
+        } catch (error) {
+            debugLog('Error buying number:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to purchase phone number'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/check/:orderId', async (req, res) => {
+        try {
+            const { orderId } = req.params;
+            const { provider = '5sim' } = req.query;
+            
+            if (!orderId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Missing order ID',
+                    message: 'Order ID is required'
+                });
+            }
+            
+            const result = await otpNumberService.checkSMS(provider, orderId);
+            
+            res.json({
+                success: true,
+                data: {
+                    result,
+                    orderId,
+                    message: result.sms && result.sms.length > 0 
+                        ? `OTP received: ${result.sms[0].text || 'SMS received'}` 
+                        : 'Waiting for SMS...'
+                }
+            });
+        } catch (error) {
+            debugLog('Error checking SMS:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to check SMS'
+            });
+        }
+    });
+
+    app.post('/api/otp-number/finish/:orderId', async (req, res) => {
+        try {
+            const { orderId } = req.params;
+            const { provider = '5sim' } = req.body;
+            const userId = req.headers['x-user-id'];
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            if (!orderId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Missing order ID',
+                    message: 'Order ID is required'
+                });
+            }
+            
+            // Verify order belongs to user
+            const order = await otpNumberService.getOrder(orderId);
+            if (!order) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Order not found',
+                    message: 'The specified order does not exist'
+                });
+            }
+            
+            if (order.user_id != userId) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Access denied',
+                    message: 'You can only finish your own orders'
+                });
+            }
+            
+            const result = await otpNumberService.finishOrder(provider, orderId);
+            
+            res.json({
+                success: true,
+                data: {
+                    result,
+                    message: 'Order completed successfully!'
+                }
+            });
+        } catch (error) {
+            debugLog('Error finishing order:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to finish order'
+            });
+        }
+    });
+
+    app.post('/api/otp-number/cancel/:orderId', async (req, res) => {
+        try {
+            const { orderId } = req.params;
+            const { provider = '5sim' } = req.body;
+            const userId = req.headers['x-user-id'];
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            if (!orderId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Missing order ID',
+                    message: 'Order ID is required'
+                });
+            }
+            
+            // Verify order belongs to user
+            const order = await otpNumberService.getOrder(orderId);
+            if (!order) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Order not found',
+                    message: 'The specified order does not exist'
+                });
+            }
+            
+            if (order.user_id != userId) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Access denied',
+                    message: 'You can only cancel your own orders'
+                });
+            }
+            
+            const result = await otpNumberService.cancelOrder(provider, orderId);
+            
+            res.json({
+                success: true,
+                data: {
+                    result,
+                    message: 'Order cancelled successfully!'
+                }
+            });
+        } catch (error) {
+            debugLog('Error cancelling order:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to cancel order'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/balance', async (req, res) => {
+        try {
+            const { provider = '5sim' } = req.query;
+            
+            const balance = await otpNumberService.getBalance(provider);
+            
+            res.json({
+                success: true,
+                data: {
+                    balance,
+                    provider
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting balance:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve balance'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/status', async (req, res) => {
+        try {
+            const { provider = '5sim' } = req.query;
+            
+            const balance = await otpNumberService.getBalance(provider);
+            const activeOrders = otpNumberService.activeOrders.size;
+            
+            res.json({
+                success: true,
+                data: {
+                    provider,
+                    balance: balance.balance,
+                    currency: balance.currency,
+                    activeOrders,
+                    status: 'operational',
+                    timestamp: new Date().toISOString()
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting service status:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                status: 'error',
+                message: 'Failed to retrieve service status'
+            });
+        }
+    });
+
+    // Additional OTP Number endpoints
+    app.get('/api/otp-number/orders', async (req, res) => {
+        try {
+            const userId = req.headers['x-user-id'];
+            const { limit = 50, page = 1, status, provider } = req.query;
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            const result = await otpNumberService.getUserOrders(userId, parseInt(limit), parseInt(page));
+            
+            // Apply additional filters if provided
+            let filteredOrders = result.orders;
+            
+            if (status) {
+                filteredOrders = filteredOrders.filter(order => order.status === status);
+            }
+            
+            if (provider) {
+                filteredOrders = filteredOrders.filter(order => order.provider === provider);
+            }
+            
+            res.json({
+                success: true,
+                data: {
+                    orders: filteredOrders,
+                    pagination: {
+                        ...result.pagination,
+                        filteredCount: filteredOrders.length
+                    }
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting user orders:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve orders'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/orders/:orderId', async (req, res) => {
+        try {
+            const { orderId } = req.params;
+            const userId = req.headers['x-user-id'];
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            const order = await otpNumberService.getOrder(orderId);
+            
+            if (!order) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Order not found',
+                    message: 'The specified order does not exist'
+                });
+            }
+            
+            // Verify order belongs to user
+            if (order.user_id != userId) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Access denied',
+                    message: 'You can only view your own orders'
+                });
+            }
+            
+            res.json({
+                success: true,
+                data: {
+                    order
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting order:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve order'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/statistics', async (req, res) => {
+        try {
+            const userId = req.headers['x-user-id'];
+            
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User authentication required',
+                    message: 'Please provide user ID in headers'
+                });
+            }
+            
+            const stats = await otpNumberService.getOrderStatistics(userId);
+            
+            res.json({
+                success: true,
+                data: {
+                    statistics: stats,
+                    userId
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting statistics:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve statistics'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/providers', async (req, res) => {
+        try {
+            const providers = Object.entries(otpNumberService.providers).map(([key, config]) => ({
+                id: key,
+                name: config.name,
+                baseUrl: config.baseUrl,
+                hasApiKey: !!config.apiKey
+            }));
+            
+            res.json({
+                success: true,
+                data: {
+                    providers,
+                    total: providers.length
+                }
+            });
+        } catch (error) {
+            debugLog('Error getting providers:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                message: 'Failed to retrieve providers'
+            });
+        }
+    });
+
+    app.get('/api/otp-number/health', async (req, res) => {
+        try {
+            const isConnected = await otpNumberService.connectToMongoDB();
+            
+            res.json({
+                success: true,
+                data: {
+                    status: 'healthy',
+                    mongodb: isConnected ? 'connected' : 'disconnected',
+                    timestamp: new Date().toISOString(),
+                    service: 'OTP Number Service'
+                }
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                status: 'unhealthy'
+            });
+        }
+    });
+
+    debugLog('✅ OTP Number API endpoints loaded successfully (Phone numbers only)');
+} catch (error) {
+    debugLog('❌ Failed to load OTP Number API endpoints:', error);
+}
+
+// Add new OTP provider routes
+app.use('/api/otp', otpRoutes);
+debugLog('✅ New OTP provider routes loaded successfully');
+
+// Promo Codes API Endpoints
+app.get('/api/promo-codes', async (req, res) => {
+    debugLog('GET /api/promo-codes called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for promo codes endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for promo codes endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const promoCollection = db.collection('promo_codes');
+        const promoCodes = await promoCollection.find({}).sort({ createdAt: -1 }).toArray();
+        
+        debugLog(`Retrieved ${promoCodes.length} promo codes`);
+        res.json(promoCodes);
+    } catch (error) {
+        debugLog('Error retrieving promo codes', { error: error.message, stack: error.stack });
+        console.error('Error in GET /api/promo-codes:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve promo codes', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.post('/api/promo-codes', async (req, res) => {
+    debugLog('POST /api/promo-codes called', { body: req.body });
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for promo codes endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for promo codes endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const { code, discount, maxUses, expiresAt, description } = req.body;
+        
+        // Validation
+        if (!code || !discount || !maxUses) {
+            return res.status(400).json({ 
+                error: 'Missing required fields', 
+                message: 'Please fill in all required fields: code, discount, maxUses' 
+            });
+        }
+        
+        // Check if promo code already exists
+        const promoCollection = db.collection('promo_codes');
+        const existingPromo = await promoCollection.findOne({ code: code.toUpperCase() });
+        if (existingPromo) {
+            return res.status(400).json({ 
+                error: 'Promo code already exists',
+                message: 'A promo code with this name already exists. Please use a different code.' 
+            });
+        }
+        
+        const newPromo = {
+            code: code.toUpperCase(),
+            discount: parseFloat(discount),
+            maxUses: parseInt(maxUses),
+            currentUses: 0,
+            expiresAt: expiresAt ? new Date(expiresAt) : null,
+            description: description || '',
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const result = await promoCollection.insertOne(newPromo);
+        newPromo._id = result.insertedId;
+        
+        debugLog('Promo code created successfully', { promoId: result.insertedId });
+        res.status(201).json(newPromo);
+    } catch (error) {
+        debugLog('Error creating promo code', { error: error.message, stack: error.stack });
+        console.error('Error in POST /api/promo-codes:', error);
+        res.status(500).json({ 
+            error: 'Failed to create promo code', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+app.put('/api/promo-codes/:id', async (req, res) => {
+    debugLog(`PUT /api/promo-codes/${req.params.id} called`, { body: req.body });
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for promo codes endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { code, discount, maxUses, expiresAt, description, isActive } = req.body;
+        
+        // Validation
+        if (!code || !discount || !maxUses) {
+            return res.status(400).json({ error: 'Missing required fields: code, discount, maxUses' });
+        }
+        
+        const { ObjectId } = require('mongodb');
+        const promoCollection = db.collection('promo_codes');
+        
+        // Check if promo code already exists (excluding current promo)
+        const existingPromo = await promoCollection.findOne({ 
+            code: code.toUpperCase(), 
+            _id: { $ne: new ObjectId(req.params.id) } 
+        });
+        if (existingPromo) {
+            return res.status(400).json({ error: 'Promo code already exists' });
+        }
+        
+        const updateData = {
+            code: code.toUpperCase(),
+            discount: parseFloat(discount),
+            maxUses: parseInt(maxUses),
+            expiresAt: expiresAt ? new Date(expiresAt) : null,
+            description: description || '',
+            isActive: isActive !== undefined ? isActive : true,
+            updatedAt: new Date()
+        };
+        
+        const result = await promoCollection.updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: updateData }
+        );
+        
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Promo code not found' });
+        }
+        
+        debugLog('Promo code updated successfully', { promoId: req.params.id });
+        res.json({ message: 'Promo code updated successfully', updated: true });
+    } catch (error) {
+        debugLog('Error updating promo code', { error: error.message, promoId: req.params.id });
+        res.status(500).json({ error: 'Failed to update promo code', details: error.message });
+    }
+});
+
+app.delete('/api/promo-codes/:id', async (req, res) => {
+    debugLog(`DELETE /api/promo-codes/${req.params.id} called`);
+    
+    if (!client || !client.topology || !client.topology.isConnected()) {
+        debugLog('MongoDB not connected for promo codes endpoint');
+        return res.status(500).json({ error: 'Database connection not available' });
+    }
+    
+    try {
+        const { ObjectId } = require('mongodb');
+        const promoCollection = db.collection('promo_codes');
+        
+        const result = await promoCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Promo code not found' });
+        }
+        
+        debugLog('Promo code deleted successfully', { promoId: req.params.id });
+        res.json({ message: 'Promo code deleted successfully', deleted: true });
+    } catch (error) {
+        debugLog('Error deleting promo code', { error: error.message, promoId: req.params.id });
+        res.status(500).json({ error: 'Failed to delete promo code', details: error.message });
+    }
+});
+
+// Dashboard Statistics API Endpoint
+app.get('/api/dashboard/stats', async (req, res) => {
+    debugLog('GET /api/dashboard/stats called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for dashboard stats - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for dashboard stats');
+                return res.json({
+                    totalUsers: 0,
+                    activeUsers: 0,
+                    bannedUsers: 0,
+                    totalBalance: 0,
+                    totalTransactions: 0,
+                    totalServers: 0,
+                    totalApis: 0,
+                    totalPromoCodes: 0
+                });
+            }
+        }
+        
+        // Get user statistics
+        const totalUsers = await collection.countDocuments({});
+        const activeUsers = await collection.countDocuments({ is_banned: false });
+        const bannedUsers = await collection.countDocuments({ is_banned: true });
+        
+        // Calculate total balance using aggregation
+        const balanceResult = await collection.aggregate([
+            { $group: { _id: null, total_balance: { $sum: '$balance' } } }
+        ]).toArray();
+        const totalBalance = balanceResult.length > 0 ? balanceResult[0].total_balance : 0;
+        
+        // Calculate total transactions using aggregation
+        const transactionResult = await collection.aggregate([
+            { $unwind: '$transactions' },
+            { $group: { _id: null, total_transactions: { $sum: 1 } } }
+        ]).toArray();
+        const totalTransactions = transactionResult.length > 0 ? transactionResult[0].total_transactions : 0;
+        
+        // Get server statistics
+        const serversCollection = db.collection('servers');
+        const totalServers = await serversCollection.countDocuments({});
+        
+        // Get API statistics
+        const apisCollection = db.collection('apis');
+        const totalApis = await apisCollection.countDocuments({});
+        
+        // Get promo code statistics
+        const promoCollection = db.collection('promo_codes');
+        const totalPromoCodes = await promoCollection.countDocuments({});
+        
+        const stats = {
+            totalUsers,
+            activeUsers,
+            bannedUsers,
+            totalBalance,
+            totalTransactions,
+            totalServers,
+            totalApis,
+            totalPromoCodes
+        };
+        
+        debugLog('Dashboard statistics calculated successfully', stats);
+        res.json(stats);
+    } catch (error) {
+        debugLog('Error getting dashboard statistics', { error: error.message, stack: error.stack });
+        res.status(500).json({ error: 'Failed to load dashboard statistics', details: error.message });
+    }
+});
+
+// Services API Endpoint (for OTP services)
+app.get('/api/services', async (req, res) => {
+    debugLog('GET /api/services called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for services endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for services endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const apisCollection = db.collection('apis');
+        const services = await apisCollection.find({}).sort({ createdAt: -1 }).toArray();
+        
+        // Format services for the dashboard
+        const formattedServices = services.map(service => ({
+            id: service._id,
+            name: service.name,
+            serverId: service.serverId,
+            status: service.status || 'inactive',
+            numbersUsed: service.numbersUsed || 0,
+            responseType: service.responseType,
+            statusCheckType: service.statusCheckType,
+            createdAt: service.createdAt,
+            updatedAt: service.updatedAt
+        }));
+        
+        debugLog(`Retrieved ${formattedServices.length} services`);
+        res.json(formattedServices);
+    } catch (error) {
+        debugLog('Error retrieving services', { error: error.message, stack: error.stack });
+        console.error('Error in GET /api/services:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve services', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+// Basic Services Management (for dashboard/admin panel)
+app.post('/api/basic-services', async (req, res) => {
+    debugLog('POST /api/basic-services called', { body: req.body });
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for basic services endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for basic services endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const { serverId, serviceId, name, logo, code, description, price, cancellationTime } = req.body;
+        
+        // Validation
+        if (!serverId || !serviceId || !name || !logo || !code || !description || !price) {
+            return res.status(400).json({ 
+                error: 'Missing required fields', 
+                message: 'Please fill in all required fields: serverId, serviceId, name, logo, code, description, price' 
+            });
+        }
+        
+        // Check if service code already exists
+        const basicServicesCollection = db.collection('basic_services');
+        const existingService = await basicServicesCollection.findOne({ code: code });
+        if (existingService) {
+            return res.status(400).json({ 
+                error: 'Service code already exists',
+                message: 'A service with this code already exists. Please use a different code.' 
+            });
+        }
+        
+        const newService = {
+            serverId,
+            serviceId,
+            name,
+            logo,
+            code,
+            description,
+            price: parseFloat(price),
+            cancellationTime: parseInt(cancellationTime) || 0,
+            status: 'active',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const result = await basicServicesCollection.insertOne(newService);
+        newService._id = result.insertedId;
+        
+        debugLog('Basic service created successfully', { serviceId: result.insertedId });
+        res.status(201).json(newService);
+    } catch (error) {
+        debugLog('Error creating basic service', { error: error.message, stack: error.stack });
+        console.error('Error in POST /api/basic-services:', error);
+        res.status(500).json({ 
+            error: 'Failed to create basic service', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+// Get all basic services
+app.get('/api/basic-services', async (req, res) => {
+    debugLog('GET /api/basic-services called');
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for basic services GET endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for basic services GET endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const basicServicesCollection = db.collection('basic_services');
+        const services = await basicServicesCollection.find({}).sort({ createdAt: -1 }).toArray();
+        
+        debugLog('Basic services retrieved successfully', { count: services.length });
+        res.status(200).json(services);
+    } catch (error) {
+        debugLog('Error retrieving basic services', { error: error.message, stack: error.stack });
+        console.error('Error in GET /api/basic-services:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve basic services', 
+            details: error.message,
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
+// API Services Management (existing endpoint for API configuration)
+app.post('/api/services', async (req, res) => {
+    debugLog('POST /api/services called', { body: req.body });
+    
+    try {
+        // Check MongoDB connection
+        if (!client || !client.topology || !client.topology.isConnected()) {
+            debugLog('MongoDB not connected for services endpoint - attempting to reconnect...');
+            const connected = await connectToMongoDB();
+            if (!connected) {
+                debugLog('❌ MongoDB reconnection failed for services endpoint');
+                return res.status(500).json({ 
+                    error: 'Database connection not available',
+                    message: 'Please check your MongoDB connection settings'
+                });
+            }
+        }
+        
+        const { name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl } = req.body;
+        
+        // Validation
+        if (!name || !serverId || !responseType || !statusCheckType || !statusValue || !getNumberUrl || !getStatusUrl) {
+            return res.status(400).json({ 
+                error: 'Missing required fields', 
+                message: 'Please fill in all required fields: name, serverId, responseType, statusCheckType, statusValue, getNumberUrl, getStatusUrl' 
+            });
+        }
+        
+        // Check if service name already exists
+        const apisCollection = db.collection('apis');
+        const existingService = await apisCollection.findOne({ name: name });
+        if (existingService) {
+            return res.status(400).json({ 
+                error: 'Service name already exists',
+                message: 'A service with this name already exists. Please use a different name.' 
+            });
+        }
+        
+        const newService = {
+            name,
+            serverId,
+            responseType,
+            statusCheckType,
+            statusValue,
+            getNumberUrl,
+            getStatusUrl,
+            status: 'inactive',
+            numbersUsed: 0,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const result = await apisCollection.insertOne(newService);
+        newService._id = result.insertedId;
+        
+        debugLog('Service created successfully', { serviceId: result.insertedId });
+        res.status(201).json(newService);
+    } catch (error) {
+        debugLog('Error creating service', { error: error.message, stack: error.stack });
+        console.error('Error in POST /api/services:', error);
+        res.status(500).json({ 
+            error: 'Failed to create service', 
+            message: 'Please check your MongoDB connection and try again'
+        });
+    }
+});
+
 app.use((err, req, res, next) => {
     debugLog('Unhandled error occurred', { 
         error: err.message, 
@@ -1315,9 +2309,16 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error', details: err.message });
 });
 
-app.use((req, res) => {
-    debugLog('404 Not Found', { path: req.path, method: req.method });
-    res.status(404).json({ error: 'Not found', path: req.path });
+app.use((req, res, next) => {
+    // Fallback: try to serve static file from website root for unmatched routes
+    const requestedPath = req.path.endsWith('/') ? req.path + 'index.html' : req.path;
+    const filePath = path.join(__dirname, '..', requestedPath);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            debugLog('404 Not Found', { path: req.path, method: req.method });
+            res.status(404).json({ error: 'Not found', path: req.path });
+        }
+    });
 });
 
 // Startup logging and MongoDB connection

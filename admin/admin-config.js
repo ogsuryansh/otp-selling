@@ -17,12 +17,28 @@ const ADMIN_CONFIG = {
         require2FA: process.env.REQUIRE_2FA === 'true' || false // Set to true to enable 2FA
     },
     
+    // Bot webhook endpoints
+    bot: {
+        baseUrl: process.env.BOT_WEBHOOK_URL || 'http://localhost:5001',
+        endpoints: {
+            addBalance: '/webhook/admin/add_balance',
+            cutBalance: '/webhook/admin/cut_balance',
+            banUser: '/webhook/admin/ban_user',
+            unbanUser: '/webhook/admin/unban_user',
+            getStats: '/webhook/admin/get_stats',
+            getUsers: '/webhook/admin/get_users',
+            getTransactions: '/webhook/admin/get_transactions',
+            broadcast: '/webhook/admin/broadcast',
+            health: '/webhook/admin/health'
+        }
+    },
+    
     // API endpoints
     api: {
         baseUrl: '/api',
         endpoints: {
-            users: '/users',
-            transactions: '/transactions',
+            users: '../users/index.html',
+            transactions: '../transactions/index.html',
             statistics: '/statistics',
             addBalance: '/add_balance',
             cutBalance: '/cut_balance',

@@ -16,8 +16,8 @@ const ADMIN_CREDENTIALS = {
     api: {
         baseUrl: '/api',
         endpoints: {
-            users: '/users',
-            transactions: '/transactions',
+            users: '../users/index.html',
+            transactions: '../transactions/index.html',
             statistics: '/statistics'
         }
     }

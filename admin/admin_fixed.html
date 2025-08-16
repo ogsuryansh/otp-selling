@@ -334,10 +334,10 @@
         </div>
 
         <div class="nav-links">
-            <a href="/">🏠 Home</a>
-            <a href="/users">👥 Users</a>
-            <a href="/transactions">💳 Transactions</a>
-            <a href="/servers">🖥️ Servers</a>
+            <a href="../index.html">🏠 Home</a>
+            <a href="../users/index.html">👥 Users</a>
+            <a href="../transactions/index.html">💳 Transactions</a>
+            <a href="../servers/index.html">🖥️ Servers</a>
         </div>
 
         <!-- Stats Grid -->
@@ -424,7 +424,7 @@
         async function loadCredentialsFromEnv() {
             try {
                 logDebug('Loading credentials from environment...');
-                const response = await fetch('/api/admin/credentials');
+                const response = await fetch('../api/admin/credentials');
                 if (response.ok) {
                     const envCredentials = await response.json();
                     ADMIN_CONFIG = envCredentials;

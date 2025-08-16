@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Configuration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">🧪 Test API Configuration System</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="testResults" class="space-y-2">
+                <div class="text-gray-600">Running tests...</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="testExample('5sim')" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">🔌</div>
+                <div class="font-semibold">Test 5sim.net</div>
+            </button>
+            
+            <button onclick="testExample('sms-activate')" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">📱</div>
+                <div class="font-semibold">Test SMS-Activate</div>
+            </button>
+            
+            <button onclick="testExample('custom')" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">⚙️</div>
+                <div class="font-semibold">Test Custom API</div>
+            </button>
+        </div>
+        
+        <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Console Log</h2>
+            <div id="consoleLog" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm h-64 overflow-y-auto">
+                <div>Console output will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleLog = document.getElementById('consoleLog');
+        
+        function addToConsole(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'text-red-400' : 'text-green-400';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleLog.appendChild(div);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        // Test functions
+        function testExample(service) {
+            console.log(`Testing ${service} example configuration...`);
+            
+            const testResults = document.getElementById('testResults');
+            
+            try {
+                // Simulate the example configuration loading
+                let config = {};
+                
+                switch(service) {
+                    case '5sim':
+                        config = {
+                            name: '5sim.net WhatsApp API',
+                            authMethod: 'api_key',
+                            responseType: 'json',
+                            messagePath: 'sms.0.text',
+                            statusCheckType: 'startsWith',
+                            statusValue: 'STATUS_OK',
+                            getNumberUrl: 'https://5sim.net/v1/user/buy/activation/wa/{country}/any',
+                            getStatusUrl: 'https://5sim.net/v1/user/check/{id}'
+                        };
+                        break;
+                        
+                    case 'sms-activate':
+                        config = {
+                            name: 'SMS-Activate API',
+                            authMethod: 'api_key_param',
+                            responseType: 'text',
+                            statusCheckType: 'startsWith',
+                            statusValue: 'ACCESS_',
+                            getNumberUrl: 'https://api.sms-activate.org/stubs/handler_api.php?action=getNumber&service={service}&country={country}&api_key={api_key}',
+                            getStatusUrl: 'https://api.sms-activate.org/stubs/handler_api.php?action=getStatus&id={id}&api_key={api_key}'
+                        };
+                        break;
+                        
+                    case 'custom':
+                        config = {
+                            name: 'Custom SMS Service API',
+                            authMethod: 'bearer_token',
+                            responseType: 'json',
+                            messagePath: 'data.message',
+                            statusCheckType: 'jsonPath',
+                            statusValue: 'success',
+                            statusPath: 'status',
+                            getNumberUrl: 'https://your-api.com/buy?country={country}&service={service}',
+                            getStatusUrl: 'https://your-api.com/check/{id}'
+                        };
+                        break;
+                }
+                
+                // Test URL placeholder replacement
+                const testUrl = config.getNumberUrl
+                    .replace('{country}', 'usa')
+                    .replace('{service}', 'whatsapp')
+                    .replace('{api_key}', 'test_key');
+                
+                console.log('Configuration loaded successfully:', config);
+                console.log('URL placeholder test:', testUrl);
+                
+                // Update test results
+                testResults.innerHTML = `
+                    <div class="text-green-600 font-semibold">✅ ${service} test passed!</div>
+                    <div class="text-sm text-gray-600">Name: ${config.name}</div>
+                    <div class="text-sm text-gray-600">Auth: ${config.authMethod}</div>
+                    <div class="text-sm text-gray-600">Response: ${config.responseType}</div>
+                    <div class="text-sm text-gray-600">Test URL: ${testUrl}</div>
+                `;
+                
+            } catch (error) {
+                console.error(`Error testing ${service}:`, error);
+                testResults.innerHTML = `
+                    <div class="text-red-600 font-semibold">❌ ${service} test failed!</div>
+                    <div class="text-sm text-gray-600">Error: ${error.message}</div>
+                `;
+            }
+        }
+        
+        // Run initial test
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded successfully');
+            console.log('Testing system initialization...');
+            
+            // Test basic functionality
+            setTimeout(() => {
+                testExample('5sim');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

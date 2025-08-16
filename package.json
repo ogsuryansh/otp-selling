@@ -5,7 +5,7 @@
   "main": "api/index.js",
   "scripts": {
     "dev": "vercel dev",
-    "local": "node start-local.js",
+    "local": "node start-local-server.js",
     "build": "echo 'No build step required'",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",

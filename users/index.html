@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users Dashboard</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="responsive.css">
+    <title>User Management - OTP Bot Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <script>
         tailwind.config = {
             theme: {
@@ -43,8 +43,8 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 1rem;
-            padding: 2rem;
-            width: 90%;
+            padding: 1.5rem;
+            width: 95%;
             max-width: 500px;
             position: absolute;
             top: 50%;
@@ -102,122 +102,132 @@
             box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3);
         }
         
-        /* Responsive table styles */
+        /* Mobile-friendly table */
+        .mobile-table {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 0.5rem;
+            .desktop-table {
+                display: none;
             }
-            
-            .glass {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-            }
-            
-            .stats-grid > div {
-                padding: 1rem 0.5rem;
-            }
-            
-            .stats-grid .text-2xl {
-                font-size: 1.25rem;
-            }
-            
-            .stats-grid .text-sm {
-                font-size: 0.75rem;
+            .mobile-table {
+                display: block;
             }
         }
         
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-controls > div {
-                width: 100%;
-            }
+        .user-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            backdrop-filter: blur(10px);
         }
         
-        @media (max-width: 480px) {
-            .container {
-                padding: 0.25rem;
-            }
-            
-            .glass {
-                padding: 0.75rem;
-            }
-            
-            .stats-grid > div {
-                padding: 0.75rem 0.5rem;
-            }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-banned {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            margin: 0.125rem;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-gray-800">
-    <div class="container mx-auto px-4 py-6 max-w-7xl">
-        <!-- Header -->
-        <div class="glass rounded-2xl p-6 mb-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">👥 Users Dashboard</h1>
-            <p class="text-gray-200 mb-4">Manage and monitor user accounts</p>
-            
-            <!-- Navigation -->
-            <div class="flex flex-wrap justify-center gap-3">
-                <a href="/" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🏠 Home
-                </a>
-                <a href="/admin" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    ⚙️ Admin
-                </a>
-                <a href="/transactions" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    💳 Transactions
-                </a>
-                <a href="/servers" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
-                    🖥️ Servers
-                </a>
+<body class="gradient-bg min-h-screen">
+    <!-- Header -->
+    <header class="glass border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">👥 User Management</h1>
+                </div>
+                <nav class="flex flex-wrap gap-2">
+                    <a href="/admin/dashboard" class="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm">
+                        📊 Dashboard
+                    </a>
+                    <a href="/admin/servers" class="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm">
+                        🖥️ Servers
+                    </a>
+                    <a href="/admin/services" class="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm">
+                        🔧 Services
+                    </a>
+                    <a href="/admin/apis" class="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm">
+                        🔌 APIs
+                    </a>
+                    <a href="/admin/orders" class="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm">
+                        📋 Orders
+                    </a>
+                </nav>
             </div>
         </div>
+    </header>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 stats-grid">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="glass rounded-xl p-4 text-center">
                 <div class="text-2xl mb-2">👥</div>
-                <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
-                <div class="text-gray-300 text-sm">Total Users</div>
+                <div class="text-xl md:text-2xl font-bold text-white" id="totalUsers">-</div>
+                <div class="text-gray-300 text-xs md:text-sm">Total Users</div>
             </div>
             
             <div class="glass rounded-xl p-4 text-center">
                 <div class="text-2xl mb-2">✅</div>
-                <div class="text-2xl font-bold text-white" id="activeUsers">-</div>
-                <div class="text-gray-300 text-sm">Active Users</div>
+                <div class="text-xl md:text-2xl font-bold text-white" id="activeUsers">-</div>
+                <div class="text-gray-300 text-xs md:text-sm">Active Users</div>
             </div>
             
             <div class="glass rounded-xl p-4 text-center">
                 <div class="text-2xl mb-2">🚫</div>
-                <div class="text-2xl font-bold text-white" id="bannedUsers">-</div>
-                <div class="text-gray-300 text-sm">Banned Users</div>
+                <div class="text-xl md:text-2xl font-bold text-white" id="bannedUsers">-</div>
+                <div class="text-gray-300 text-xs md:text-sm">Banned Users</div>
             </div>
             
             <div class="glass rounded-xl p-4 text-center">
                 <div class="text-2xl mb-2">💰</div>
-                <div class="text-2xl font-bold text-white" id="totalBalance">-</div>
-                <div class="text-gray-300 text-sm">Total Balance</div>
+                <div class="text-xl md:text-2xl font-bold text-white" id="totalBalance">-</div>
+                <div class="text-gray-300 text-xs md:text-sm">Total Balance</div>
             </div>
         </div>
 
         <!-- Search and Controls -->
-        <div class="glass rounded-xl p-6 mb-6">
+        <div class="glass rounded-xl p-4 md:p-6 mb-6">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <h2 class="text-xl font-semibold text-white">User List</h2>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto search-controls">
-                    <input type="text" id="searchInput" class="px-4 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 border border-white/20 focus:outline-none focus:border-white/40 text-sm" placeholder="Search users...">
-                    <button onclick="loadUsers()" class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
+                <h2 class="text-lg md:text-xl font-semibold text-white">User List</h2>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <input type="text" id="searchInput" 
+                           class="px-4 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 border border-white/20 focus:outline-none focus:border-white/40 text-sm" 
+                           placeholder="Search users...">
+                    <button onclick="loadUsers()" 
+                            class="glass px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-300 text-sm font-medium">
                         🔄 Refresh
                     </button>
                 </div>
@@ -233,13 +243,12 @@
             <div class="text-red-300"></div>
         </div>
 
-        <!-- Success Message -->
         <div id="successMessage" class="glass rounded-xl p-6 text-center mb-6 bg-green-500/20 border border-green-500/30" style="display: none;">
             <div class="text-green-300"></div>
         </div>
 
-        <!-- Users Table -->
-        <div class="glass rounded-xl p-6 overflow-x-auto">
+        <!-- Desktop Table -->
+        <div class="glass rounded-xl p-4 md:p-6 overflow-x-auto desktop-table">
             <table class="w-full text-sm" id="usersTable" style="display: none;">
                 <thead>
                     <tr class="border-b border-white/20">
@@ -257,13 +266,18 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-table" id="usersMobileCards" style="display: none;">
+            <!-- Mobile user cards will be populated here -->
+        </div>
     </div>
 
     <!-- Balance Edit Modal -->
     <div id="balanceModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800" id="balanceModalTitle">Edit Balance</h3>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800" id="balanceModalTitle">Edit Balance</h3>
                 <button onclick="closeModal('balanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
@@ -289,7 +303,7 @@
     <div id="addBalanceModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Add Balance</h3>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">Add Balance</h3>
                 <button onclick="closeModal('addBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
@@ -315,7 +329,7 @@
     <div id="cutBalanceModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Cut Balance</h3>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">Cut Balance</h3>
                 <button onclick="closeModal('cutBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
@@ -341,7 +355,7 @@
     <div id="banUserModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Ban User</h3>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">Ban User</h3>
                 <button onclick="closeModal('banUserModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
@@ -361,444 +375,409 @@
                 <button onclick="closeModal('banUserModal')" class="btn btn-secondary flex-1">Cancel</button>
             </div>
         </div>
+    </div>
 
-        <!-- Direct Web Links Section -->
-        <div class="glass rounded-xl p-6 mt-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-semibold text-white">🔗 Direct Web Links</h3>
-                <p class="text-gray-300 text-sm">Quick access to all admin panel sections</p>
+    <!-- Unban User Modal -->
+    <div id="unbanUserModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">Unban User</h3>
+                <button onclick="closeModal('unbanUserModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/admin/dashboard" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">📊</div>
-                    <div class="text-white font-semibold text-sm">Dashboard</div>
-                    <div class="text-gray-300 text-xs">Main admin dashboard</div>
-                </a>
-                
-                <a href="/admin/servers" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">🖥️</div>
-                    <div class="text-white font-semibold text-sm">Servers</div>
-                    <div class="text-gray-300 text-xs">Manage OTP servers</div>
-                </a>
-                
-                <a href="/admin/services" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">🔧</div>
-                    <div class="text-white font-semibold text-sm">Services</div>
-                    <div class="text-gray-300 text-xs">Manage OTP services</div>
-                </a>
-                
-                <a href="/admin/apis" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">🔌</div>
-                    <div class="text-white font-semibold text-sm">APIs</div>
-                    <div class="text-gray-300 text-xs">Manage API connections</div>
-                </a>
-                
-                <a href="/admin/orders" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">📋</div>
-                    <div class="text-white font-semibold text-sm">Orders</div>
-                    <div class="text-gray-300 text-xs">View all orders</div>
-                </a>
-                
-                <a href="/users" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300 bg-white/20">
-                    <div class="text-2xl mb-2">👥</div>
-                    <div class="text-white font-semibold text-sm">Users</div>
-                    <div class="text-gray-300 text-xs">Manage users</div>
-                </a>
-                
-                <a href="/transactions" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">💰</div>
-                    <div class="text-white font-semibold text-sm">Transactions</div>
-                    <div class="text-gray-300 text-xs">View transactions</div>
-                </a>
-                
-                <a href="/promo-codes" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">🎫</div>
-                    <div class="text-white font-semibold text-sm">Promo Codes</div>
-                    <div class="text-gray-300 text-xs">Manage promo codes</div>
-                </a>
-                
-                <a href="/api-config" class="glass p-4 rounded-lg text-center hover:bg-white/20 transition-all duration-300">
-                    <div class="text-2xl mb-2">⚙️</div>
-                    <div class="text-white font-semibold text-sm">API Config</div>
-                    <div class="text-gray-300 text-xs">Configure APIs</div>
-                </a>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+                <input type="text" id="unbanUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">User Name:</label>
+                <input type="text" id="unbanUserName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-600 text-sm">Are you sure you want to unban this user?</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="unbanUser()" class="btn btn-success flex-1">Unban User</button>
+                <button onclick="closeModal('unbanUserModal')" class="btn btn-secondary flex-1">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
-        let allUsers = [];
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            loadStatistics();
+        });
 
-        // Load statistics
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const userCards = document.querySelectorAll('.user-card');
+            const tableRows = document.querySelectorAll('#usersTableBody tr');
+
+            // Filter mobile cards
+            userCards.forEach(card => {
+                const userName = card.querySelector('.user-name').textContent.toLowerCase();
+                const userId = card.querySelector('.user-id').textContent.toLowerCase();
+                if (userName.includes(searchTerm) || userId.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Filter desktop table rows
+            tableRows.forEach(row => {
+                const userName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const userId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                if (userName.includes(searchTerm) || userId.includes(searchTerm)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
         async function loadStatistics() {
             try {
                 const response = await fetch('/api/statistics');
-                const stats = await response.json();
+                const data = await response.json();
                 
-                document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
-                document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
-                document.getElementById('bannedUsers').textContent = stats.bannedUsers || 0;
-                document.getElementById('totalBalance').textContent = `${(stats.totalBalance || 0).toFixed(2)} 💎`;
+                document.getElementById('totalUsers').textContent = data.totalUsers || 0;
+                document.getElementById('activeUsers').textContent = data.activeUsers || 0;
+                document.getElementById('bannedUsers').textContent = data.bannedUsers || 0;
+                document.getElementById('totalBalance').textContent = `$${(data.totalBalance || 0).toFixed(2)}`;
             } catch (error) {
                 console.error('Error loading statistics:', error);
             }
         }
 
-        // Load users
         async function loadUsers() {
             const loadingMessage = document.getElementById('loadingMessage');
             const errorMessage = document.getElementById('errorMessage');
             const usersTable = document.getElementById('usersTable');
-            const usersTableBody = document.getElementById('usersTableBody');
+            const usersMobileCards = document.getElementById('usersMobileCards');
 
             loadingMessage.style.display = 'block';
             errorMessage.style.display = 'none';
             usersTable.style.display = 'none';
+            usersMobileCards.style.display = 'none';
 
             try {
                 const response = await fetch('/api/users');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const users = await response.json();
+
+                loadingMessage.style.display = 'none';
+                
+                if (users.length === 0) {
+                    errorMessage.querySelector('div').textContent = 'No users found';
+                    errorMessage.style.display = 'block';
+                    return;
                 }
-                
-                allUsers = await response.json();
-                displayUsers(allUsers);
-                
-                loadingMessage.style.display = 'none';
-                usersTable.style.display = 'table';
-            } catch (error) {
-                console.error('Error loading users:', error);
-                loadingMessage.style.display = 'none';
-                errorMessage.style.display = 'block';
-                errorMessage.querySelector('div').textContent = `Error loading users: ${error.message}`;
-            }
-        }
 
-        // Display users in table
-        function displayUsers(users) {
-            const usersTableBody = document.getElementById('usersTableBody');
-            usersTableBody.innerHTML = '';
+                // Populate desktop table
+                const tableBody = document.getElementById('usersTableBody');
+                tableBody.innerHTML = '';
 
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-white/10 hover:bg-white/5 transition-colors';
-                
-                const statusClass = user.status === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300';
-                
-                row.innerHTML = `
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">${user.id}</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">${user.name}</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden md:table-cell">${user.username}</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-primary">${user.balance.toFixed(2)} 💎</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">
-                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">
-                            ${user.status}
-                        </span>
-                    </td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden lg:table-cell">${formatDate(user.registration_date)}</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm hidden lg:table-cell">${formatDate(user.last_activity)}</td>
-                    <td class="py-3 px-2 md:px-4 text-xs md:text-sm">
-                        <div class="flex flex-col sm:flex-row gap-1">
-                            <button onclick="openAddBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-success text-xs px-2 py-1 w-full sm:w-auto">
+                // Populate mobile cards
+                const mobileCardsContainer = document.getElementById('usersMobileCards');
+                mobileCardsContainer.innerHTML = '';
+
+                users.forEach(user => {
+                    // Desktop table row
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-white/10 hover:bg-white/5';
+                    
+                    const statusClass = user.status === 'active' ? 'status-active' : 'status-banned';
+                    const statusText = user.status === 'active' ? 'Active' : 'Banned';
+                    
+                    row.innerHTML = `
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">${user.id}</td>
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">${user.name}</td>
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm hidden md:table-cell">${user.username}</td>
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">$${user.balance.toFixed(2)}</td>
+                        <td class="py-3 px-2 md:px-4">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm hidden lg:table-cell">${new Date(user.registration_date).toLocaleDateString()}</td>
+                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm hidden lg:table-cell">${new Date(user.last_activity).toLocaleDateString()}</td>
+                        <td class="py-3 px-2 md:px-4">
+                            <div class="flex flex-wrap gap-1">
+                                <button onclick="editBalance(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-blue-500 hover:bg-blue-600 text-white">
+                                    💰 Edit
+                                </button>
+                                <button onclick="addBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-green-500 hover:bg-green-600 text-white">
+                                    ➕ Add
+                                </button>
+                                <button onclick="cutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-yellow-500 hover:bg-yellow-600 text-white">
+                                    ➖ Cut
+                                </button>
+                                ${user.status === 'active' ? 
+                                    `<button onclick="banUserModal(${user.id}, '${user.name}')" class="action-btn bg-red-500 hover:bg-red-600 text-white">🚫 Ban</button>` :
+                                    `<button onclick="unbanUserModal(${user.id}, '${user.name}')" class="action-btn bg-green-500 hover:bg-green-600 text-white">✅ Unban</button>`
+                                }
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+
+                    // Mobile card
+                    const card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="text-white font-semibold user-name">${user.name}</div>
+                                <div class="text-gray-400 text-sm user-id">ID: ${user.id}</div>
+                                <div class="text-gray-400 text-sm">${user.username}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-white font-bold text-lg">$${user.balance.toFixed(2)}</div>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="text-gray-400 text-xs mb-3">
+                            <div>Registered: ${new Date(user.registration_date).toLocaleDateString()}</div>
+                            <div>Last Activity: ${new Date(user.last_activity).toLocaleDateString()}</div>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            <button onclick="editBalance(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-blue-500 hover:bg-blue-600 text-white">
+                                💰 Edit
+                            </button>
+                            <button onclick="addBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-green-500 hover:bg-green-600 text-white">
                                 ➕ Add
                             </button>
-                            <button onclick="openCutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-warning text-xs px-2 py-1 w-full sm:w-auto">
+                            <button onclick="cutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="action-btn bg-yellow-500 hover:bg-yellow-600 text-white">
                                 ➖ Cut
                             </button>
                             ${user.status === 'active' ? 
-                                `<button onclick="openBanUserModal(${user.id}, '${user.name}')" class="btn btn-danger text-xs px-2 py-1 w-full sm:w-auto">🚫 Ban</button>` :
-                                `<button onclick="unbanUser(${user.id})" class="btn btn-success text-xs px-2 py-1 w-full sm:w-auto">✅ Unban</button>`
+                                `<button onclick="banUserModal(${user.id}, '${user.name}')" class="action-btn bg-red-500 hover:bg-red-600 text-white">🚫 Ban</button>` :
+                                `<button onclick="unbanUserModal(${user.id}, '${user.name}')" class="action-btn bg-green-500 hover:bg-green-600 text-white">✅ Unban</button>`
                             }
-                            <button onclick="openBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="btn btn-primary text-xs px-2 py-1 w-full sm:w-auto">
-                                ✏️ Edit
-                            </button>
                         </div>
-                    </td>
-                `;
-                usersTableBody.appendChild(row);
-            });
+                    `;
+                    mobileCardsContainer.appendChild(card);
+                });
+
+                usersTable.style.display = 'table';
+                usersMobileCards.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                loadingMessage.style.display = 'none';
+                errorMessage.querySelector('div').textContent = 'Failed to load users. Please try again.';
+                errorMessage.style.display = 'block';
+            }
         }
 
         // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function openBalanceModal(userId, userName, currentBalance) {
+        function showMessage(message, type = 'success') {
+            const messageElement = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+            messageElement.querySelector('div').textContent = message;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // User action functions
+        function editBalance(userId, userName, currentBalance) {
             document.getElementById('balanceUserId').value = userId;
-            document.getElementById('currentBalance').value = `${currentBalance.toFixed(2)} 💎`;
-            document.getElementById('newBalance').value = currentBalance.toFixed(2);
+            document.getElementById('currentBalance').value = `$${currentBalance.toFixed(2)}`;
+            document.getElementById('newBalance').value = currentBalance;
             document.getElementById('balanceModalTitle').textContent = `Edit Balance - ${userName}`;
-            openModal('balanceModal');
+            document.getElementById('balanceModal').style.display = 'block';
         }
 
-        function openAddBalanceModal(userId, userName, currentBalance) {
+        function addBalanceModal(userId, userName, currentBalance) {
             document.getElementById('addBalanceUserId').value = userId;
-            document.getElementById('addBalanceCurrent').value = `${currentBalance.toFixed(2)} 💎`;
+            document.getElementById('addBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
             document.getElementById('addBalanceAmount').value = '';
-            openModal('addBalanceModal');
+            document.getElementById('addBalanceModal').style.display = 'block';
         }
 
-        function openCutBalanceModal(userId, userName, currentBalance) {
+        function cutBalanceModal(userId, userName, currentBalance) {
             document.getElementById('cutBalanceUserId').value = userId;
-            document.getElementById('cutBalanceCurrent').value = `${currentBalance.toFixed(2)} 💎`;
+            document.getElementById('cutBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
             document.getElementById('cutBalanceAmount').value = '';
-            openModal('cutBalanceModal');
+            document.getElementById('cutBalanceModal').style.display = 'block';
         }
 
-        function openBanUserModal(userId, userName) {
+        function banUserModal(userId, userName) {
             document.getElementById('banUserId').value = userId;
             document.getElementById('banUserName').value = userName;
             document.getElementById('banReason').value = '';
-            openModal('banUserModal');
+            document.getElementById('banUserModal').style.display = 'block';
         }
 
-        // Action functions
+        function unbanUserModal(userId, userName) {
+            document.getElementById('unbanUserId').value = userId;
+            document.getElementById('unbanUserName').value = userName;
+            document.getElementById('unbanUserModal').style.display = 'block';
+        }
+
         async function updateUserBalance() {
             const userId = document.getElementById('balanceUserId').value;
             const newBalance = parseFloat(document.getElementById('newBalance').value);
-            
-            if (isNaN(newBalance) || newBalance < 0) {
-                showError('Please enter a valid balance amount');
-                return;
-            }
 
             try {
                 const response = await fetch('/api/update_user', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        balance: newBalance,
-                        first_name: 'Updated via web',
-                        admin_id: 7574316340
+                        balance: newBalance
                     })
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showSuccess(`Balance updated successfully for user ${userId}`);
+                    showMessage('Balance updated successfully!');
                     closeModal('balanceModal');
                     loadUsers();
                     loadStatistics();
                 } else {
-                    showError(result.message || 'Failed to update balance');
+                    showMessage(result.message || 'Failed to update balance', 'error');
                 }
             } catch (error) {
-                showError('Error updating balance: ' + error.message);
+                console.error('Error updating balance:', error);
+                showMessage('Failed to update balance. Please try again.', 'error');
             }
         }
 
         async function addBalance() {
             const userId = document.getElementById('addBalanceUserId').value;
             const amount = parseFloat(document.getElementById('addBalanceAmount').value);
-            
-            if (isNaN(amount) || amount <= 0) {
-                showError('Please enter a valid amount');
-                return;
-            }
 
             try {
                 const response = await fetch('/api/add_balance', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        amount: amount,
-                        admin_id: 7574316340
+                        amount: amount
                     })
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showSuccess(`Added ${amount} 💎 to user ${userId}`);
+                    showMessage('Balance added successfully!');
                     closeModal('addBalanceModal');
                     loadUsers();
                     loadStatistics();
                 } else {
-                    showError(result.message || 'Failed to add balance');
+                    showMessage(result.message || 'Failed to add balance', 'error');
                 }
             } catch (error) {
-                showError('Error adding balance: ' + error.message);
+                console.error('Error adding balance:', error);
+                showMessage('Failed to add balance. Please try again.', 'error');
             }
         }
 
         async function cutBalance() {
             const userId = document.getElementById('cutBalanceUserId').value;
             const amount = parseFloat(document.getElementById('cutBalanceAmount').value);
-            
-            if (isNaN(amount) || amount <= 0) {
-                showError('Please enter a valid amount');
-                return;
-            }
 
             try {
                 const response = await fetch('/api/cut_balance', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        amount: amount,
-                        admin_id: 7574316340
+                        amount: amount
                     })
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showSuccess(`Cut ${amount} 💎 from user ${userId}`);
+                    showMessage('Balance cut successfully!');
                     closeModal('cutBalanceModal');
                     loadUsers();
                     loadStatistics();
                 } else {
-                    showError(result.message || 'Failed to cut balance');
+                    showMessage(result.message || 'Failed to cut balance', 'error');
                 }
             } catch (error) {
-                showError('Error cutting balance: ' + error.message);
+                console.error('Error cutting balance:', error);
+                showMessage('Failed to cut balance. Please try again.', 'error');
             }
         }
 
         async function banUser() {
             const userId = document.getElementById('banUserId').value;
-            const reason = document.getElementById('banReason').value.trim();
-            
-            if (!reason) {
-                showError('Please enter a ban reason');
-                return;
-            }
+            const reason = document.getElementById('banReason').value;
 
             try {
                 const response = await fetch('/api/ban_user', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        reason: reason,
-                        admin_id: 7574316340
+                        reason: reason
                     })
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showSuccess(`User ${userId} banned successfully`);
+                    showMessage('User banned successfully!');
                     closeModal('banUserModal');
                     loadUsers();
                     loadStatistics();
                 } else {
-                    showError(result.message || 'Failed to ban user');
+                    showMessage(result.message || 'Failed to ban user', 'error');
                 }
             } catch (error) {
-                showError('Error banning user: ' + error.message);
+                console.error('Error banning user:', error);
+                showMessage('Failed to ban user. Please try again.', 'error');
             }
         }
 
-        async function unbanUser(userId) {
-            if (!confirm(`Are you sure you want to unban user ${userId}?`)) {
-                return;
-            }
+        async function unbanUser() {
+            const userId = document.getElementById('unbanUserId').value;
 
             try {
                 const response = await fetch('/api/unban_user', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
-                        user_id: parseInt(userId),
-                        admin_id: 7574316340
+                        user_id: parseInt(userId)
                     })
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showSuccess(`User ${userId} unbanned successfully`);
+                    showMessage('User unbanned successfully!');
+                    closeModal('unbanUserModal');
                     loadUsers();
                     loadStatistics();
                 } else {
-                    showError(result.message || 'Failed to unban user');
+                    showMessage(result.message || 'Failed to unban user', 'error');
                 }
             } catch (error) {
-                showError('Error unbanning user: ' + error.message);
+                console.error('Error unbanning user:', error);
+                showMessage('Failed to unban user. Please try again.', 'error');
             }
         }
-
-        // Message functions
-        function showSuccess(message) {
-            const successMessage = document.getElementById('successMessage');
-            successMessage.querySelector('div').textContent = message;
-            successMessage.style.display = 'block';
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.querySelector('div').textContent = message;
-            errorMessage.style.display = 'block';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        // Search functionality
-        function setupSearch() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredUsers = allUsers.filter(user => 
-                    user.id.toString().includes(searchTerm) ||
-                    user.name.toLowerCase().includes(searchTerm) ||
-                    user.username.toLowerCase().includes(searchTerm)
-                );
-                displayUsers(filteredUsers);
-            });
-        }
-
-        // Format date
-        function formatDate(dateString) {
-            if (!dateString || dateString === 'Unknown') {
-                return 'Unknown';
-            }
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-            } catch (error) {
-                return dateString;
-            }
-        }
-
-        // Auto-refresh every 30 seconds
-        function startAutoRefresh() {
-            setInterval(() => {
-                loadStatistics();
-                loadUsers();
-            }, 30000);
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            loadStatistics();
-            loadUsers();
-            setupSearch();
-            startAutoRefresh();
-        });
     </script>
 </body>
 </html>

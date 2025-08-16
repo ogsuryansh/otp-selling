@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.mongodb.net/otp_bot?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.abc123.mongodb.net/otp_bot?retryWrites=true&w=majority';
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
 
 let client = null;
@@ -31,24 +31,37 @@ async function connectToMongoDB() {
             return true;
         }
         
+        console.log('🔗 Attempting to connect to MongoDB...');
+        console.log('📝 MongoDB URI:', MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
+        console.log('🗄️ Database:', MONGODB_DATABASE);
+        
         client = new MongoClient(MONGODB_URI, {
             serverSelectionTimeoutMS: 15000,
-            maxPoolSize: 10
+            maxPoolSize: 10,
+            retryWrites: true,
+            w: 'majority'
         });
         
         await client.connect();
         db = client.db(MONGODB_DATABASE);
+        
+        // Test the connection
+        await db.admin().ping();
         
         // Create collections if they don't exist
         await db.createCollection('servers');
         await db.createCollection('services');
         await db.createCollection('apis');
         await db.createCollection('orders');
+        await db.createCollection('users');
+        await db.createCollection('transactions');
+        await db.createCollection('promo_codes');
         
         console.log('✅ MongoDB connected successfully');
         return true;
     } catch (error) {
         console.error('❌ MongoDB connection failed:', error.message);
+        console.error('🔍 Full error:', error);
         return false;
     }
 }
@@ -98,12 +111,26 @@ app.get('/api/health', (req, res) => {
 
 // Dashboard statistics endpoint
 app.get('/api/statistics', async (req, res) => {
-    console.log('📊 Statistics endpoint called');
-    try {
-        if (!db) {
-            console.log('🔄 Connecting to MongoDB...');
-            await connectToMongoDB();
-        }
+            console.log('📊 Statistics endpoint called');
+        try {
+            if (!db) {
+                console.log('🔄 Connecting to MongoDB...');
+                const connected = await connectToMongoDB();
+                if (!connected) {
+                    console.log('⚠️ MongoDB not available, returning fallback data');
+                    return res.json({
+                        todayEarnings: 0,
+                        totalUsers: 0,
+                        numbersSold: 0,
+                        popularService: 'No data available',
+                        totalRevenue: 0,
+                        activeUsers: 0,
+                        bannedUsers: 0,
+                        totalBalance: 0,
+                        error: 'MongoDB connection failed'
+                    });
+                }
+            }
         
         const serversCollection = db.collection('servers');
         const servicesCollection = db.collection('services');

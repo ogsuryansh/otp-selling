@@ -93,6 +93,9 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "MONGODB_URI": "mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.mongodb.net/otp_bot?retryWrites=true&w=majority",
+    "MONGODB_DATABASE": "otp_bot",
+    "MONGODB_COLLECTION": "users"
   }
 }

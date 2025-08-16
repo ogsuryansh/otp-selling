@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // MongoDB configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.mongodb.net/otp_bot?retryWrites=true&w=majority';
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
 
 let client = null;
@@ -877,6 +877,182 @@ app.post('/api/unban_user', async (req, res) => {
     }
 });
 
+// Transactions endpoint
+app.get('/api/transactions', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const transactionsCollection = db.collection('transactions');
+        const transactions = await transactionsCollection.find({}).sort({ created_at: -1 }).limit(100).toArray();
+        res.json(transactions);
+    } catch (error) {
+        console.error('Error getting transactions:', error);
+        res.status(500).json({ error: 'Failed to load transactions' });
+    }
+});
+
+// Dashboard stats endpoint
+app.get('/api/dashboard/stats', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const usersCollection = db.collection('users');
+        const ordersCollection = db.collection('orders');
+        
+        const totalUsers = await usersCollection.countDocuments({});
+        const totalOrders = await ordersCollection.countDocuments({});
+        
+        // Calculate today's earnings
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const todayOrders = await ordersCollection.find({
+            createdAt: { $gte: today, $lt: tomorrow },
+            status: 'completed'
+        }).toArray();
+        
+        const todayEarnings = todayOrders.reduce((sum, order) => sum + (order.amount || 0), 0);
+        
+        res.json({
+            totalUsers,
+            totalOrders,
+            todayEarnings,
+            todayOrders: todayOrders.length
+        });
+    } catch (error) {
+        console.error('Error getting dashboard stats:', error);
+        res.status(500).json({ error: 'Failed to load dashboard stats' });
+    }
+});
+
+// OTP endpoints (placeholder responses)
+app.get('/api/otp/statistics', async (req, res) => {
+    res.json({
+        totalOrders: 0,
+        completedOrders: 0,
+        pendingOrders: 0,
+        totalEarnings: 0
+    });
+});
+
+app.get('/api/otp/orders', async (req, res) => {
+    res.json([]);
+});
+
+app.get('/api/otp/orders/:id', async (req, res) => {
+    res.json({});
+});
+
+app.post('/api/otp/orders/:id/cancel', async (req, res) => {
+    res.json({ success: true });
+});
+
+app.post('/api/otp/orders/:id/finish', async (req, res) => {
+    res.json({ success: true });
+});
+
+// Basic services endpoint
+app.get('/api/basic-services', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const servicesCollection = db.collection('services');
+        const services = await servicesCollection.find({}).toArray();
+        res.json(services);
+    } catch (error) {
+        console.error('Error getting basic services:', error);
+        res.status(500).json({ error: 'Failed to load services' });
+    }
+});
+
+app.post('/api/basic-services', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const servicesCollection = db.collection('services');
+        const result = await servicesCollection.insertOne({
+            ...req.body,
+            createdAt: new Date()
+        });
+        res.json({ success: true, id: result.insertedId });
+    } catch (error) {
+        console.error('Error creating basic service:', error);
+        res.status(500).json({ error: 'Failed to create service' });
+    }
+});
+
+// Promo codes endpoints
+app.get('/api/promo-codes', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const promoCollection = db.collection('promo_codes');
+        const promoCodes = await promoCollection.find({}).toArray();
+        res.json(promoCodes);
+    } catch (error) {
+        console.error('Error getting promo codes:', error);
+        res.status(500).json({ error: 'Failed to load promo codes' });
+    }
+});
+
+app.post('/api/promo-codes', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const promoCollection = db.collection('promo_codes');
+        const result = await promoCollection.insertOne({
+            ...req.body,
+            createdAt: new Date()
+        });
+        res.json({ success: true, id: result.insertedId });
+    } catch (error) {
+        console.error('Error creating promo code:', error);
+        res.status(500).json({ error: 'Failed to create promo code' });
+    }
+});
+
+app.put('/api/promo-codes/:id', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const promoCollection = db.collection('promo_codes');
+        const result = await promoCollection.updateOne(
+            { _id: req.params.id },
+            { $set: { ...req.body, updatedAt: new Date() } }
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating promo code:', error);
+        res.status(500).json({ error: 'Failed to update promo code' });
+    }
+});
+
+app.delete('/api/promo-codes/:id', async (req, res) => {
+    try {
+        if (!db) { await connectToMongoDB(); }
+        const promoCollection = db.collection('promo_codes');
+        await promoCollection.deleteOne({ _id: req.params.id });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting promo code:', error);
+        res.status(500).json({ error: 'Failed to delete promo code' });
+    }
+});
+
+// Import endpoints
+app.post('/api/import/file', async (req, res) => {
+    try {
+        res.json({ success: true, message: 'File import functionality not implemented yet' });
+    } catch (error) {
+        console.error('Error importing file:', error);
+        res.status(500).json({ error: 'Failed to import file' });
+    }
+});
+
+app.post('/api/import/url', async (req, res) => {
+    try {
+        res.json({ success: true, message: 'URL import functionality not implemented yet' });
+    } catch (error) {
+        console.error('Error importing from URL:', error);
+        res.status(500).json({ error: 'Failed to import from URL' });
+    }
+});
+
 // Serve static pages
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
@@ -958,12 +1134,6 @@ connectToMongoDB().then(success => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-    console.log(`🌐 Local URL: http://localhost:${PORT}`);
-    console.log(`🗄️ MongoDB: ${MONGODB_URI}/${MONGODB_DATABASE}`);
-});
-
+// Export the app for Vercel serverless functions
 module.exports = app;
  

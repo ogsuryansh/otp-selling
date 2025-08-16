@@ -9,6 +9,14 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Debug logging middleware
+app.use((req, res, next) => {
+    console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+    console.log(`📝 Request Headers:`, req.headers);
+    console.log(`📄 Request Body:`, req.body);
+    next();
+});
+
 // MongoDB configuration
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.mongodb.net/otp_bot?retryWrites=true&w=majority';
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
@@ -61,21 +69,39 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, '..')));
 
+// Test endpoint
+app.get('/api/test', (req, res) => {
+    console.log('🧪 Test endpoint called');
+    res.json({ 
+        message: 'API is working!',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+    console.log('🏥 Health check endpoint called');
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
         mongodb: {
             connected: !!client && client.topology && client.topology.isConnected()
+        },
+        environment: {
+            node_env: process.env.NODE_ENV,
+            mongodb_uri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+            mongodb_database: process.env.MONGODB_DATABASE
         }
     });
 });
 
 // Dashboard statistics endpoint
 app.get('/api/statistics', async (req, res) => {
+    console.log('📊 Statistics endpoint called');
     try {
         if (!db) {
+            console.log('🔄 Connecting to MongoDB...');
             await connectToMongoDB();
         }
         
@@ -127,6 +153,16 @@ app.get('/api/statistics', async (req, res) => {
         const usersWithBalance = await usersCollection.find({}, { balance: 1 }).toArray();
         const totalBalance = usersWithBalance.reduce((sum, user) => sum + (user.balance || 0), 0);
         
+        console.log('📊 Statistics data:', {
+            todayEarnings,
+            totalUsers,
+            numbersSold: totalOrders,
+            popularService,
+            totalRevenue,
+            activeUsers: activeUsersCount,
+            bannedUsers: bannedUsersCount,
+            totalBalance: totalBalance
+        });
         res.json({
             todayEarnings,
             totalUsers,
@@ -139,7 +175,7 @@ app.get('/api/statistics', async (req, res) => {
             totalBalance: totalBalance
         });
     } catch (error) {
-        console.error('Error getting statistics:', error);
+        console.error('❌ Error getting statistics:', error);
         res.status(500).json({ error: 'Failed to load statistics' });
     }
 });
@@ -1125,6 +1161,10 @@ app.get('/api-config/connection', (req, res) => {
     res.sendFile(path.join(__dirname, '../api-config/api-connection.html'));
 });
 
+app.get('/test-api', (req, res) => {
+    res.sendFile(path.join(__dirname, '../test-api.html'));
+});
+
 // Connect to MongoDB on startup
 connectToMongoDB().then(success => {
     if (success) {
@@ -1132,6 +1172,17 @@ connectToMongoDB().then(success => {
     } else {
         console.log('❌ MongoDB connection failed on startup');
     }
+});
+
+// Catch-all route for debugging
+app.use('*', (req, res) => {
+    console.log('🚨 Catch-all route hit:', req.method, req.originalUrl);
+    res.status(404).json({
+        error: 'Route not found',
+        method: req.method,
+        url: req.originalUrl,
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Export the app for Vercel serverless functions

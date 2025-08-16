@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Test Page</h1>
+    <p>Testing API endpoints to debug routing issues...</p>
+    
+    <div>
+        <button onclick="testAPI('/api/test')">Test Basic API</button>
+        <button onclick="testAPI('/api/health')">Test Health Check</button>
+        <button onclick="testAPI('/api/statistics')">Test Statistics</button>
+        <button onclick="testAPI('/api/dashboard')">Test Dashboard</button>
+        <button onclick="testAPI('/api/users')">Test Users</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        async function testAPI(endpoint) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = `<strong>Testing ${endpoint}...</strong>`;
+            resultsDiv.appendChild(resultDiv);
+            
+            try {
+                console.log(`Testing endpoint: ${endpoint}`);
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = `
+                    <strong>✅ ${endpoint}</strong><br>
+                    Status: ${response.status}<br>
+                    Data: <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <strong>❌ ${endpoint}</strong><br>
+                    Error: ${error.message}<br>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        }
+        
+        // Test current URL
+        console.log('Current URL:', window.location.href);
+        console.log('Base URL:', window.location.origin);
+    </script>
+</body>
+</html>

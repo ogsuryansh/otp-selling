@@ -115,6 +115,107 @@
                 </table>
             </div>
         </div>
+
+        <!-- Direct Web Links Section -->
+        <div class="bg-white rounded-lg shadow mt-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
+                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">📊</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                            <p class="text-sm text-gray-600">Main admin dashboard</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🖥️</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Servers</h4>
+                            <p class="text-sm text-gray-600">Manage OTP servers</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🔧</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Services</h4>
+                            <p class="text-sm text-gray-600">Manage OTP services</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
+                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🔌</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">APIs</h4>
+                            <p class="text-sm text-gray-600">Manage API connections</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">📋</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Orders</h4>
+                            <p class="text-sm text-gray-600">View all orders</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/users" class="flex items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
+                        <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">👥</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Users</h4>
+                            <p class="text-sm text-gray-600">Manage users</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
+                        <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">💰</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Transactions</h4>
+                            <p class="text-sm text-gray-600">View transactions</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
+                        <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🎫</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Promo Codes</h4>
+                            <p class="text-sm text-gray-600">Manage promo codes</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
+                        <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">⚙️</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">API Config</h4>
+                            <p class="text-sm text-gray-600">Configure APIs</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add/Edit API Modal -->
@@ -383,124 +484,9 @@
             `).join('');
         }
 
-        // Add direct web links section
-        function addDirectWebLinks() {
-            const mainContent = document.querySelector('.max-w-7xl');
-            const existingLinksSection = document.querySelector('.direct-web-links-section');
-            
-            if (existingLinksSection) {
-                return; // Already exists
-            }
-            
-            const linksSection = document.createElement('div');
-            linksSection.className = 'direct-web-links-section bg-white rounded-lg shadow mt-8';
-            linksSection.innerHTML = `
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                    <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
-                </div>
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">📊</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Dashboard</h4>
-                                <p class="text-sm text-gray-600">Main admin dashboard</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
-                            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">🖥️</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Servers</h4>
-                                <p class="text-sm text-gray-600">Manage OTP servers</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
-                            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">🔧</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Services</h4>
-                                <p class="text-sm text-gray-600">Manage OTP services</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                            <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">🔌</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">APIs</h4>
-                                <p class="text-sm text-gray-600">Manage API connections</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                            <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">📋</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Orders</h4>
-                                <p class="text-sm text-gray-600">View all orders</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/users" class="flex items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
-                            <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">👥</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Users</h4>
-                                <p class="text-sm text-gray-600">Manage users</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                            <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">💰</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Transactions</h4>
-                                <p class="text-sm text-gray-600">View transactions</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                            <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">🎫</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">Promo Codes</h4>
-                                <p class="text-sm text-gray-600">Manage promo codes</p>
-                            </div>
-                        </a>
-                        
-                        <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                            <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">⚙️</span>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">API Config</h4>
-                                <p class="text-sm text-gray-600">Configure APIs</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            `;
-            
-            mainContent.appendChild(linksSection);
-        }
-
-        // Add direct web links when page loads
+        // Load APIs when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadApis();
-            setTimeout(addDirectWebLinks, 100); // Small delay to ensure DOM is ready
         });
     </script>
 </body>

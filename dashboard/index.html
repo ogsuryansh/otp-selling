@@ -227,7 +227,7 @@
                 <button class="tab-button" onclick="showTab('servers')">🖥️ Servers</button>
                 <button class="tab-button" onclick="showTab('services')">🔧 Services</button>
                 <button class="tab-button" onclick="showTab('api-connect')">🔌 Connect API</button>
-                <button class="tab-button" onclick="showTab('bot-settings')">⚙️ Bot Settings</button>
+
                 <button class="tab-button" onclick="showTab('my-services')">📋 My Services</button>
                 <button class="tab-button" onclick="showTab('promo-codes')">🎫 Promo Codes</button>
             </div>
@@ -413,45 +413,7 @@
                 </form>
             </div>
 
-            <!-- Bot Settings Tab -->
-            <div id="bot-settings" class="tab-content">
-                <h3 class="text-xl font-semibold text-white mb-4">Bot Configuration</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="card">
-                        <h4 class="text-lg font-semibold text-white mb-3">🤖 General Settings</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-white text-sm">Bot Token</label>
-                                <input type="password" id="botToken" placeholder="Enter bot token" class="form-input">
-                            </div>
-                            <div>
-                                <label class="text-white text-sm">Webhook URL</label>
-                                <input type="url" id="webhookUrl" placeholder="https://your-domain.com/webhook" class="form-input">
-                            </div>
-                            <button onclick="saveBotSettings()" class="btn-primary w-full">Save Settings</button>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h4 class="text-lg font-semibold text-white mb-3">⚙️ Advanced Settings</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-white text-sm">Max Retries</label>
-                                <input type="number" id="maxRetries" value="3" min="1" max="10" class="form-input">
-                            </div>
-                            <div>
-                                <label class="text-white text-sm">Timeout (seconds)</label>
-                                <input type="number" id="timeout" value="30" min="5" max="300" class="form-input">
-                            </div>
-                            <div>
-                                <label class="text-white text-sm">Rate Limit (requests/min)</label>
-                                <input type="number" id="rateLimit" value="10" min="1" max="100" class="form-input">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- My Services Tab -->
             <div id="my-services" class="tab-content">
@@ -1208,33 +1170,7 @@
             }
         });
 
-        // Bot settings functions
-        async function saveBotSettings() {
-            const settings = {
-                botToken: document.getElementById('botToken').value,
-                webhookUrl: document.getElementById('webhookUrl').value,
-                maxRetries: parseInt(document.getElementById('maxRetries').value),
-                timeout: parseInt(document.getElementById('timeout').value),
-                rateLimit: parseInt(document.getElementById('rateLimit').value)
-            };
 
-            try {
-                const response = await fetch('/api/bot/settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(settings)
-                });
-
-                if (response.ok) {
-                    showSuccess('Bot settings saved successfully!');
-                } else {
-                    showError('Failed to save bot settings');
-                }
-            } catch (error) {
-                console.error('Error saving bot settings:', error);
-                showError('Error saving bot settings');
-            }
-        }
 
         // Utility functions
         function showSuccess(message) {

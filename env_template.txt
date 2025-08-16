@@ -1,31 +1,10 @@
-# OTP Bot Environment Configuration
-# Copy this file to .env and fill in your actual values
-
-# MongoDB Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
+# MongoDB Connection
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 MONGODB_DATABASE=otp_bot
-MONGODB_COLLECTION=users
 
-# OTP Service API Keys
-FIVESIM_API_KEY=your_5sim_api_key_here
-SMS_ACTIVATE_API_KEY=your_sms_activate_api_key_here
-SMSHUB_API_KEY=your_smshub_api_key_here
-
-# Admin Configuration
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
-ADMIN_ID=7574316340
-
-# Security Settings
-MAX_LOGIN_ATTEMPTS=5
-LOCKOUT_DURATION=900000
-SESSION_TIMEOUT=86400000
-REQUIRE_2FA=false
+# Environment
+NODE_ENV=development
 
 # Server Configuration
-PORT=3000
-NODE_ENV=development
-DEBUG=true
+PORT=3001
 
-# Vercel Configuration (if deploying to Vercel)
-VERCEL=true

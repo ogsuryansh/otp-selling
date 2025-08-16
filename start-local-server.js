@@ -1,58 +1,92 @@
-#!/usr/bin/env node
-
-/**
- * Local Development Server
- * This script starts the API server locally for development
- */
-
 const path = require('path');
-const { spawn } = require('child_process');
+const express = require('express');
+const cors = require('cors');
 
-console.log('🚀 Starting Local Development Server...');
-console.log('📁 Working Directory:', process.cwd());
-console.log('⏰ Started at:', new Date().toISOString());
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Set development environment
-process.env.NODE_ENV = 'development';
-process.env.DEBUG = 'true';
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
-// Start the API server
-const serverProcess = spawn('node', ['api/index.js'], {
-    stdio: 'inherit',
-    cwd: __dirname,
-    env: {
-        ...process.env,
-        PORT: process.env.PORT || 3000,
-        NODE_ENV: 'development',
-        DEBUG: 'true'
-    }
+// Import the main API routes
+const apiRoutes = require('./api/index.js');
+
+// Use the API routes
+app.use('/api', apiRoutes);
+
+// Serve static files
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Handle server process events
-serverProcess.on('error', (error) => {
-    console.error('❌ Failed to start server:', error.message);
-    process.exit(1);
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/dashboard.html'));
 });
 
-serverProcess.on('exit', (code) => {
-    if (code !== 0) {
-        console.error(`❌ Server exited with code ${code}`);
-        process.exit(code);
-    }
+app.get('/admin/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/dashboard.html'));
 });
 
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down server...');
-    serverProcess.kill('SIGINT');
+app.get('/admin/servers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/servers.html'));
 });
 
-process.on('SIGTERM', () => {
-    console.log('\n🛑 Shutting down server...');
-    serverProcess.kill('SIGTERM');
+app.get('/admin/services', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/services.html'));
 });
 
-console.log('✅ Server process started');
-console.log('🌐 Local URL: http://localhost:3000');
-console.log('🔧 Debug Mode: Enabled');
-console.log('📝 Press Ctrl+C to stop the server');
+app.get('/admin/apis', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/apis.html'));
+});
+
+app.get('/admin/orders', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/orders.html'));
+});
+
+app.get('/admin/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin/login.html'));
+});
+
+
+
+// Additional routes for other pages
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dashboard/index.html'));
+});
+
+app.get('/services', (req, res) => {
+    res.sendFile(path.join(__dirname, 'services/index.html'));
+});
+
+app.get('/servers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'servers/index.html'));
+});
+
+app.get('/users', (req, res) => {
+    res.sendFile(path.join(__dirname, 'users/index.html'));
+});
+
+app.get('/transactions', (req, res) => {
+    res.sendFile(path.join(__dirname, 'transactions/index.html'));
+});
+
+app.get('/promo-codes', (req, res) => {
+    res.sendFile(path.join(__dirname, 'promo-codes/index.html'));
+});
+
+app.get('/api-config', (req, res) => {
+    res.sendFile(path.join(__dirname, 'api-config/index.html'));
+});
+
+app.get('/api-config/connection', (req, res) => {
+    res.sendFile(path.join(__dirname, 'api-config/api-connection.html'));
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`🚀 Local development server running on http://localhost:${PORT}`);
+    console.log(`📁 Serving files from: ${__dirname}`);
+    console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+});

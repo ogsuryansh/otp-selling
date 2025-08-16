@@ -3,200 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Bot - Home</title>
-    <!-- Removed Tailwind CDN for production; using compiled CSS -->
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    <title>Telegram OTP Bot - Phone Number Selling Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6'
+                    }
+                }
+            }
         }
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-        }
-    </style>
+    </script>
 </head>
-<body class="gradient-bg min-h-screen text-gray-200">
-    <div class="container mx-auto px-4 py-6 max-w-6xl">
-        <!-- Header -->
-        <div class="glass rounded-2xl p-6 mb-6 text-center">
-            <h1 class="text-3xl font-bold text-white mb-2">🤖 OTP Bot System</h1>
-            <p class="text-gray-300 mb-4">Complete SMS OTP Management Solution</p>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                        <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
+                        <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                        <a href="/admin/apis" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">APIs</a>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
+        
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
+                <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Main Navigation Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            <!-- Dashboard -->
-            <a href="dashboard/index.html" class="nav-card">
-                <div class="text-3xl mb-3">📊</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Dashboard</h3>
-                <p class="text-gray-300 text-xs">System overview</p>
-            </a>
-
-            <!-- Admin Panel -->
-            <a href="admin/index.html" class="nav-card">
-                <div class="text-3xl mb-3">⚙️</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Admin Panel</h3>
-                <p class="text-gray-300 text-xs">System admin</p>
-            </a>
-
-            <!-- API Configuration -->
-            <a href="api-config/index.html" class="nav-card">
-                <div class="text-3xl mb-3">🔌</div>
-                <h3 class="text-lg font-semibold text-white mb-1">API Config</h3>
-                <p class="text-gray-300 text-xs">SMS APIs</p>
-            </a>
-
-            <!-- Services -->
-            <a href="services/index.html" class="nav-card">
-                <div class="text-3xl mb-3">🔧</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Services</h3>
-                <p class="text-gray-300 text-xs">OTP services</p>
-            </a>
-
-            <!-- Users -->
-            <a href="users/index.html" class="nav-card">
-                <div class="text-3xl mb-3">👥</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Users</h3>
-                <p class="text-gray-300 text-xs">User management</p>
-            </a>
-
-            <!-- Servers -->
-            <a href="servers/index.html" class="nav-card">
-                <div class="text-3xl mb-3">🖥️</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Servers</h3>
-                <p class="text-gray-300 text-xs">Server config</p>
-            </a>
-
-            <!-- Transactions -->
-            <a href="transactions/index.html" class="nav-card">
-                <div class="text-3xl mb-3">💰</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Transactions</h3>
-                <p class="text-gray-300 text-xs">Payment history</p>
-            </a>
-
-            <!-- Promo Codes -->
-            <a href="promo-codes/index.html" class="nav-card">
-                <div class="text-3xl mb-3">🎫</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Promo Codes</h3>
-                <p class="text-gray-300 text-xs">Discounts</p>
-            </a>
-
-            <!-- Documentation -->
-            <a href="docs/index.html" class="nav-card">
-                <div class="text-3xl mb-3">📚</div>
-                <h3 class="text-lg font-semibold text-white mb-1">Documentation</h3>
-                <p class="text-gray-300 text-xs">Guides</p>
-            </a>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Telegram OTP Bot Platform</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Complete phone number selling solution for SMS/OTP verification services. Manage servers, services, and APIs from one dashboard.</p>
         </div>
 
         <!-- Quick Stats -->
-        <div class="glass rounded-xl p-6 mt-8">
-            <h2 class="text-2xl font-semibold text-white mb-4">📈 Quick Statistics</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">👥</div>
-                    <div class="text-2xl font-bold text-white" id="totalUsers">-</div>
-                    <div class="text-gray-300 text-sm">Total Users</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-bold">₹</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Today's Earnings</p>
+                        <p class="text-2xl font-bold text-gray-900" id="todayEarnings">₹0</p>
+                    </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">🔌</div>
-                    <div class="text-2xl font-bold text-white" id="totalApis">-</div>
-                    <div class="text-gray-300 text-sm">Active APIs</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">👥</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">New Users Today</p>
+                        <p class="text-2xl font-bold text-gray-900" id="newUsers">0</p>
+                    </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">📱</div>
-                    <div class="text-2xl font-bold text-white" id="totalOrders">-</div>
-                    <div class="text-gray-300 text-sm">Total Orders</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">📱</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Numbers Sold Today</p>
+                        <p class="text-2xl font-bold text-gray-900" id="numbersSold">0</p>
+                    </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="text-2xl mb-2">💰</div>
-                    <div class="text-2xl font-bold text-white" id="totalRevenue">-</div>
-                    <div class="text-gray-300 text-sm">Revenue</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">🔥</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Popular Service</p>
+                        <p class="text-2xl font-bold text-gray-900" id="popularService">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dashboard -->
+            <a href="/admin/dashboard" class="group">
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:bg-secondary transition-colors duration-200">
+                                <span class="text-white text-xl">📊</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Dashboard</h3>
+                            <p class="text-gray-600">Track earnings, users, and sales</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Servers -->
+            <a href="/admin/servers" class="group">
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors duration-200">
+                                <span class="text-white text-xl">🖥️</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Manage Servers</h3>
+                            <p class="text-gray-600">Add phone number providers by country</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Services -->
+            <a href="/admin/services" class="group">
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-200">
+                                <span class="text-white text-xl">🔧</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Manage Services</h3>
+                            <p class="text-gray-600">Create products to sell</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- API Configuration -->
+            <a href="/admin/apis" class="group">
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors duration-200">
+                                <span class="text-white text-xl">🔌</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Connect APIs</h3>
+                            <p class="text-gray-600">Connect to SMS providers</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Bot Settings -->
+
+
+            <!-- Orders -->
+            <a href="/admin/orders" class="group">
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-200">
+                                <span class="text-white text-xl">📋</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">View Orders</h3>
+                            <p class="text-gray-600">Track all transactions</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- How It Works Section -->
+        <div class="mt-16 bg-white rounded-lg shadow p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">1</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">User Selects Service</h3>
+                    <p class="text-gray-600 text-sm">Choose WhatsApp, Telegram, Gmail verification</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">2</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Payment</h3>
+                    <p class="text-gray-600 text-sm">Pay via UPI, Paytm, or other methods</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">3</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Get Phone Number</h3>
+                    <p class="text-gray-600 text-sm">Receive a phone number from our servers</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">4</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Receive SMS</h3>
+                    <p class="text-gray-600 text-sm">Get OTP codes forwarded to you</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="assets/js/main.js"></script>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-400">&copy; 2024 Telegram OTP Bot Platform. All rights reserved.</p>
+                <p class="text-gray-500 text-sm mt-2">Phone Number Selling for SMS/OTP Verification</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // Load quick statistics when page loads
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Load quick stats
         document.addEventListener('DOMContentLoaded', function() {
             loadQuickStats();
         });
 
         async function loadQuickStats() {
             try {
-                // Show loading state
-                const statElements = ['totalUsers', 'totalApis', 'totalOrders', 'totalRevenue'];
-                statElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) element.textContent = '...';
-                });
-
-                // Fetch statistics from API
                 const response = await fetch('/api/statistics');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update stats (with fallbacks)
+                    document.getElementById('todayEarnings').textContent = `₹${data.todayEarnings || 0}`;
+                    document.getElementById('newUsers').textContent = data.totalUsers || 0;
+                    document.getElementById('numbersSold').textContent = data.numbersSold || 0;
+                    document.getElementById('popularService').textContent = data.popularService || 'WhatsApp';
+                } else {
+                    console.error('Failed to load quick stats');
                 }
-                
-                const data = await response.json();
-                
-                // Update statistics display
-                const stats = data;
-                    
-                    // Update total users
-                    const totalUsersElement = document.getElementById('totalUsers');
-                    if (totalUsersElement) {
-                        totalUsersElement.textContent = stats.totalUsers || 0;
-                    }
-                    
-                    // Update total APIs (using active users as proxy)
-                    const totalApisElement = document.getElementById('totalApis');
-                    if (totalApisElement) {
-                        totalApisElement.textContent = stats.activeUsers || 0;
-                    }
-                    
-                    // Update total orders (using total transactions)
-                    const totalOrdersElement = document.getElementById('totalOrders');
-                    if (totalOrdersElement) {
-                        totalOrdersElement.textContent = stats.totalTransactions || 0;
-                    }
-                    
-                                         // Update total revenue (using total balance)
-                     const totalRevenueElement = document.getElementById('totalRevenue');
-                     if (totalRevenueElement) {
-                         const revenue = stats.totalBalance || 0;
-                         totalRevenueElement.textContent = new Intl.NumberFormat('en-US', {
-                             style: 'currency',
-                             currency: 'USD'
-                         }).format(revenue);
-                     }
-                 
-                 console.log('Quick statistics loaded successfully');
-                
             } catch (error) {
-                console.error('Error loading quick statistics:', error);
-                
-                // Show error state
-                const statElements = ['totalUsers', 'totalApis', 'totalOrders', 'totalRevenue'];
-                statElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) element.textContent = 'Error';
-                });
-                
-                // Show error toast if available
-                if (window.Utils && window.Utils.showToast) {
-                    Utils.showToast('Failed to load statistics', 'error');
-                }
+                console.error('Stats loading failed:', error);
             }
         }
 
-        // Refresh statistics every 30 seconds
+        // Refresh stats every 30 seconds
         setInterval(loadQuickStats, 30000);
     </script>
 </body>

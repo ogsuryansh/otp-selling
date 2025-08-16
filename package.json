@@ -1,7 +1,7 @@
 {
-  "name": "otp-bot-admin-panel",
+  "name": "telegram-otp-bot-platform",
   "version": "1.0.0",
-  "description": "OTP Bot Admin Panel - Node.js version for Vercel deployment",
+  "description": "Telegram OTP Bot - Phone Number Selling Platform",
   "main": "api/index.js",
   "scripts": {
     "dev": "vercel dev",
@@ -9,19 +9,18 @@
     "build": "echo 'No build step required'",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",
-    "debug:vercel": "vercel dev --debug",
-    "test:mongodb": "node start-debug.js"
+    "debug:vercel": "vercel dev --debug"
   },
-  "keywords": ["admin-panel", "otp-bot", "vercel", "nodejs"],
+  "keywords": ["otp-bot", "phone-numbers", "sms-verification", "telegram-bot"],
   "author": "Your Name",
   "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "path": "^0.12.7",
-    "mongodb": "^6.3.0",
-    "dotenv": "^16.3.1"
-  },
+      "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "path": "^0.12.7",
+        "mongodb": "^6.3.0",
+        "dotenv": "^16.3.1"
+    },
   "devDependencies": {
     "vercel": "^32.5.0"
   },

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect APIs - OTP Bot Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 mr-8">
+                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
+                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                            <a href="/admin/apis" class="bg-primary text-white px-3 py-2 rounded-md text-sm font-medium">APIs</a>
+                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Orders</a>
+                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div class="mobile-menu hidden md:hidden">
+                            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
+                <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                <a href="/admin/apis" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">APIs</a>
+                <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
+                <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+            </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Connect APIs</h1>
+                <p class="text-gray-600 mt-2">Connect to SMS providers for phone numbers and OTP messages</p>
+            </div>
+            <button onclick="openAddApiModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md flex items-center">
+                <span class="mr-2">➕</span>
+                Add API Provider
+            </button>
+        </div>
+
+        <!-- API Providers Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                <div class="text-center text-gray-500">
+                    <span class="text-4xl mb-4 block">🔌</span>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No APIs Connected</h3>
+                    <p class="text-sm text-gray-500">Add your first API provider to get started with phone number services.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- APIs List -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Connected APIs</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="apisTable">
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                No APIs connected. Add your first API provider to get started.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit API Modal -->
+    <div id="apiModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add API Provider</h3>
+                    <button onclick="closeApiModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="apiForm" class="space-y-4">
+                    <input type="hidden" id="apiId" name="apiId">
+                    
+                    <div>
+                        <label for="providerName" class="block text-sm font-medium text-gray-700">Provider Name</label>
+                        <input type="text" id="providerName" name="providerName" placeholder="SMS Activate" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="providerUrl" class="block text-sm font-medium text-gray-700">Provider URL</label>
+                        <input type="url" id="providerUrl" name="providerUrl" placeholder="https://sms-activate.org" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="apiKey" class="block text-sm font-medium text-gray-700">API Key</label>
+                        <input type="password" id="apiKey" name="apiKey" placeholder="Enter your API key" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="getNumbersUrl" class="block text-sm font-medium text-gray-700">Get Numbers API URL</label>
+                        <input type="url" id="getNumbersUrl" name="getNumbersUrl" placeholder="https://api.example.com/getNumbers" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="getSmsUrl" class="block text-sm font-medium text-gray-700">Get SMS API URL</label>
+                        <input type="url" id="getSmsUrl" name="getSmsUrl" placeholder="https://api.example.com/getSms" required 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="responseFormat" class="block text-sm font-medium text-gray-700">Response Format</label>
+                        <select id="responseFormat" name="responseFormat" required 
+                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                            <option value="json">JSON</option>
+                            <option value="text">Plain Text</option>
+                            <option value="xml">XML</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="status" name="status" required 
+                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="testing">Testing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeApiModal()" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">
+                            Save API
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // API modal functions
+        function openAddApiModal() {
+            document.getElementById('modalTitle').textContent = 'Add API Provider';
+            document.getElementById('apiForm').reset();
+            document.getElementById('apiId').value = '';
+            document.getElementById('apiModal').classList.remove('hidden');
+        }
+
+        function closeApiModal() {
+            document.getElementById('apiModal').classList.add('hidden');
+        }
+
+        function editApi(id) {
+            // Reset form
+            document.getElementById('apiForm').reset();
+            document.getElementById('apiId').value = id || '';
+            document.getElementById('modalTitle').textContent = id ? 'Edit API' : 'Add New API';
+            
+            if (id) {
+                // Load API data for editing
+                loadApiForEditing(id);
+            }
+            
+            document.getElementById('apiModal').classList.remove('hidden');
+        }
+
+        async function loadApiForEditing(id) {
+            try {
+                const response = await fetch(`/api/apis/${id}`);
+                if (response.ok) {
+                    const api = await response.json();
+                    document.getElementById('providerName').value = api.providerName || '';
+                    document.getElementById('providerUrl').value = api.providerUrl || '';
+                    document.getElementById('apiKey').value = api.apiKey || '';
+                    document.getElementById('getNumbersUrl').value = api.getNumbersUrl || '';
+                    document.getElementById('getSmsUrl').value = api.getSmsUrl || '';
+                    document.getElementById('responseFormat').value = api.responseFormat || 'json';
+                    document.getElementById('status').value = api.status || 'active';
+                }
+            } catch (error) {
+                console.error('Error loading API for editing:', error);
+            }
+        }
+
+        function testApi(apiId) {
+            // In real app, make API call to test the connection
+            console.log('Testing API:', apiId);
+            alert('Testing API connection... Check console for results.');
+        }
+
+        async function deleteApi(apiId) {
+            if (confirm('Are you sure you want to delete this API provider?')) {
+                try {
+                    const response = await fetch(`/api/apis/${apiId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        loadApis(); // Reload the APIs list
+                    } else {
+                        const error = await response.json();
+                        alert('Error: ' + (error.message || 'Failed to delete API'));
+                    }
+                } catch (error) {
+                    console.error('Error deleting API:', error);
+                    alert('Error deleting API. Please try again.');
+                }
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('apiForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const apiId = formData.get('apiId');
+            const apiData = {
+                providerName: formData.get('providerName'),
+                providerUrl: formData.get('providerUrl'),
+                apiKey: formData.get('apiKey'),
+                getNumbersUrl: formData.get('getNumbersUrl'),
+                getSmsUrl: formData.get('getSmsUrl'),
+                responseFormat: formData.get('responseFormat'),
+                status: formData.get('status')
+            };
+            
+            try {
+                let response;
+                if (apiId) {
+                    // Update existing API
+                    response = await fetch(`/api/apis/${apiId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(apiData)
+                    });
+                } else {
+                    // Create new API
+                    response = await fetch('/api/apis', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(apiData)
+                    });
+                }
+                
+                if (response.ok) {
+                    closeApiModal();
+                    loadApis(); // Reload the APIs list
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'Failed to save API'));
+                }
+            } catch (error) {
+                console.error('Error saving API:', error);
+                alert('Error saving API. Please try again.');
+            }
+        });
+
+        // Load APIs data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApis();
+        });
+
+        async function loadApis() {
+            try {
+                const response = await fetch('/api/apis');
+                if (response.ok) {
+                    const apis = await response.json();
+                    updateApisList(apis);
+                } else {
+                    console.error('Failed to load APIs');
+                }
+            } catch (error) {
+                console.error('APIs loading failed:', error);
+            }
+        }
+
+        function updateApisList(apis) {
+            const tbody = document.getElementById('apisTable');
+            
+            if (apis.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No APIs connected. Add your first API provider to get started.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = apis.map(api => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🔌</span>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">${api.providerName}</div>
+                                <div class="text-sm text-gray-500">${api.providerUrl}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            api.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            api.status === 'inactive' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${api.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${api.apiKey ? '***' + api.apiKey.slice(-4) : 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${api.balance || 0}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${api.getNumbersUrl}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="testApi('${api._id}')" class="text-blue-600 hover:text-blue-900 mr-3">Test</button>
+                        <button onclick="editApi('${api._id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
+                        <button onclick="deleteApi('${api._id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Add direct web links section
+        function addDirectWebLinks() {
+            const mainContent = document.querySelector('.max-w-7xl');
+            const existingLinksSection = document.querySelector('.direct-web-links-section');
+            
+            if (existingLinksSection) {
+                return; // Already exists
+            }
+            
+            const linksSection = document.createElement('div');
+            linksSection.className = 'direct-web-links-section bg-white rounded-lg shadow mt-8';
+            linksSection.innerHTML = `
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
+                    <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📊</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                                <p class="text-sm text-gray-600">Main admin dashboard</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🖥️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Servers</h4>
+                                <p class="text-sm text-gray-600">Manage OTP servers</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🔧</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Services</h4>
+                                <p class="text-sm text-gray-600">Manage OTP services</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
+                            <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🔌</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">APIs</h4>
+                                <p class="text-sm text-gray-600">Manage API connections</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                            <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📋</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Orders</h4>
+                                <p class="text-sm text-gray-600">View all orders</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/users" class="flex items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
+                            <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">👥</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Users</h4>
+                                <p class="text-sm text-gray-600">Manage users</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
+                            <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">💰</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Transactions</h4>
+                                <p class="text-sm text-gray-600">View transactions</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
+                            <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🎫</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Promo Codes</h4>
+                                <p class="text-sm text-gray-600">Manage promo codes</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
+                            <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">⚙️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">API Config</h4>
+                                <p class="text-sm text-gray-600">Configure APIs</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            mainContent.appendChild(linksSection);
+        }
+
+        // Add direct web links when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApis();
+            setTimeout(addDirectWebLinks, 100); // Small delay to ensure DOM is ready
+        });
+    </script>
+</body>
+</html>

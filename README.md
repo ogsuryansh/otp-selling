@@ -1,120 +1,99 @@
-# OTP Bot System - Modular Website
+# Telegram OTP Bot - Phone Number Selling Platform
 
-A comprehensive SMS OTP management system with a modular, organized website structure.
+A complete phone number selling solution for SMS/OTP verification services. This platform allows you to sell phone numbers that users can use to receive verification codes for various services like WhatsApp, Telegram, Gmail, etc.
+
+## 🎯 What This Platform Does
+
+**Core Business Model:** You sell PHONE NUMBERS for receiving SMS/OTP codes. Users pay you to get a phone number, then use that number to receive verification codes for various services.
+
+**Simple Workflow:**
+1. User visits your bot
+2. User selects a service (e.g., WhatsApp verification)
+3. User pays you money
+4. Your system gets a phone number from external API
+5. User receives the phone number
+6. User uses it to get SMS/OTP
+7. Your system forwards the SMS to the user
+
+## 🚀 Key Features
+
+### 1. **Admin Dashboard**
+- Track earnings, users, and sales
+- View revenue trends and popular services
+- Monitor recent orders and system status
+
+### 2. **Manage Servers**
+- Add phone number providers by country
+- Configure server names, country codes, and flags
+- Set server status (active/inactive/maintenance)
+
+### 3. **Manage Services**
+- Create products to sell (WhatsApp, Telegram, Gmail, etc.)
+- Set service codes, prices, and descriptions
+- Link services to specific servers
+
+### 4. **Connect External APIs**
+- Connect to SMS providers (SMS Activate, 5sim, SMS Hub)
+- Configure API keys, URLs, and response formats
+- Test API connections and monitor balances
+
+### 5. **Bot Settings**
+- Configure Telegram bot token and username
+- Set up support channel and contact information
+- Configure payment methods (UPI, Paytm, Bank transfer)
+
+### 6. **Order Management**
+- Track all transactions and order status
+- Filter orders by status, service, and date
+- Export order data and manage customer support
+
+## 🛠️ Technology Stack
+
+- **Frontend:** HTML + Tailwind CSS (mobile-friendly design)
+- **Backend:** Node.js + Express
+- **Database:** MySQL (simple relational structure)
+- **Bot:** Telegram Bot API
+- **Styling:** Clean blue and white design with Tailwind CSS
 
 ## 📁 Project Structure
 
 ```
 website/
-├── index.html                 # Main navigation hub
-├── assets/                    # Shared assets
-│   ├── css/
-│   │   └── main.css          # Main stylesheet
-│   ├── js/
-│   │   └── main.js           # Main JavaScript utilities
-│   └── images/               # Images and icons
-├── admin/                     # Admin panel
-│   ├── index.html            # Main admin interface
-│   ├── admin-auth.js         # Authentication logic
-│   ├── admin-config.js       # Configuration management
-│   └── admin-credentials.js  # Credential management
-├── dashboard/                 # Dashboard
-│   └── index.html            # Main dashboard with all features
-├── api-config/               # API configuration
-│   └── index.html            # API setup and management
-├── services/                  # Services management
-│   └── index.html            # OTP services and orders
-├── users/                     # User management
-│   └── index.html            # User accounts and management
-├── servers/                   # Server management
-│   └── index.html            # Server configuration
-├── transactions/              # Transaction history
-│   └── index.html            # Payment and transaction logs
-├── promo-codes/               # Promotional codes
-│   └── index.html            # Promo code management
-├── docs/                      # Documentation
-│   ├── index.html            # Documentation hub
-│   ├── ADMIN_SETUP_README.md
-│   ├── API_CONFIGURATION_README.md
-│   ├── DEPLOYMENT_GUIDE.md
-│   └── ...                   # Other documentation files
-├── api/                       # API endpoints
-│   ├── index.js              # Main API server
-│   ├── otp.js                # OTP service endpoints
-│   └── services/             # API services
-├── data/                      # Data storage
-├── package.json              # Node.js dependencies
-├── vercel.json               # Vercel deployment config
-└── README.md                 # This file
+├── index.html                 # Main landing page
+├── admin/
+│   ├── dashboard.html        # Business overview and metrics
+│   ├── servers.html          # Manage phone number servers
+│   ├── services.html         # Manage products to sell
+│   ├── apis.html            # Connect to SMS providers
+│   ├── bot-settings.html    # Configure Telegram bot
+│   └── orders.html          # Track all transactions
+├── api/                      # Backend API endpoints
+├── package.json              # Dependencies and scripts
+└── README.md                # This file
 ```
 
-## 🚀 Features
+## 🗄️ Database Schema
 
-### 📊 Dashboard
-- Complete system overview
-- Real-time statistics
-- User management
-- Auto import API services
-- Server management
-- Service configuration
-- API connection tools
-- Bot settings
-- Promo code management
+### Core Tables
+- **servers** - Country-based phone number providers
+- **services** - Products you sell (WhatsApp, Telegram, etc.)
+- **orders** - User transactions and order status
+- **api_configs** - SMS provider API settings
+- **bot_settings** - Telegram bot configuration
+- **users** - Customer information
 
-### ⚙️ Admin Panel
-- System administration
-- User management
-- Configuration settings
-- Security controls
-- Monitoring tools
+## 🚀 Getting Started
 
-### 🔌 API Configuration
-- Dynamic SMS service setup
-- Multiple provider support
-- Authentication methods
-- Response parsing
-- Rate limiting
-- Testing tools
+### Prerequisites
+- Node.js 18+ installed
+- MySQL database
+- Telegram Bot Token (from @BotFather)
 
-### 👥 User Management
-- User registration
-- Account management
-- Balance tracking
-- Order history
-- Profile settings
-
-### 🖥️ Server Management
-- Server configuration
-- Performance monitoring
-- Health checks
-- Scaling options
-
-### 💰 Transactions
-- Payment processing
-- Transaction history
-- Financial reports
-- Invoice generation
-
-### 🎫 Promo Codes
-- Promotional code creation
-- Discount management
-- Usage tracking
-- Expiration handling
-
-## 🛠️ Technology Stack
-
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: Tailwind CSS
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB
-- **Deployment**: Vercel
-- **APIs**: RESTful API design
-
-## 📦 Installation
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone <your-repo-url>
    cd website
    ```
 
@@ -123,143 +102,114 @@ website/
    npm install
    ```
 
-3. **Configure environment variables**
+3. **Set up environment variables**
    ```bash
    cp env_template.txt .env
-   # Edit .env with your configuration
+   # Edit .env with your database and bot credentials
    ```
 
-4. **Start development server**
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
+5. **Access the platform**
+   - Main page: `http://localhost:3000`
+   - Admin panel: `http://localhost:3000/admin/dashboard.html`
+
 ## 🔧 Configuration
 
-### Environment Variables
-```env
-# Database
-MONGODB_URI=your_mongodb_connection_string
+### 1. **Database Setup**
+Create a MySQL database and update the connection settings in your environment file.
 
-# Bot Configuration
-BOT_TOKEN=your_telegram_bot_token
-WEBHOOK_URL=your_webhook_url
+### 2. **Telegram Bot**
+1. Message @BotFather on Telegram
+2. Create a new bot with `/newbot`
+3. Copy the bot token to your environment file
 
-# API Settings
-API_PORT=3000
-NODE_ENV=development
+### 3. **SMS Provider APIs**
+- **SMS Activate:** Popular service with global coverage
+- **5sim:** Fast SMS service with instant delivery
+- **SMS Hub:** Reliable service with good pricing
 
-# Security
-JWT_SECRET=your_jwt_secret
-ADMIN_PASSWORD=your_admin_password
-```
+### 4. **Payment Methods**
+Configure your preferred payment methods:
+- UPI ID
+- Paytm number
+- Bank account details
 
-### API Configuration
-1. Navigate to `/api-config/`
-2. Add your SMS service providers
-3. Configure authentication methods
-4. Test API connections
-5. Set up rate limiting
+## 📱 Mobile-Friendly Design
 
-## 📱 Usage
+The platform is built with a responsive design that works perfectly on:
+- Desktop computers
+- Tablets
+- Mobile phones
+- All screen sizes
 
-### Accessing Different Modules
+## 🎨 Design Features
 
-- **Home**: `http://localhost:3000/`
-- **Dashboard**: `http://localhost:3000/dashboard/`
-- **Admin**: `http://localhost:3000/admin/`
-- **API Config**: `http://localhost:3000/api-config/`
-- **Services**: `http://localhost:3000/services/`
-- **Users**: `http://localhost:3000/users/`
-- **Servers**: `http://localhost:3000/servers/`
-- **Transactions**: `http://localhost:3000/transactions/`
-- **Promo Codes**: `http://localhost:3000/promo-codes/`
-- **Documentation**: `http://localhost:3000/docs/`
+- **Clean Blue & White Theme:** Professional and trustworthy appearance
+- **Tailwind CSS:** Modern, utility-first CSS framework
+- **Responsive Layout:** Adapts to any device size
+- **Intuitive Navigation:** Easy-to-use admin interface
+- **Status Indicators:** Clear visual feedback for all operations
 
-### Key Features
+## 🔒 Security Features
 
-#### Dashboard Overview
-- View system statistics
-- Monitor active users
-- Track API performance
-- Manage all services from one place
+- API key encryption
+- Secure form handling
+- Input validation
+- SQL injection prevention
+- XSS protection
 
-#### Auto Import
-- Import services from files (JSON/CSV)
-- Import from external URLs
-- Bulk configuration
-- Import history tracking
+## 📊 Monitoring & Analytics
 
-#### API Management
-- Support for multiple SMS providers
-- Dynamic API configuration
-- Authentication methods
-- Response parsing
-- Rate limiting
-- Testing tools
-
-#### User Management
-- User registration and authentication
-- Balance management
-- Order tracking
-- Profile customization
+- Real-time order tracking
+- Revenue analytics
+- User statistics
+- Service popularity metrics
+- API health monitoring
 
 ## 🚀 Deployment
 
-### Vercel Deployment
-1. Connect your repository to Vercel
-2. Configure environment variables
-3. Deploy automatically on push
+### Local Development
+```bash
+npm run local
+```
 
-### Manual Deployment
-1. Build the project
-2. Upload to your server
-3. Configure web server
-4. Set up SSL certificates
+### Production (Vercel)
+```bash
+npm run build
+vercel --prod
+```
 
-## 📚 Documentation
+## 🤝 Support
 
-Comprehensive documentation is available in the `/docs/` directory:
+For support and questions:
+- Check the documentation in the `/docs` folder
+- Review the admin panel configuration
+- Test API connections before going live
 
-- **Setup Guides**: Installation and configuration
-- **API Documentation**: Endpoint references
-- **Deployment Guides**: Production deployment
-- **Troubleshooting**: Common issues and solutions
+## 📈 Business Tips
 
-## 🔒 Security
+1. **Start Small:** Begin with 2-3 popular services
+2. **Test APIs:** Ensure all SMS providers work before launch
+3. **Monitor Quality:** Track delivery rates and user satisfaction
+4. **Scale Gradually:** Add more services and servers as you grow
+5. **Customer Support:** Provide excellent support for better retention
 
-- JWT authentication
-- Password hashing
-- Rate limiting
-- Input validation
-- CORS configuration
-- Environment variable protection
+## 🔄 Updates & Maintenance
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- Regular API health checks
+- Monitor SMS provider balances
+- Update service prices as needed
+- Backup database regularly
+- Monitor bot performance
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
-
-- **Documentation**: `/docs/`
-- **Issues**: GitHub Issues
-- **Community**: GitHub Discussions
-
-## 🔄 Updates
-
-- Regular security updates
-- Feature enhancements
-- Bug fixes
-- Performance improvements
-
 ---
 
-**Note**: This is a modular system designed for easy maintenance and scalability. Each module can be developed and deployed independently while maintaining consistency through shared assets and utilities.
+**Remember:** You're selling PHONE NUMBERS for SMS verification. That's it. Everything else is extra complexity you don't need right now. Keep it simple and focus on your core business!

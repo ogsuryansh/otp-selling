@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Orders - OTP Bot Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 mr-8">
+                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
+                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">APIs</a>
+                            <a href="/admin/orders" class="bg-primary text-white px-3 py-2 rounded-md text-sm font-medium">Orders</a>
+                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div class="mobile-menu hidden md:hidden">
+                            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
+                <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
+                <a href="/admin/orders" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">Orders</a>
+                <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+            </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">View Orders</h1>
+                <p class="text-gray-600 mt-2">Track all transactions and order status</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="exportOrders()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center">
+                    <span class="mr-2">📊</span>
+                    Export
+                </button>
+                <button onclick="refreshOrders()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
+                    <span class="mr-2">🔄</span>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+                <!-- Order Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-bold">📋</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                                <p class="text-2xl font-bold text-gray-900" id="totalOrders">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm">✅</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Completed</p>
+                                <p class="text-2xl font-bold text-gray-900" id="completedOrders">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm">⏳</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Pending</p>
+                                <p class="text-2xl font-bold text-gray-900" id="pendingOrders">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm">❌</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Failed</p>
+                                <p class="text-2xl font-bold text-gray-900" id="failedOrders">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">All Orders</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="ordersTable">
+                                <tr>
+                                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                        No orders found. Orders will appear here when available.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">97</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>
+                        <button class="px-3 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md">1</button>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Order functions
+        function viewOrder(orderId) {
+            console.log('Viewing order:', orderId);
+            alert(`Viewing order #${orderId}`);
+        }
+
+        function resendSMS(orderId) {
+            if (confirm(`Resend SMS for order #${orderId}?`)) {
+                console.log('Resending SMS for order:', orderId);
+                alert('SMS resent successfully!');
+            }
+        }
+
+        function approveOrder(orderId) {
+            if (confirm(`Approve order #${orderId}?`)) {
+                console.log('Approving order:', orderId);
+                alert('Order approved successfully!');
+            }
+        }
+
+        function forwardSMS(orderId) {
+            if (confirm(`Forward SMS for order #${orderId}?`)) {
+                console.log('Forwarding SMS for order:', orderId);
+                alert('SMS forwarded successfully!');
+            }
+        }
+
+        function exportOrders() {
+            console.log('Exporting orders...');
+            alert('Orders exported successfully!');
+        }
+
+        function refreshOrders() {
+            console.log('Refreshing orders...');
+            loadOrders();
+        }
+
+        function filterOrders() {
+            const status = document.getElementById('statusFilter').value;
+            const service = document.getElementById('serviceFilter').value;
+            const date = document.getElementById('dateFilter').value;
+            
+            console.log('Filtering orders:', { status, service, date });
+            // In real app, apply filters and reload orders
+        }
+
+        function searchOrders() {
+            const searchTerm = document.getElementById('searchOrders').value;
+            console.log('Searching orders:', searchTerm);
+            // In real app, apply search and reload orders
+        }
+
+        // Load orders data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrders();
+        });
+
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/orders');
+                if (response.ok) {
+                    const orders = await response.json();
+                    // Update orders list and statistics
+                    updateOrdersList(orders);
+                    updateOrderStats(orders);
+                }
+            } catch (error) {
+                console.log('Orders loading failed, using default data');
+            }
+        }
+
+        function updateOrdersList(orders) {
+            // Implementation for updating the orders list
+            console.log('Updating orders list:', orders);
+        }
+
+        function updateOrderStats(orders) {
+            // Implementation for updating order statistics
+            console.log('Updating order stats:', orders);
+        }
+
+        // Add direct web links section
+        function addDirectWebLinks() {
+            const mainContent = document.querySelector('.max-w-7xl');
+            const existingLinksSection = document.querySelector('.direct-web-links-section');
+            
+            if (existingLinksSection) {
+                return; // Already exists
+            }
+            
+            const linksSection = document.createElement('div');
+            linksSection.className = 'direct-web-links-section bg-white rounded-lg shadow mt-8';
+            linksSection.innerHTML = `
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
+                    <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📊</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                                <p class="text-sm text-gray-600">Main admin dashboard</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🖥️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Servers</h4>
+                                <p class="text-sm text-gray-600">Manage OTP servers</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🔧</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Services</h4>
+                                <p class="text-sm text-gray-600">Manage OTP services</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
+                            <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🔌</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">APIs</h4>
+                                <p class="text-sm text-gray-600">Manage API connections</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                            <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📋</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Orders</h4>
+                                <p class="text-sm text-gray-600">View all orders</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/users" class="flex items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
+                            <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">👥</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Users</h4>
+                                <p class="text-sm text-gray-600">Manage users</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
+                            <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">💰</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Transactions</h4>
+                                <p class="text-sm text-gray-600">View transactions</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
+                            <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">🎫</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Promo Codes</h4>
+                                <p class="text-sm text-gray-600">Manage promo codes</p>
+                            </div>
+                        </a>
+                        
+                        <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
+                            <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">⚙️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">API Config</h4>
+                                <p class="text-sm text-gray-600">Configure APIs</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            mainContent.appendChild(linksSection);
+        }
+
+        // Add direct web links when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrders();
+            setTimeout(addDirectWebLinks, 100); // Small delay to ensure DOM is ready
+        });
+    </script>
+</body>
+</html>

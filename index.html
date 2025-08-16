@@ -101,167 +101,164 @@
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm">📱</span>
+                            <span class="text-white text-sm">📋</span>
                         </div>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-500">Numbers Sold Today</p>
-                        <p class="text-2xl font-bold text-gray-900" id="numbersSold">0</p>
+                        <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                        <p class="text-2xl font-bold text-gray-900" id="totalOrders">0</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm">🔥</span>
+                        <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">🖥️</span>
                         </div>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-500">Popular Service</p>
-                        <p class="text-2xl font-bold text-gray-900" id="popularService">-</p>
+                        <p class="text-sm font-medium text-gray-500">Active Servers</p>
+                        <p class="text-2xl font-bold text-gray-900" id="activeServers">0</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Navigation Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Dashboard -->
-            <a href="/admin/dashboard" class="group">
-                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:bg-secondary transition-colors duration-200">
-                                <span class="text-white text-xl">📊</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Dashboard</h3>
-                            <p class="text-gray-600">Track earnings, users, and sales</p>
-                        </div>
-                    </div>
+        <!-- Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:bg-secondary transition-colors duration-200">
+                    <span class="text-white text-xl">🖥️</span>
                 </div>
-            </a>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">Server Management</h3>
+                <p class="text-gray-600 mb-4">Manage your OTP servers, monitor their status, and configure settings for optimal performance.</p>
+                <a href="/admin/servers" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    Manage Servers
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
 
-            <!-- Servers -->
-            <a href="/admin/servers" class="group">
-                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors duration-200">
-                                <span class="text-white text-xl">🖥️</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Manage Servers</h3>
-                            <p class="text-gray-600">Add phone number providers by country</p>
-                        </div>
-                    </div>
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors duration-200">
+                    <span class="text-white text-xl">🔧</span>
                 </div>
-            </a>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">Service Configuration</h3>
+                <p class="text-gray-600 mb-4">Configure OTP services, set pricing, and manage service availability for different platforms.</p>
+                <a href="/admin/services" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    Configure Services
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
 
-            <!-- Services -->
-            <a href="/admin/services" class="group">
-                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-200">
-                                <span class="text-white text-xl">🔧</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Manage Services</h3>
-                            <p class="text-gray-600">Create products to sell</p>
-                        </div>
-                    </div>
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-200">
+                    <span class="text-white text-xl">🔌</span>
                 </div>
-            </a>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">API Integration</h3>
+                <p class="text-gray-600 mb-4">Connect and manage third-party APIs for SMS services, payment gateways, and other integrations.</p>
+                <a href="/admin/apis" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    Manage APIs
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
 
-            <!-- API Configuration -->
-            <a href="/admin/apis" class="group">
-                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors duration-200">
-                                <span class="text-white text-xl">🔌</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">Connect APIs</h3>
-                            <p class="text-gray-600">Connect to SMS providers</p>
-                        </div>
-                    </div>
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center group-hover:bg-orange-600 transition-colors duration-200">
+                    <span class="text-white text-xl">📊</span>
                 </div>
-            </a>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">Analytics Dashboard</h3>
+                <p class="text-gray-600 mb-4">Monitor your business performance with detailed analytics, reports, and real-time insights.</p>
+                <a href="/admin/dashboard" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    View Dashboard
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
 
-            <!-- Bot Settings -->
-
-
-            <!-- Orders -->
-            <a href="/admin/orders" class="group">
-                <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-primary">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-200">
-                                <span class="text-white text-xl">📋</span>
-                            </div>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">View Orders</h3>
-                            <p class="text-gray-600">Track all transactions</p>
-                        </div>
-                    </div>
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-200">
+                    <span class="text-white text-xl">👥</span>
                 </div>
-            </a>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">User Management</h3>
+                <p class="text-gray-600 mb-4">Manage bot users, view their activities, and handle balance operations efficiently.</p>
+                <a href="/admin/users" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    Manage Users
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center group-hover:bg-yellow-600 transition-colors duration-200">
+                    <span class="text-white text-xl">💰</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-2">Transaction History</h3>
+                <p class="text-gray-600 mb-4">Track all financial transactions, balance changes, and payment activities in real-time.</p>
+                <a href="/transactions" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                    View Transactions
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
         </div>
 
-        <!-- How It Works Section -->
-        <div class="mt-16 bg-white rounded-lg shadow p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">How It Works</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-2xl">1</span>
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/admin/dashboard" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">📊</span>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">User Selects Service</h3>
-                    <p class="text-gray-600 text-sm">Choose WhatsApp, Telegram, Gmail verification</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-2xl">2</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                        <p class="text-sm text-gray-600">Main admin dashboard</p>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Payment</h3>
-                    <p class="text-gray-600 text-sm">Pay via UPI, Paytm, or other methods</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-2xl">3</span>
+                </a>
+                
+                <a href="/admin/servers" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors">
+                    <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🖥️</span>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Get Phone Number</h3>
-                    <p class="text-gray-600 text-sm">Receive a phone number from our servers</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-2xl">4</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Servers</h4>
+                        <p class="text-sm text-gray-600">Manage OTP servers</p>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Receive SMS</h3>
-                    <p class="text-gray-600 text-sm">Get OTP codes forwarded to you</p>
-                </div>
+                </a>
+                
+                <a href="/admin/services" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🔧</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Services</h4>
+                        <p class="text-sm text-gray-600">Manage OTP services</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/apis" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors">
+                    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🔌</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">APIs</h4>
+                        <p class="text-sm text-gray-600">Manage API connections</p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center">
-                <p class="text-gray-400">&copy; 2024 Telegram OTP Bot Platform. All rights reserved.</p>
-                <p class="text-gray-500 text-sm mt-2">Phone Number Selling for SMS/OTP Verification</p>
-            </div>
-        </div>
-    </footer>
 
     <script>
         // Mobile menu toggle
@@ -272,32 +269,24 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // Load quick stats
-        document.addEventListener('DOMContentLoaded', function() {
-            loadQuickStats();
-        });
-
-        async function loadQuickStats() {
+        // Load dashboard stats
+        async function loadStats() {
             try {
                 const response = await fetch('/api/statistics');
                 if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Update stats (with fallbacks)
-                    document.getElementById('todayEarnings').textContent = `₹${data.todayEarnings || 0}`;
-                    document.getElementById('newUsers').textContent = data.totalUsers || 0;
-                    document.getElementById('numbersSold').textContent = data.numbersSold || 0;
-                    document.getElementById('popularService').textContent = data.popularService || 'WhatsApp';
-                } else {
-                    console.error('Failed to load quick stats');
+                    const stats = await response.json();
+                    document.getElementById('todayEarnings').textContent = `₹${stats.todayEarnings || 0}`;
+                    document.getElementById('newUsers').textContent = stats.newUsers || 0;
+                    document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
+                    document.getElementById('activeServers').textContent = stats.activeServers || 0;
                 }
             } catch (error) {
-                console.error('Stats loading failed:', error);
+                console.log('Failed to load stats:', error);
             }
         }
 
-        // Refresh stats every 30 seconds
-        setInterval(loadQuickStats, 30000);
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadStats);
     </script>
 </body>
 </html>

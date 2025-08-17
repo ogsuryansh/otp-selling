@@ -44,6 +44,28 @@
   ],
   "routes": [
     {
+      "src": "/assets/css/(.*)",
+      "dest": "/assets/css/$1",
+      "headers": {
+        "Content-Type": "text/css"
+      }
+    },
+    {
+      "src": "/assets/js/(.*)",
+      "dest": "/assets/js/$1",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },

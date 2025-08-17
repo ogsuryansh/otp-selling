@@ -13,7 +13,8 @@ router.get('/', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            // Return empty array if database is not available
+            return res.json(successResponse([]));
         }
         
         const servers = await db.collection('servers').find({}).toArray();

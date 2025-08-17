@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vercel dev",
     "local": "node start-local-server.js",
-    "build": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch",
+    "build": "npm run build:css",
     "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",

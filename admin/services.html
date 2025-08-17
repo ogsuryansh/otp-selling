@@ -285,17 +285,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof tailwind !== 'undefined') {
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: '#2563eb',
-                                secondary: '#1e40af',
-                                accent: '#3b82f6'
-                            }
-                        }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6'
                     }
                 }
+            }
+        }
             }
         });
     </script>
@@ -452,11 +452,11 @@
                 <h3 id="modalTitle">Add Service</h3>
                 <button onclick="closeServiceModal()" class="modal-close">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
             <div class="modal-body">
                 <!-- Description -->
                 <p class="text-gray-600 mb-6">Select a server and add a service to it. You can later connect an API to this service. Users will be buying this service using their 💎</p>
@@ -590,13 +590,13 @@
                     const serviceData = await response.json();
                     const service = serviceData.data || serviceData;
                     
-                                         document.getElementById('serviceName').value = service.serviceName || service.name || '';
+                    document.getElementById('serviceName').value = service.serviceName || service.name || '';
                      document.getElementById('serviceIdField').value = service.serviceId || '';
                      document.getElementById('serviceLogo').value = service.serviceLogo || '';
                      document.getElementById('serviceCode').value = service.serviceCode || '';
-                     document.getElementById('serverId').value = service.serverId || '';
-                     document.getElementById('price').value = service.price || '';
-                     document.getElementById('description').value = service.description || '';
+                    document.getElementById('serverId').value = service.serverId || '';
+                    document.getElementById('price').value = service.price || '';
+                    document.getElementById('description').value = service.description || '';
                      document.getElementById('disableCancellation').value = service.disableCancellation || 0;
                 } else {
                     console.error('Failed to load service data');

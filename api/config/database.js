@@ -10,6 +10,12 @@ let db = null;
 // MongoDB connection function
 async function connectToMongoDB() {
     try {
+        // If no MongoDB URI is provided, return null (for development without DB)
+        if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/otp_bot') {
+            console.warn('MongoDB URI not configured, running without database');
+            return { db: null, client: null };
+        }
+        
         if (client && client.topology && client.topology.isConnected()) {
             return { db, client };
         }

@@ -13,7 +13,8 @@ router.get('/', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            // Return empty array if database is not available
+            return res.json(successResponse([]));
         }
         
         const apis = await db.collection('apis').find({}).toArray();
@@ -36,7 +37,7 @@ router.get('/:id', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const api = await db.collection('apis').findOne({ _id: new ObjectId(id) });
@@ -77,7 +78,7 @@ router.post('/', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const newApi = {

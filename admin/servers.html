@@ -3,26 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Servers - OTP Bot Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#3b82f6'
-                    }
-                }
+    <title>Server Management - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <script src="../assets/js/app.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Remove underlines from all anchor tags */
+        a {
+            text-decoration: none;
+        }
+        
+        /* Container centering fix */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
         }
-    </script>
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Navigation styles */
+        .nav-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .nav-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Custom styles for better alignment and responsiveness */
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile menu improvements */
+        .mobile-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Loading animation */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+                 /* Enhanced Button Styles */
+         .btn-primary {
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+             color: white !important;
+             border: none !important;
+             padding: 12px 24px !important;
+             border-radius: 8px !important;
+             font-weight: 600 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             display: inline-flex !important;
+             align-items: center !important;
+             justify-content: center !important;
+             gap: 8px !important;
+             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+             width: auto !important;
+         }
+         
+         .btn-primary:hover {
+             transform: translateY(-2px) !important;
+             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+         }
+         
+         .btn-secondary {
+             background: #f3f4f6 !important;
+             color: #374151 !important;
+             border: 2px solid #e5e7eb !important;
+             padding: 10px 20px !important;
+             border-radius: 8px !important;
+             font-weight: 500 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             width: auto !important;
+         }
+         
+         .btn-secondary:hover {
+             background: #e5e7eb !important;
+             transform: translateY(-1px) !important;
+         }
+        
+        /* Action Button Styles */
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-btn-edit {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .action-btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .action-btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Grid improvements */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Modal improvements */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            transition: all 0.3s ease;
+        }
+        
+        /* Color utilities */
+        .bg-primary { background-color: #2563eb; }
+        .bg-secondary { background-color: #1e40af; }
+        .bg-accent { background-color: #3b82f6; }
+        .text-primary { color: #2563eb; }
+        .text-secondary { color: #1e40af; }
+        .text-accent { color: #3b82f6; }
+        
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-white { background-color: #ffffff; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-green-500 { background-color: #10b981; }
+        .bg-green-600 { background-color: #059669; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-orange-600 { background-color: #ea580c; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .bg-yellow-600 { background-color: #ca8a04; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .bg-purple-600 { background-color: #7c3aed; }
+        
+        .text-white { color: #ffffff; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-900 { color: #111827; }
+        
+        .border-gray-200 { border-color: #e5e7eb; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .border-green-200 { border-color: #bbf7d0; }
+        .border-purple-200 { border-color: #ddd6fe; }
+        .border-orange-200 { border-color: #fed7aa; }
+        .border-red-200 { border-color: #fecaca; }
+        .border-yellow-200 { border-color: #fef3c7; }
+        
+        .hover\:bg-blue-100:hover { background-color: #dbeafe; }
+        .hover\:bg-green-100:hover { background-color: #dcfce7; }
+        .hover\:bg-purple-100:hover { background-color: #f3e8ff; }
+        .hover\:bg-orange-100:hover { background-color: #ffedd5; }
+        .hover\:bg-red-100:hover { background-color: #fee2e2; }
+        .hover\:bg-yellow-100:hover { background-color: #fef3c7; }
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        .hover\:text-primary:hover { color: #2563eb; }
+        .hover\:text-gray-600:hover { color: #4b5563; }
+        .hover\:text-gray-800:hover { color: #1f2937; }
+        .hover\:text-gray-900:hover { color: #111827; }
+        
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-green-600:hover { background-color: #059669; }
+        .hover\:bg-red-600:hover { background-color: #dc2626; }
+        .hover\:bg-orange-600:hover { background-color: #ea580c; }
+        .hover\:bg-yellow-600:hover { background-color: #ca8a04; }
+        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
+        
+                 /* Form styles */
+         .form-group {
+             margin-bottom: 1.5rem;
+         }
+         
+         .form-label {
+             display: block;
+             margin-bottom: 0.5rem;
+             font-weight: 500;
+             color: #374151;
+             font-size: 0.875rem;
+         }
+         
+         .form-input {
+             width: 100%;
+             padding: 0.75rem 1rem;
+             border: 1px solid #d1d5db;
+             border-radius: 0.5rem;
+             background-color: white;
+             color: #111827;
+             transition: all 0.2s ease-in-out;
+             font-size: 0.875rem;
+         }
+         
+         .form-input:focus {
+             outline: none;
+             border-color: #2563eb;
+             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+         }
+         
+         .form-select {
+             width: 100%;
+             padding: 0.75rem 1rem;
+             border: 1px solid #d1d5db;
+             border-radius: 0.5rem;
+             background-color: white;
+             color: #111827;
+             transition: all 0.2s ease-in-out;
+             font-size: 0.875rem;
+             cursor: pointer;
+         }
+         
+         .form-select:focus {
+             outline: none;
+             border-color: #2563eb;
+             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+         }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="nav-container">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="/" class="flex-shrink-0 mr-4 sm:mr-8">
@@ -30,18 +341,18 @@
                     </a>
                     <div class="hidden md:block">
                         <div class="ml-6 sm:ml-10 flex items-baseline space-x-2 sm:space-x-4">
-                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                            <a href="/admin/servers" class="bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Servers</a>
-                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">APIs</a>
-                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Orders</a>
-                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                            <a href="/admin/dashboard" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Dashboard</a>
+                            <a href="/admin/servers" class="nav-link bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servers</a>
+                            <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Services</a>
+                            <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">APIs</a>
+                            <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Orders</a>
+                            <a href="/admin/users" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Users</a>
                         </div>
                     </div>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -50,216 +361,181 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                    <a href="/admin/servers" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">Servers</a>
-                    <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
-                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
-                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
-                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                    <a href="/admin/dashboard" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="/admin/servers" class="nav-link bg-primary text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Servers</a>
+                    <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Services</a>
+                    <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">APIs</a>
+                    <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Orders</a>
+                    <a href="/admin/users" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Users</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div class="container py-4 sm:py-8">
         <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
-            <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Manage Servers</h1>
-                <p class="text-gray-600 mt-2">Add phone number providers by country</p>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Server Management</h1>
+                <p class="text-gray-600 mt-2">Manage OTP servers and their configurations</p>
             </div>
-            <button onclick="openAddServerModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md flex items-center justify-center w-full sm:w-auto">
-                <span class="mr-2">➕</span>
+            <button onclick="openAddServerModal()" class="btn-primary">
+                <span>➕</span>
                 Add Server
             </button>
         </div>
 
-        <!-- Servers List -->
+        <!-- Stats Cards -->
+        <div class="stats-grid mb-6 sm:mb-8">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🖥️</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Servers</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalServers">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🟢</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Active Servers</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="activeServers">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🔴</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Inactive Servers</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="inactiveServers">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🌍</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Countries</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalCountries">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers Table -->
         <div class="bg-white rounded-lg shadow">
             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Phone Number Servers</h3>
+                <h3 class="text-lg font-semibold text-gray-900">All Servers</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="table-responsive overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server Name</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="serversTable">
                         <tr>
-                            <td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">
-                                No servers found. Add your first server to get started.
+                            <td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">
+                                <div class="loading-pulse">Loading servers...</div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <!-- Direct Web Links Section -->
-        <div class="bg-white rounded-lg shadow mt-6 sm:mt-8">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                    <a href="/admin/dashboard" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📊</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Dashboard</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Main admin dashboard</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/servers" class="flex items-center p-3 sm:p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🖥️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Servers</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP servers</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/services" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔧</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Services</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP services</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/apis" class="flex items-center p-3 sm:p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔌</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">APIs</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage API connections</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/orders" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📋</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Orders</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View all orders</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/users" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">👥</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Users</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage users</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/transactions" class="flex items-center p-3 sm:p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">💰</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Transactions</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View transactions</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/promo-codes" class="flex items-center p-3 sm:p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🎫</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Promo Codes</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage promo codes</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/api-config" class="flex items-center p-3 sm:p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">⚙️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">API Config</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Configure APIs</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Add/Edit Server Modal -->
-    <div id="serverModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-4 sm:top-20 mx-auto p-4 sm:p-5 border w-full max-w-sm sm:max-w-md shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Server</h3>
-                    <button onclick="closeServerModal()" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+    <!-- Enhanced Add Server Modal -->
+    <div id="serverModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Server</h3>
+                <button onclick="closeServerModal()" class="modal-close">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Description -->
+                <p class="text-gray-600 mb-6">Add a server to your bot. You can later add a service and connect it with your added server.</p>
                 
+                <!-- Enhanced Form -->
                 <form id="serverForm" class="space-y-4">
                     <input type="hidden" id="serverId" name="serverId">
-                    <input type="hidden" id="countryFlag" name="countryFlag" value="🇮🇳">
                     
-                    <div>
-                        <label for="countryName" class="block text-sm font-medium text-gray-700">Country</label>
-                        <select id="countryName" name="countryName" disabled class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
-                            <option value="India" selected>🇮🇳 India</option>
+                    <div class="form-group">
+                        <label for="serverName" class="form-label">Server Name *</label>
+                        <input type="text" id="serverName" name="serverName" required class="form-input" placeholder="Server 1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="countryCode" class="form-label">Server Country Code *</label>
+                        <input type="text" id="countryCode" name="countryCode" required class="form-input" placeholder="91">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="countryName" class="form-label">Server Country</label>
+                        <select id="countryName" name="countryName" class="form-select">
+                            <option value="India">🇮🇳 - India</option>
+                            <option value="United States">🇺🇸 - United States</option>
+                            <option value="United Kingdom">🇬🇧 - United Kingdom</option>
+                            <option value="Canada">🇨🇦 - Canada</option>
+                            <option value="Australia">🇦🇺 - Australia</option>
+                            <option value="Germany">🇩🇪 - Germany</option>
+                            <option value="France">🇫🇷 - France</option>
+                            <option value="Japan">🇯🇵 - Japan</option>
+                            <option value="South Korea">🇰🇷 - South Korea</option>
+                            <option value="Brazil">🇧🇷 - Brazil</option>
+                            <option value="Mexico">🇲🇽 - Mexico</option>
+                            <option value="Russia">🇷🇺 - Russia</option>
+                            <option value="China">🇨🇳 - China</option>
+                            <option value="Singapore">🇸🇬 - Singapore</option>
+                            <option value="Netherlands">🇳🇱 - Netherlands</option>
+                            <option value="Sweden">🇸🇪 - Sweden</option>
+                            <option value="Norway">🇳🇴 - Norway</option>
+                            <option value="Denmark">🇩🇰 - Denmark</option>
                         </select>
                     </div>
                     
-                    <div>
-                        <label for="serverName" class="block text-sm font-medium text-gray-700">Server Name</label>
-                        <input type="text" id="serverName" name="serverName" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="countryCode" class="block text-sm font-medium text-gray-700">Country Code</label>
-                        <input type="text" id="countryCode" name="countryCode" placeholder="+91" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="status" name="status" required 
-                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="maintenance">Maintenance</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
-                        <button type="button" onclick="closeServerModal()" 
-                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" onclick="closeServerModal()" class="btn-secondary flex-1">
                             Cancel
                         </button>
-                        <button type="submit" 
-                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">
-                            Save Server
+                        <button type="submit" class="btn-primary flex-1">
+                            <span id="submitBtnText">Submit</span>
                         </button>
                     </div>
                 </form>
@@ -276,47 +552,54 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // Server modal functions
+        // Enhanced Server modal functions
         function openAddServerModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Server';
+            document.getElementById('modalTitle').textContent = 'Add Server';
+            document.getElementById('submitBtnText').textContent = 'Submit';
             document.getElementById('serverForm').reset();
             document.getElementById('serverId').value = '';
-            document.getElementById('serverModal').classList.remove('hidden');
+            // Set default values for new server
+            document.getElementById('countryCode').value = '91';
+            document.getElementById('countryName').value = 'India';
+            showModal('serverModal');
         }
 
         function closeServerModal() {
-            document.getElementById('serverModal').classList.add('hidden');
+            hideModal('serverModal');
+            // Reset form when closing
+            document.getElementById('serverForm').reset();
         }
 
         function editServer(id) {
-            // Reset form
+            document.getElementById('modalTitle').textContent = 'Edit Server';
+            document.getElementById('submitBtnText').textContent = 'Submit';
             document.getElementById('serverForm').reset();
             document.getElementById('serverId').value = id || '';
-            document.getElementById('modalTitle').textContent = id ? 'Edit Server' : 'Add New Server';
-            
-            // Always set India as country for new servers
-            document.getElementById('countryName').value = 'India';
-            document.getElementById('countryFlag').value = '🇮🇳';
             
             if (id) {
-                // Load server data for editing
                 loadServerForEditing(id);
             }
             
-            document.getElementById('serverModal').classList.remove('hidden');
+            showModal('serverModal');
         }
 
         async function loadServerForEditing(id) {
             try {
                 const response = await fetch(`/api/servers/${id}`);
                 if (response.ok) {
-                    const server = await response.json();
-                    document.getElementById('serverName').value = server.serverName || '';
-                    document.getElementById('countryCode').value = server.countryCode || '';
-                    document.getElementById('status').value = server.status || 'active';
+                    const serverData = await response.json();
+                    const server = serverData.data || serverData;
+                    
+                                         document.getElementById('serverName').value = server.serverName || server.name || '';
+                     document.getElementById('countryCode').value = server.countryCode || '';
+                     document.getElementById('countryName').value = server.countryName || '';
+                } else {
+                    console.error('Failed to load server data');
+                    alert('Failed to load server data for editing');
                 }
             } catch (error) {
                 console.error('Error loading server for editing:', error);
+                alert('Error loading server data. Please try again.');
             }
         }
 
@@ -328,9 +611,11 @@
                     });
                     
                     if (response.ok) {
-                        loadServers(); // Reload the servers list
+                        loadServers();
+                        alert('Server deleted successfully');
                     } else {
-                        const error = await response.json();
+                        const errorData = await response.json();
+                        const error = errorData.data || errorData;
                         alert('Error: ' + (error.message || 'Failed to delete server'));
                     }
                 } catch (error) {
@@ -347,22 +632,22 @@
             const formData = new FormData(this);
             const serverId = formData.get('serverId');
             const serverData = {
-                serverName: formData.get('serverName'),
+                name: formData.get('serverName'),
+                url: '', // Not in mobile form
                 countryCode: formData.get('countryCode'),
-                status: formData.get('status')
+                countryName: formData.get('countryName'),
+                status: 'active'
             };
             
             try {
                 let response;
                 if (serverId) {
-                    // Update existing server
                     response = await fetch(`/api/servers/${serverId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(serverData)
                     });
                 } else {
-                    // Create new server
                     response = await fetch('/api/servers', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -372,9 +657,11 @@
                 
                 if (response.ok) {
                     closeServerModal();
-                    loadServers(); // Reload the servers list
+                    loadServers();
+                    alert(serverId ? 'Server updated successfully' : 'Server created successfully');
                 } else {
-                    const error = await response.json();
+                    const errorData = await response.json();
+                    const error = errorData.data || errorData;
                     alert('Error: ' + (error.message || 'Failed to save server'));
                 }
             } catch (error) {
@@ -392,21 +679,44 @@
             try {
                 const response = await fetch('/api/servers');
                 if (response.ok) {
-                    const servers = await response.json();
+                    const data = await response.json();
+                    const servers = data.data || data;
+                    
+                    if (!Array.isArray(servers)) {
+                        console.error('Servers response is not an array:', servers);
+                        updateServersList([]);
+                        return;
+                    }
+                    
                     updateServersList(servers);
+                    updateStats(servers);
                 } else {
-                    console.error('Failed to load servers');
+                    console.error('Failed to load servers:', response.status);
+                    updateServersList([]);
                 }
             } catch (error) {
                 console.error('Servers loading failed:', error);
+                updateServersList([]);
             }
+        }
+
+        function updateStats(servers) {
+            const totalServers = servers.length;
+            const activeServers = servers.filter(server => server.status === 'active').length;
+            const inactiveServers = servers.filter(server => server.status === 'inactive').length;
+            const uniqueCountries = new Set(servers.map(server => server.countryCode || server.countryName)).size;
+            
+            document.getElementById('totalServers').textContent = totalServers;
+            document.getElementById('activeServers').textContent = activeServers;
+            document.getElementById('inactiveServers').textContent = inactiveServers;
+            document.getElementById('totalCountries').textContent = uniqueCountries;
         }
 
         function updateServersList(servers) {
             const tbody = document.getElementById('serversTable');
             
-            if (servers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">No servers found. Add your first server to get started.</td></tr>';
+            if (!servers || servers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">No servers found. Add your first server to get started.</td></tr>';
                 return;
             }
             
@@ -414,34 +724,85 @@
                 <tr>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <span class="text-xl sm:text-2xl mr-2">${server.countryFlag}</span>
-                            <span class="text-sm font-medium text-gray-900">${server.countryName}</span>
+                            <span class="text-2xl mr-3">🖥️</span>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">${server.serverName || server.name || 'Unknown'}</div>
+                                <div class="text-sm text-gray-500">${server.countryCode || ''}</div>
+                            </div>
                         </div>
                     </td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">${server.serverName}</td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${server.countryCode}</td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                            <a href="${server.url || '#'}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                ${server.url || 'No URL'}
+                            </a>
+                        </div>
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <span class="text-lg mr-2">${getCountryFlag(server.countryName)}</span>
+                            <span class="text-sm text-gray-900">${server.countryName || 'Unknown'}</span>
+                        </div>
+                    </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             server.status === 'active' ? 'bg-green-100 text-green-800' : 
                             server.status === 'inactive' ? 'bg-red-100 text-red-800' : 
                             'bg-yellow-100 text-yellow-800'
                         }">
-                            ${server.status}
+                            ${server.status || 'unknown'}
                         </span>
                     </td>
-                    
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${server.servicesCount || 0} services
+                    </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editServer('${server._id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
-                        <button onclick="deleteServer('${server._id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button onclick="editServer('${server._id || server.id}')" class="action-btn action-btn-edit">
+                                <span>✏️</span>
+                                Edit
+                            </button>
+                            <button onclick="deleteServer('${server._id || server.id}')" class="action-btn action-btn-delete">
+                                <span>🗑️</span>
+                                Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
-        // Load servers when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadServers();
-        });
+        function getCountryFlag(countryName) {
+            const flags = {
+                'India': '🇮🇳',
+                'United States': '🇺🇸',
+                'United Kingdom': '🇬🇧',
+                'Canada': '🇨🇦',
+                'Australia': '🇦🇺',
+                'Germany': '🇩🇪',
+                'France': '🇫🇷',
+                'Japan': '🇯🇵',
+                'South Korea': '🇰🇷',
+                'Brazil': '🇧🇷',
+                'Mexico': '🇲🇽',
+                'Russia': '🇷🇺',
+                'China': '🇨🇳',
+                'Singapore': '🇸🇬',
+                'Netherlands': '🇳🇱',
+                'Sweden': '🇸🇪',
+                'Norway': '🇳🇴',
+                'Denmark': '🇩🇰'
+            };
+            return flags[countryName] || '🏳️';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('serverModal');
+            if (event.target === modal) {
+                closeServerModal();
+            }
+        }
     </script>
 </body>
 </html>

@@ -76,18 +76,6 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/api-config",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api-config/connection",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/test-api",
-      "dest": "/api/index.js"
-    },
-    {
       "src": "/",
       "dest": "/api/index.js"
     },
@@ -97,9 +85,11 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "MONGODB_URI": "mongodb+srv://vishalgiri0044:kR9oUspxQUtYdund@cluster0.zdudgbg.mongodb.net/otp_bot?retryWrites=true&w=majority&appName=Cluster0",
-    "MONGODB_DATABASE": "otp_bot",
-    "MONGODB_COLLECTION": "users"
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
   }
 }

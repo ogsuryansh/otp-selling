@@ -6,21 +6,28 @@
   "scripts": {
     "dev": "vercel dev",
     "local": "node start-local-server.js",
-    "build": "echo 'No build step required'",
+    "build": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch",
+    "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",
     "debug:vercel": "vercel dev --debug"
   },
-  "keywords": ["otp-bot", "phone-numbers", "sms-verification", "telegram-bot"],
+  "keywords": [
+    "otp-bot",
+    "phone-numbers",
+    "sms-verification",
+    "telegram-bot"
+  ],
   "author": "Your Name",
   "license": "MIT",
-      "dependencies": {
-        "express": "^4.18.2",
-        "cors": "^2.8.5",
-        "path": "^0.12.7",
-        "mongodb": "^6.3.0",
-        "dotenv": "^16.3.1"
-    },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "path": "^0.12.7",
+    "tailwindcss": "^4.1.12"
+  },
   "devDependencies": {
     "vercel": "^32.5.0"
   },

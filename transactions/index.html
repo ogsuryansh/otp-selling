@@ -50,7 +50,7 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                     <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
                     <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
@@ -239,18 +239,15 @@
 
         // Transaction functions
         function exportTransactions() {
-            console.log('Exporting transactions...');
             alert('Transactions exported successfully!');
         }
 
         function refreshTransactions() {
-            console.log('Refreshing transactions...');
             loadTransactions();
         }
 
         function searchTransactions() {
             const searchTerm = document.getElementById('searchTransactions').value;
-            console.log('Searching transactions:', searchTerm);
             loadTransactions(searchTerm);
         }
 
@@ -269,7 +266,7 @@
                     throw new Error('Failed to load transactions');
                 }
             } catch (error) {
-                console.log('Transactions loading failed, using mock data');
+                // Handle error silently
                 // Use mock data for bot transactions
                 const mockTransactions = [
                     {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Bot Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/app.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -651,7 +652,7 @@
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard loaded');
+    
             loadDashboardData();
         });
 
@@ -853,23 +854,23 @@
 
         // Modal functions
         function openAddUserModal() {
-            document.getElementById('addUserModal').style.display = 'block';
+            showModal('addUserModal');
         }
 
         function openAddServerModal() {
-            document.getElementById('addServerModal').style.display = 'block';
+            showModal('addServerModal');
         }
 
         function openAddServiceModal() {
-            document.getElementById('addServiceModal').style.display = 'block';
+            showModal('addServiceModal');
         }
 
         function openAddPromoModal() {
-            document.getElementById('addPromoModal').style.display = 'block';
+            showModal('addPromoModal');
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            hideModal(modalId);
         }
 
         // Form handlers

@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management - OTP Bot Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Users - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/app.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -572,7 +575,7 @@
 
         // Modal functions
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            hideModal(modalId);
         }
 
         function showMessage(message, type = 'success') {
@@ -591,34 +594,34 @@
             document.getElementById('currentBalance').value = `$${currentBalance.toFixed(2)}`;
             document.getElementById('newBalance').value = currentBalance;
             document.getElementById('balanceModalTitle').textContent = `Edit Balance - ${userName}`;
-            document.getElementById('balanceModal').style.display = 'block';
+            showModal('balanceModal');
         }
 
         function addBalanceModal(userId, userName, currentBalance) {
             document.getElementById('addBalanceUserId').value = userId;
             document.getElementById('addBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
             document.getElementById('addBalanceAmount').value = '';
-            document.getElementById('addBalanceModal').style.display = 'block';
+            showModal('addBalanceModal');
         }
 
         function cutBalanceModal(userId, userName, currentBalance) {
             document.getElementById('cutBalanceUserId').value = userId;
             document.getElementById('cutBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
             document.getElementById('cutBalanceAmount').value = '';
-            document.getElementById('cutBalanceModal').style.display = 'block';
+            showModal('cutBalanceModal');
         }
 
         function banUserModal(userId, userName) {
             document.getElementById('banUserId').value = userId;
             document.getElementById('banUserName').value = userName;
             document.getElementById('banReason').value = '';
-            document.getElementById('banUserModal').style.display = 'block';
+            showModal('banUserModal');
         }
 
         function unbanUserModal(userId, userName) {
             document.getElementById('unbanUserId').value = userId;
             document.getElementById('unbanUserName').value = userName;
-            document.getElementById('unbanUserModal').style.display = 'block';
+            showModal('unbanUserModal');
         }
 
         async function updateUserBalance() {

@@ -3,45 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - OTP Bot Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#3b82f6'
-                    }
-                }
+    <title>User Management - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <script src="../assets/js/app.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Remove underlines from all anchor tags */
+        a {
+            text-decoration: none;
+        }
+        
+        /* Container centering fix */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
         }
-    </script>
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Navigation styles */
+        .nav-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .nav-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Custom styles for better alignment and responsiveness */
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-container {
+            transition: all 0.3s ease;
+        }
+        
+        .table-container:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-row {
+            transition: all 0.2s ease;
+        }
+        
+        .user-row:hover {
+            background-color: #f9fafb;
+        }
+        
+        /* Mobile menu improvements */
+        .mobile-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Loading animation */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Grid improvements */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Modal improvements */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            transition: all 0.3s ease;
+        }
+        
+        /* Color utilities */
+        .bg-primary { background-color: #2563eb; }
+        .bg-secondary { background-color: #1e40af; }
+        .bg-accent { background-color: #3b82f6; }
+        .text-primary { color: #2563eb; }
+        .text-secondary { color: #1e40af; }
+        .text-accent { color: #3b82f6; }
+        
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-white { background-color: #ffffff; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-green-500 { background-color: #10b981; }
+        .bg-green-600 { background-color: #059669; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-orange-600 { background-color: #ea580c; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .bg-yellow-600 { background-color: #ca8a04; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .bg-purple-600 { background-color: #7c3aed; }
+        
+        .text-white { color: #ffffff; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-900 { color: #111827; }
+        
+        .border-gray-200 { border-color: #e5e7eb; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .border-green-200 { border-color: #bbf7d0; }
+        .border-purple-200 { border-color: #ddd6fe; }
+        .border-orange-200 { border-color: #fed7aa; }
+        .border-red-200 { border-color: #fecaca; }
+        .border-yellow-200 { border-color: #fef3c7; }
+        
+        .hover\:bg-blue-100:hover { background-color: #dbeafe; }
+        .hover\:bg-green-100:hover { background-color: #dcfce7; }
+        .hover\:bg-purple-100:hover { background-color: #f3e8ff; }
+        .hover\:bg-orange-100:hover { background-color: #ffedd5; }
+        .hover\:bg-red-100:hover { background-color: #fee2e2; }
+        .hover\:bg-yellow-100:hover { background-color: #fef3c7; }
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        .hover\:text-primary:hover { color: #2563eb; }
+        .hover\:text-gray-600:hover { color: #4b5563; }
+        .hover\:text-gray-800:hover { color: #1f2937; }
+        .hover\:text-gray-900:hover { color: #111827; }
+        
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-green-600:hover { background-color: #059669; }
+        .hover\:bg-red-600:hover { background-color: #dc2626; }
+        .hover\:bg-orange-600:hover { background-color: #ea580c; }
+        .hover\:bg-yellow-600:hover { background-color: #ca8a04; }
+        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="nav-container">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="flex-shrink-0 mr-8">
-                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    <a href="/" class="flex-shrink-0 mr-4 sm:mr-8">
+                        <h1 class="text-lg sm:text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
                     </a>
                     <div class="hidden md:block">
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
-                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">APIs</a>
-                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Orders</a>
-                            <a href="/admin/users" class="bg-primary text-white px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                        <div class="ml-6 sm:ml-10 flex items-baseline space-x-2 sm:space-x-4">
+                            <a href="/admin/dashboard" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Dashboard</a>
+                            <a href="/admin/servers" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servers</a>
+                            <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Services</a>
+                            <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">APIs</a>
+                            <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Orders</a>
+                            <a href="/admin/users" class="nav-link bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Users</a>
                         </div>
                     </div>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -50,33 +251,33 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
-                    <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
-                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
-                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
-                    <a href="/admin/users" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                    <a href="/admin/dashboard" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="/admin/servers" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Servers</a>
+                    <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Services</a>
+                    <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">APIs</a>
+                    <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Orders</a>
+                    <a href="/admin/users" class="nav-link bg-primary text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Users</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="container py-4 sm:py-8">
         <!-- Page Header -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Manage Users</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Manage Users</h1>
                 <p class="text-gray-600 mt-2">View and manage all bot users</p>
             </div>
-            <div class="flex space-x-3">
-                <button onclick="refreshUsers()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <button onclick="refreshUsers()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center transition-colors duration-200">
                     <span class="mr-2">🔄</span>
                     Refresh
                 </button>
-                <button onclick="exportUsers()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center">
+                <button onclick="exportUsers()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center justify-center transition-colors duration-200">
                     <span class="mr-2">📊</span>
                     Export
                 </button>
@@ -84,71 +285,79 @@
         </div>
 
         <!-- User Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+        <div class="stats-grid mb-6 sm:mb-8">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-primary">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                             <span class="text-white text-sm">👥</span>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Total Users</p>
-                        <p class="text-2xl font-bold text-gray-900" id="totalUsers">0</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="totalUsers">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-green-500">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                             <span class="text-white text-sm">✅</span>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Active Users</p>
-                        <p class="text-2xl font-bold text-gray-900" id="activeUsers">0</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="activeUsers">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-red-500">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                             <span class="text-white text-sm">🚫</span>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Banned Users</p>
-                        <p class="text-2xl font-bold text-gray-900" id="bannedUsers">0</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="bannedUsers">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-purple-500">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                             <span class="text-white text-sm">💰</span>
                         </div>
                     </div>
-                    <div class="ml-4">
+                    <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Total Balance</p>
-                        <p class="text-2xl font-bold text-gray-900" id="totalBalance">₹0</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="totalBalance">
+                            <span class="loading-pulse">₹0.00</span>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Search and Filters -->
-        <div class="bg-white rounded-lg shadow p-6 mb-8">
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900">User List</h2>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <input type="text" id="searchInput" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary text-sm" placeholder="Search users...">
-                    <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary text-sm">
+                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <input type="text" id="searchInput" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm" placeholder="Search users...">
+                    <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                         <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="banned">Banned</option>
@@ -158,28 +367,28 @@
         </div>
 
         <!-- Users Table -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
+        <div class="table-container bg-white rounded-lg shadow">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">All Users</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="table-responsive overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
                         <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                                Loading users...
+                            <td colspan="8" class="px-4 sm:px-6 py-4 text-center text-gray-500">
+                                <div class="loading-pulse">Loading users...</div>
                             </td>
                         </tr>
                     </tbody>
@@ -189,43 +398,30 @@
     </div>
 
     <!-- Add Balance Modal -->
-    <div id="addBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div id="addBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 modal-overlay">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white modal-content">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-medium text-gray-900">Add Balance</h3>
-                    <button onclick="closeModal('addBalanceModal')" class="text-gray-400 hover:text-gray-600">
+                    <button onclick="closeModal('addBalanceModal')" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                
                 <form id="addBalanceForm" class="space-y-4">
+                    <input type="hidden" id="addBalanceUserId">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">User ID:</label>
-                        <input type="text" id="addBalanceUserId" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
+                        <input type="text" id="addBalanceCurrent" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Current Balance:</label>
-                        <input type="text" id="addBalanceCurrent" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount to Add</label>
+                        <input type="number" id="addBalanceAmount" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Amount to Add:</label>
-                        <input type="number" id="addBalanceAmount" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary" step="0.01" min="0.01" required>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeModal('addBalanceModal')" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-green-500 hover:bg-green-600 rounded-md">
-                            Add Balance
-                        </button>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeModal('addBalanceModal')" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200">Add Balance</button>
                     </div>
                 </form>
             </div>
@@ -233,195 +429,179 @@
     </div>
 
     <!-- Cut Balance Modal -->
-    <div id="cutBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div id="cutBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 modal-overlay">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white modal-content">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-medium text-gray-900">Cut Balance</h3>
-                    <button onclick="closeModal('cutBalanceModal')" class="text-gray-400 hover:text-gray-600">
+                    <button onclick="closeModal('cutBalanceModal')" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                
                 <form id="cutBalanceForm" class="space-y-4">
+                    <input type="hidden" id="cutBalanceUserId">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">User ID:</label>
-                        <input type="text" id="cutBalanceUserId" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
+                        <input type="text" id="cutBalanceCurrent" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Current Balance:</label>
-                        <input type="text" id="cutBalanceCurrent" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount to Cut</label>
+                        <input type="number" id="cutBalanceAmount" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Amount to Cut:</label>
-                        <input type="number" id="cutBalanceAmount" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary" step="0.01" min="0.01" required>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeModal('cutBalanceModal')" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-md">
-                            Cut Balance
-                        </button>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeModal('cutBalanceModal')" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors duration-200">Cut Balance</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Ban User Modal -->
-    <div id="banUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Ban User</h3>
-                    <button onclick="closeModal('banUserModal')" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+    <!-- Enhanced Ban User Modal -->
+    <div id="banUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ban User</h3>
+                <button onclick="closeModal('banUserModal')" class="modal-close">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Description -->
+                <p class="text-gray-600 mb-6">Ban a user from accessing the bot. This action cannot be undone easily.</p>
                 
+                <!-- Enhanced Form -->
                 <form id="banUserForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">User ID:</label>
-                        <input type="text" id="banUserId" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                    <input type="hidden" id="banUserId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">User Name</label>
+                        <input type="text" id="banUserName" readonly class="form-input bg-gray-50 text-gray-700">
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">User Name:</label>
-                        <input type="text" id="banUserName" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Ban *</label>
+                        <textarea id="banReason" required rows="3" class="form-input" placeholder="Enter the reason for banning this user..."></textarea>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Ban Reason:</label>
-                        <textarea id="banReason" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary" rows="3" placeholder="Enter ban reason..." required></textarea>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeModal('banUserModal')" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" onclick="closeModal('banUserModal')" class="btn-secondary flex-1">
                             Cancel
                         </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md">
+                        <button type="submit" class="btn-primary flex-1 bg-red-500 hover:bg-red-600">
                             Ban User
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- Direct Web Links Section -->
-        <div class="bg-white rounded-lg shadow mt-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">📊</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Dashboard</h4>
-                            <p class="text-sm text-gray-600">Main admin dashboard</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
-                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🖥️</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Servers</h4>
-                            <p class="text-sm text-gray-600">Manage OTP servers</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/services" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🔧</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Services</h4>
-                            <p class="text-sm text-gray-600">Manage OTP services</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🔌</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">APIs</h4>
-                            <p class="text-sm text-gray-600">Manage API connections</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">📋</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Orders</h4>
-                            <p class="text-sm text-gray-600">View all orders</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/users" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">👥</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Users</h4>
-                            <p class="text-sm text-gray-600">Manage users</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                        <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">💰</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Transactions</h4>
-                            <p class="text-sm text-gray-600">View transactions</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                        <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🎫</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Promo Codes</h4>
-                            <p class="text-sm text-gray-600">Manage promo codes</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                        <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">⚙️</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">API Config</h4>
-                            <p class="text-sm text-gray-600">Configure APIs</p>
-                        </div>
-                    </a>
-                </div>
+    <!-- Direct Web Links Section -->
+    <div class="bg-white rounded-lg shadow mt-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
+            <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">📊</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Dashboard</h4>
+                        <p class="text-sm text-gray-600">Main admin dashboard</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+                    <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🖥️</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Servers</h4>
+                        <p class="text-sm text-gray-600">Manage OTP servers</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/services" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🔧</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Services</h4>
+                        <p class="text-sm text-gray-600">Manage OTP services</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
+                    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🔌</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">APIs</h4>
+                        <p class="text-sm text-gray-600">Manage API connections</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                    <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">📋</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Orders</h4>
+                        <p class="text-sm text-gray-600">View all orders</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/users" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
+                    <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">👥</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Users</h4>
+                        <p class="text-sm text-gray-600">Manage users</p>
+                    </div>
+                </a>
+                
+                <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
+                    <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">💰</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Transactions</h4>
+                        <p class="text-sm text-gray-600">View transactions</p>
+                    </div>
+                </a>
+                
+                <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
+                    <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">🎫</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Promo Codes</h4>
+                        <p class="text-sm text-gray-600">Manage promo codes</p>
+                    </div>
+                </a>
+                
+                <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
+                    <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white text-lg">⚙️</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">API Config</h4>
+                        <p class="text-sm text-gray-600">Configure APIs</p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
-
-
 
     <script>
         let allUsers = [];
@@ -434,22 +614,32 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // Load user statistics
+        // Load user statistics from MongoDB
         async function loadUserStats() {
             try {
-                const response = await fetch('/api/statistics');
-                const stats = await response.json();
-                
-                document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
-                document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
-                document.getElementById('bannedUsers').textContent = stats.bannedUsers || 0;
-                document.getElementById('totalBalance').textContent = `₹${(stats.totalBalance || 0).toFixed(2)}`;
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    const usersData = await response.json();
+                    const users = usersData.data || usersData;
+                    
+                    if (Array.isArray(users)) {
+                        const totalUsers = users.length;
+                        const activeUsers = users.filter(user => user.status === 'active').length;
+                        const bannedUsers = users.filter(user => user.status === 'banned').length;
+                        const totalBalance = users.reduce((total, user) => total + (parseFloat(user.balance) || 0), 0);
+                        
+                        document.getElementById('totalUsers').textContent = totalUsers;
+                        document.getElementById('activeUsers').textContent = activeUsers;
+                        document.getElementById('bannedUsers').textContent = bannedUsers;
+                        document.getElementById('totalBalance').textContent = `₹${totalBalance.toFixed(2)}`;
+                    }
+                }
             } catch (error) {
                 console.error('Error loading user statistics:', error);
             }
         }
 
-        // Load users
+        // Load users from MongoDB
         async function loadUsers() {
             try {
                 const response = await fetch('/api/users');
@@ -457,13 +647,14 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                allUsers = await response.json();
+                const usersData = await response.json();
+                allUsers = usersData.data || usersData;
                 displayUsers(allUsers);
             } catch (error) {
                 console.error('Error loading users:', error);
                 document.getElementById('usersTableBody').innerHTML = `
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="8" class="px-4 sm:px-6 py-4 text-center text-gray-500">
                             Error loading users: ${error.message}
                         </td>
                     </tr>
@@ -475,33 +666,33 @@
         function displayUsers(users) {
             const tbody = document.getElementById('usersTableBody');
             
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">No users found.</td></tr>';
+            if (!Array.isArray(users) || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 sm:px-6 py-4 text-center text-gray-500">No users found.</td></tr>';
                 return;
             }
             
             tbody.innerHTML = users.map(user => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.username}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-primary">₹${user.balance.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                <tr class="user-row hover:bg-gray-50">
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user._id || user.id || 'N/A'}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.name || user.username || 'N/A'}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.username || '@username'}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-semibold text-primary">₹${(parseFloat(user.balance) || 0).toFixed(2)}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }">
-                            ${user.status}
+                            ${user.status || 'active'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.registration_date)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.last_activity)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex space-x-2">
-                            <button onclick="openAddBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded">➕ Add</button>
-                            <button onclick="openCutBalanceModal(${user.id}, '${user.name}', ${user.balance})" class="text-yellow-600 hover:text-yellow-900 text-xs px-2 py-1 bg-yellow-100 rounded">➖ Cut</button>
-                            ${user.status === 'active' ? 
-                                `<button onclick="openBanUserModal(${user.id}, '${user.name}')" class="text-red-600 hover:text-red-900 text-xs px-2 py-1 bg-red-100 rounded">🚫 Ban</button>` :
-                                `<button onclick="unbanUser(${user.id})" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded">✅ Unban</button>`
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.createdAt || user.registration_date)}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.updatedAt || user.last_activity)}</td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
+                            <button onclick="openAddBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded transition-colors duration-200">➕ Add</button>
+                            <button onclick="openCutBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="text-yellow-600 hover:text-yellow-900 text-xs px-2 py-1 bg-yellow-100 rounded transition-colors duration-200">➖ Cut</button>
+                            ${(user.status || 'active') === 'active' ? 
+                                `<button onclick="openBanUserModal('${user._id || user.id}', '${user.name || user.username}')" class="text-red-600 hover:text-red-900 text-xs px-2 py-1 bg-red-100 rounded transition-colors duration-200">🚫 Ban</button>` :
+                                `<button onclick="unbanUser('${user._id || user.id}')" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded transition-colors duration-200">✅ Unban</button>`
                             }
                         </div>
                     </td>
@@ -511,11 +702,11 @@
 
         // Modal functions
         function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+            showModal(modalId);
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            hideModal(modalId);
         }
 
         function openAddBalanceModal(userId, userName, currentBalance) {
@@ -546,15 +737,18 @@
             const amount = parseFloat(document.getElementById('addBalanceAmount').value);
             
             try {
-                const response = await fetch('/api/add_balance', {
-                    method: 'POST',
+                const response = await fetch('/api/users/' + userId, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: parseInt(userId), amount: amount })
+                    body: JSON.stringify({ 
+                        balance: amount,
+                        action: 'add_balance'
+                    })
                 });
 
                 const result = await response.json();
                 
-                if (result.success) {
+                if (response.ok) {
                     alert(`Added ₹${amount} to user ${userId}`);
                     closeModal('addBalanceModal');
                     loadUsers();
@@ -573,15 +767,18 @@
             const amount = parseFloat(document.getElementById('cutBalanceAmount').value);
             
             try {
-                const response = await fetch('/api/cut_balance', {
-                    method: 'POST',
+                const response = await fetch('/api/users/' + userId, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: parseInt(userId), amount: amount })
+                    body: JSON.stringify({ 
+                        balance: amount,
+                        action: 'cut_balance'
+                    })
                 });
 
                 const result = await response.json();
                 
-                if (result.success) {
+                if (response.ok) {
                     alert(`Cut ₹${amount} from user ${userId}`);
                     closeModal('cutBalanceModal');
                     loadUsers();
@@ -600,16 +797,19 @@
             const reason = document.getElementById('banReason').value.trim();
             
             try {
-                const response = await fetch('/api/ban_user', {
-                    method: 'POST',
+                const response = await fetch('/api/users/' + userId, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: parseInt(userId), reason: reason })
+                    body: JSON.stringify({ 
+                        status: 'banned',
+                        banReason: reason
+                    })
                 });
 
                 const result = await response.json();
                 
-                if (result.success) {
-                    alert(`User ${userId} banned successfully`);
+                if (response.ok) {
+                    alert(`User ${userId} has been banned`);
                     closeModal('banUserModal');
                     loadUsers();
                     loadUserStats();
@@ -621,33 +821,61 @@
             }
         });
 
-        async function unbanUser(userId) {
-            if (!confirm(`Are you sure you want to unban user ${userId}?`)) {
-                return;
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            filterUsers(searchTerm, statusFilter);
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = e.target.value;
+            filterUsers(searchTerm, statusFilter);
+        });
+
+        function filterUsers(searchTerm, statusFilter) {
+            let filteredUsers = allUsers;
+
+            if (searchTerm) {
+                filteredUsers = filteredUsers.filter(user => 
+                    (user.name && user.name.toLowerCase().includes(searchTerm)) ||
+                    (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                    (user._id && user._id.toString().includes(searchTerm))
+                );
             }
 
+            if (statusFilter) {
+                filteredUsers = filteredUsers.filter(user => user.status === statusFilter);
+            }
+
+            displayUsers(filteredUsers);
+        }
+
+        // Unban user function
+        async function unbanUser(userId) {
+            if (!confirm('Are you sure you want to unban this user?')) return;
+            
             try {
-                const response = await fetch('/api/unban_user', {
-                    method: 'POST',
+                const response = await fetch('/api/users/' + userId, {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: parseInt(userId) })
+                    body: JSON.stringify({ status: 'active' })
                 });
 
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(`User ${userId} unbanned successfully`);
+                if (response.ok) {
+                    alert('User has been unbanned');
                     loadUsers();
                     loadUserStats();
                 } else {
-                    alert('Error: ' + (result.message || 'Failed to unban user'));
+                    alert('Failed to unban user');
                 }
             } catch (error) {
                 alert('Error unbanning user: ' + error.message);
             }
         }
 
-        // Utility functions
+        // Refresh and export functions
         function refreshUsers() {
             loadUsers();
             loadUserStats();
@@ -655,11 +883,11 @@
 
         function exportUsers() {
             const csvContent = "data:text/csv;charset=utf-8," 
-                + "User ID,Name,Username,Balance,Status,Registration,Last Activity\n"
+                + "User ID,Name,Username,Balance,Status,Registration Date,Last Activity\n"
                 + allUsers.map(user => 
-                    `${user.id},"${user.name}","${user.username}",${user.balance},${user.status},"${formatDate(user.registration_date)}","${formatDate(user.last_activity)}"`
+                    `${user._id || user.id},${user.name || ''},${user.username || ''},${user.balance || 0},${user.status || 'active'},${formatDate(user.createdAt)},${formatDate(user.updatedAt)}`
                 ).join("\n");
-            
+
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -669,64 +897,26 @@
             document.body.removeChild(link);
         }
 
-        function formatDate(dateString) {
-            if (!dateString || dateString === 'Unknown') {
-                return 'Unknown';
-            }
+        // Format date helper function
+        function formatDate(date) {
             try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-            } catch (error) {
-                return dateString;
-            }
-        }
-
-        // Search and filter functionality
-        function setupSearchAndFilter() {
-            const searchInput = document.getElementById('searchInput');
-            const statusFilter = document.getElementById('statusFilter');
-            
-            function filterUsers() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const statusTerm = statusFilter.value;
-                
-                const filteredUsers = allUsers.filter(user => {
-                    const matchesSearch = user.id.toString().includes(searchTerm) ||
-                                        user.name.toLowerCase().includes(searchTerm) ||
-                                        user.username.toLowerCase().includes(searchTerm);
-                    const matchesStatus = !statusTerm || user.status === statusTerm;
-                    
-                    return matchesSearch && matchesStatus;
+                const d = new Date(date);
+                return d.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-                
-                displayUsers(filteredUsers);
+            } catch (error) {
+                return 'Invalid Date';
             }
-            
-            searchInput.addEventListener('input', filterUsers);
-            statusFilter.addEventListener('change', filterUsers);
         }
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('[id$="Modal"]');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        }
-
-        // Initialize page
+        // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            loadUserStats();
             loadUsers();
-            setupSearchAndFilter();
-            
-            // Auto-refresh every 30 seconds
-            setInterval(() => {
-                loadUserStats();
-                loadUsers();
-            }, 30000);
+            loadUserStats();
         });
     </script>
 </body>

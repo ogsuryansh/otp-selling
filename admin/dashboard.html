@@ -4,25 +4,251 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - OTP Bot Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#3b82f6'
-                    }
-                }
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <script src="../assets/js/app.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Remove underlines from all anchor tags */
+        a {
+            text-decoration: none;
+        }
+        
+        /* Container centering fix */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
         }
-    </script>
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Navigation styles */
+        .nav-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .nav-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Custom styles for better alignment and responsiveness */
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-card {
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-card {
+            transition: all 0.3s ease;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile menu improvements */
+        .mobile-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Loading animation */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Grid improvements */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .actions-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+        }
+        
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .activity-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .action-card {
+                padding: 1rem;
+            }
+        }
+        
+        /* Color utilities */
+        .bg-primary { background-color: #2563eb; }
+        .bg-secondary { background-color: #1e40af; }
+        .bg-accent { background-color: #3b82f6; }
+        .text-primary { color: #2563eb; }
+        .text-secondary { color: #1e40af; }
+        .text-accent { color: #3b82f6; }
+        
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-white { background-color: #ffffff; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-green-500 { background-color: #10b981; }
+        .bg-green-600 { background-color: #059669; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-orange-600 { background-color: #ea580c; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .bg-yellow-600 { background-color: #ca8a04; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .bg-purple-600 { background-color: #7c3aed; }
+        
+        .text-white { color: #ffffff; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-900 { color: #111827; }
+        
+        .border-gray-200 { border-color: #e5e7eb; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .border-green-200 { border-color: #bbf7d0; }
+        .border-purple-200 { border-color: #ddd6fe; }
+        .border-orange-200 { border-color: #fed7aa; }
+        .border-red-200 { border-color: #fecaca; }
+        .border-yellow-200 { border-color: #fef3c7; }
+        
+        .hover\:bg-blue-100:hover { background-color: #dbeafe; }
+        .hover\:bg-green-100:hover { background-color: #dcfce7; }
+        .hover\:bg-purple-100:hover { background-color: #f3e8ff; }
+        .hover\:bg-orange-100:hover { background-color: #ffedd5; }
+        .hover\:bg-red-100:hover { background-color: #fee2e2; }
+        .hover\:bg-yellow-100:hover { background-color: #fef3c7; }
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        .hover\:text-primary:hover { color: #2563eb; }
+        .hover\:text-gray-600:hover { color: #4b5563; }
+        .hover\:text-gray-800:hover { color: #1f2937; }
+        .hover\:text-gray-900:hover { color: #111827; }
+        
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-green-600:hover { background-color: #059669; }
+        .hover\:bg-red-600:hover { background-color: #dc2626; }
+        .hover\:bg-orange-600:hover { background-color: #ea580c; }
+        .hover\:bg-yellow-600:hover { background-color: #ca8a04; }
+        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="nav-container">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="/" class="flex-shrink-0 mr-4 sm:mr-8">
@@ -30,18 +256,18 @@
                     </a>
                     <div class="hidden md:block">
                         <div class="ml-6 sm:ml-10 flex items-baseline space-x-2 sm:space-x-4">
-                            <a href="/admin/dashboard" class="bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Servers</a>
-                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">APIs</a>
-                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Orders</a>
-                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                            <a href="/admin/dashboard" class="nav-link bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Dashboard</a>
+                            <a href="/admin/servers" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servers</a>
+                            <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Services</a>
+                            <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">APIs</a>
+                            <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Orders</a>
+                            <a href="/admin/users" class="nav-link text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Users</a>
                         </div>
                     </div>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -50,21 +276,21 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="/admin/dashboard" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
-                    <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
-                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
-                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
-                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                    <a href="/admin/dashboard" class="nav-link bg-primary text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="/admin/servers" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Servers</a>
+                    <a href="/admin/services" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Services</a>
+                    <a href="/admin/apis" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">APIs</a>
+                    <a href="/admin/orders" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Orders</a>
+                    <a href="/admin/users" class="nav-link text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Users</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div class="container py-4 sm:py-8">
         <!-- Page Header -->
         <div class="mb-6 sm:mb-8">
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
@@ -72,8 +298,8 @@
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div class="stats-grid mb-6 sm:mb-8">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -82,12 +308,14 @@
                     </div>
                     <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Today's Earnings</p>
-                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="todayEarnings">₹0</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="todayEarnings">
+                            <span class="loading-pulse">₹0.00</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -96,164 +324,141 @@
                     </div>
                     <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-500">Total Users</p>
-                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalUsers">0</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalUsers">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white text-sm">📱</span>
+                        <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">📋</span>
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <p class="text-sm font-medium text-gray-500">Numbers Sold</p>
-                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="numbersSold">0</p>
+                        <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalOrders">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="stat-card bg-white rounded-lg shadow p-4 sm:p-6">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white text-sm">🔥</span>
+                            <span class="text-white text-sm">🖥️</span>
                         </div>
                     </div>
                     <div class="ml-4 flex-1">
-                        <p class="text-sm font-medium text-gray-500">Popular Service</p>
-                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="popularService">-</p>
+                        <p class="text-sm font-medium text-gray-500">Active Servers</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="activeServers">
+                            <span class="loading-pulse">0</span>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Orders -->
-        <div class="bg-white rounded-lg shadow">
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow mb-6 sm:mb-8">
             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Recent Orders</h3>
+                <h2 class="text-lg font-semibold text-gray-900">Quick Actions</h2>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="recentOrdersTable">
-                        <tr>
-                            <td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">
-                                No recent orders found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="p-4 sm:p-6">
+                <div class="actions-grid">
+                    <a href="/admin/servers" class="action-card flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">🖥️</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">Manage Servers</h4>
+                            <p class="text-sm text-gray-600 truncate">Add and configure servers</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/services" class="action-card flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">🔧</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">Manage Services</h4>
+                            <p class="text-sm text-gray-600 truncate">Configure OTP services</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/apis" class="action-card flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">🔌</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">Manage APIs</h4>
+                            <p class="text-sm text-gray-600 truncate">Connect API providers</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/orders" class="action-card flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">📋</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">View Orders</h4>
+                            <p class="text-sm text-gray-600 truncate">Track all orders</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/users" class="action-card flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">👥</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">Manage Users</h4>
+                            <p class="text-sm text-gray-600 truncate">User management</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/transactions" class="action-card flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <span class="text-white text-lg">💰</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 truncate">Transactions</h4>
+                            <p class="text-sm text-gray-600 truncate">View transactions</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- Direct Web Links Section -->
-        <div class="bg-white rounded-lg shadow mt-6 sm:mt-8">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+        <!-- Recent Activity -->
+        <div class="activity-grid">
+            <div class="activity-card bg-white rounded-lg shadow">
+                <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Orders</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-4" id="recentOrdersList">
+                        <div class="text-center text-gray-500 py-4">
+                            <div class="loading-pulse">Loading recent orders...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                    <a href="/admin/dashboard" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📊</span>
+
+            <div class="activity-card bg-white rounded-lg shadow">
+                <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">System Status</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-4" id="systemStatusList">
+                        <div class="text-center text-gray-500 py-4">
+                            <div class="loading-pulse">Loading system status...</div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Dashboard</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Main admin dashboard</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/servers" class="flex items-center p-3 sm:p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🖥️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Servers</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP servers</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/services" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔧</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Services</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP services</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/apis" class="flex items-center p-3 sm:p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔌</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">APIs</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage API connections</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/orders" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📋</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Orders</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View all orders</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/users" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">👥</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Users</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage users</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/transactions" class="flex items-center p-3 sm:p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">💰</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Transactions</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View transactions</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/promo-codes" class="flex items-center p-3 sm:p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🎫</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Promo Codes</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage promo codes</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/api-config" class="flex items-center p-3 sm:p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">⚙️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">API Config</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Configure APIs</p>
-                        </div>
-                    </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -268,68 +473,186 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // Load dashboard data
+        // Load real data from MongoDB
         async function loadDashboardData() {
             try {
-                const response = await fetch('/api/statistics');
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('todayEarnings').textContent = `₹${data.todayEarnings || 0}`;
-                    document.getElementById('totalUsers').textContent = data.totalUsers || 0;
-                    document.getElementById('numbersSold').textContent = data.numbersSold || 0;
-                    document.getElementById('popularService').textContent = data.popularService || '-';
+                // Load users count
+                const usersResponse = await fetch('/api/users');
+                if (usersResponse.ok) {
+                    const usersData = await usersResponse.json();
+                    const users = usersData.data || usersData;
+                    document.getElementById('totalUsers').textContent = Array.isArray(users) ? users.length : 0;
                 }
+
+                // Load orders count
+                const ordersResponse = await fetch('/api/orders');
+                if (ordersResponse.ok) {
+                    const ordersData = await ordersResponse.json();
+                    const orders = ordersData.data || ordersData;
+                    document.getElementById('totalOrders').textContent = Array.isArray(orders) ? orders.length : 0;
+                }
+
+                // Load servers count
+                const serversResponse = await fetch('/api/servers');
+                if (serversResponse.ok) {
+                    const serversData = await serversResponse.json();
+                    const servers = serversData.data || serversData;
+                    const activeServers = Array.isArray(servers) ? servers.filter(server => server.status === 'active').length : 0;
+                    document.getElementById('activeServers').textContent = activeServers;
+                }
+
+                // Calculate today's earnings from orders
+                const todayEarnings = await calculateTodayEarnings();
+                document.getElementById('todayEarnings').textContent = `₹${todayEarnings.toFixed(2)}`;
+
+                // Load recent orders
+                await loadRecentOrders();
+
+                // Load system status
+                await loadSystemStatus();
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
+                // Set default values on error
+                document.getElementById('todayEarnings').textContent = '₹0.00';
+                document.getElementById('totalUsers').textContent = '0';
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('activeServers').textContent = '0';
             }
         }
 
-        // Load recent orders
+        // Calculate today's earnings from orders
+        async function calculateTodayEarnings() {
+            try {
+                const ordersResponse = await fetch('/api/orders');
+                if (ordersResponse.ok) {
+                    const ordersData = await ordersResponse.json();
+                    const orders = ordersData.data || ordersData;
+                    
+                    if (Array.isArray(orders)) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        const todayOrders = orders.filter(order => {
+                            const orderDate = new Date(order.createdAt || order.date);
+                            orderDate.setHours(0, 0, 0, 0);
+                            return orderDate.getTime() === today.getTime() && order.status === 'completed';
+                        });
+                        
+                        return todayOrders.reduce((total, order) => total + (parseFloat(order.amount) || 0), 0);
+                    }
+                }
+                return 0;
+            } catch (error) {
+                console.error('Error calculating today\'s earnings:', error);
+                return 0;
+            }
+        }
+
         async function loadRecentOrders() {
             try {
-                const response = await fetch('/api/dashboard');
+                const response = await fetch('/api/orders?limit=5');
                 if (response.ok) {
-                    const data = await response.json();
-                    updateRecentOrdersTable(data.recentOrders || []);
+                    const ordersData = await response.json();
+                    const orders = ordersData.data || ordersData;
+                    
+                    const recentOrdersList = document.getElementById('recentOrdersList');
+                    
+                    if (!Array.isArray(orders) || orders.length === 0) {
+                        recentOrdersList.innerHTML = '<div class="text-center text-gray-500 py-4">No recent orders found.</div>';
+                        return;
+                    }
+                    
+                    recentOrdersList.innerHTML = orders.map(order => `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center flex-1 min-w-0">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-green-600 text-sm">📱</span>
+                                </div>
+                                <div class="ml-3 flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Order #${order._id || order.id || 'N/A'}</p>
+                                    <p class="text-sm text-gray-500 truncate">${order.serviceName || 'Unknown service'}</p>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 ml-2">
+                                <span class="text-sm text-gray-500">${formatDate(order.createdAt || Date.now())}</span>
+                            </div>
+                        </div>
+                    `).join('');
                 }
             } catch (error) {
                 console.error('Error loading recent orders:', error);
+                document.getElementById('recentOrdersList').innerHTML = '<div class="text-center text-gray-500 py-4">Failed to load recent orders.</div>';
             }
         }
 
-        function updateRecentOrdersTable(orders) {
-            const tbody = document.getElementById('recentOrdersTable');
-            
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">No recent orders found.</td></tr>';
-                return;
+        async function loadSystemStatus() {
+            try {
+                const systemStatusList = document.getElementById('systemStatusList');
+                
+                // Check API server status
+                const apiResponse = await fetch('/api/health');
+                const apiStatus = apiResponse.ok ? 'Online' : 'Offline';
+                const apiStatusColor = apiResponse.ok ? 'green' : 'red';
+                
+                // Check database status (assuming it's working if we can fetch data)
+                const dbResponse = await fetch('/api/users');
+                const dbStatus = dbResponse.ok ? 'Online' : 'Offline';
+                const dbStatusColor = dbResponse.ok ? 'green' : 'red';
+                
+                systemStatusList.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-${apiStatusColor}-400 rounded-full mr-3 flex-shrink-0"></div>
+                            <span class="text-sm font-medium text-gray-900">API Server</span>
+                        </div>
+                        <span class="text-sm text-${apiStatusColor}-600">${apiStatus}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-${dbStatusColor}-400 rounded-full mr-3 flex-shrink-0"></div>
+                            <span class="text-sm font-medium text-gray-900">Database</span>
+                        </div>
+                        <span class="text-sm text-${dbStatusColor}-600">${dbStatus}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-3 flex-shrink-0"></div>
+                            <span class="text-sm font-medium text-gray-900">Web Interface</span>
+                        </div>
+                        <span class="text-sm text-green-600">Online</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading system status:', error);
+                document.getElementById('systemStatusList').innerHTML = '<div class="text-center text-gray-500 py-4">Failed to load system status.</div>';
             }
-            
-            tbody.innerHTML = orders.map(order => `
-                <tr>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">${order.service || '-'}</td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">${order.user || '-'}</td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${order.amount || 0}</td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            order.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                            'bg-red-100 text-red-800'
-                        }">
-                            ${order.status || 'unknown'}
-                        </span>
-                    </td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(order.date).toLocaleDateString()}</td>
-                </tr>
-            `).join('');
+        }
+
+        // Format date helper function
+        function formatDate(date) {
+            try {
+                const d = new Date(date);
+                return d.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return 'Invalid Date';
+            }
         }
 
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();
-            loadRecentOrders();
         });
     </script>
 </body>
 </html>
+
 

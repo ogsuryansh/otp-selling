@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Management</title>
+    <title>Servers - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="responsive.css">
+    <script src="../assets/js/app.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -497,7 +500,7 @@
             document.getElementById('serverForm').reset();
             document.getElementById('serverCountry').value = 'India';
             document.getElementById('serverStatus').value = 'active';
-            document.getElementById('serverModal').style.display = 'block';
+            showModal('serverModal');
         }
 
         // Edit server
@@ -514,7 +517,7 @@
             document.getElementById('serverCountry').value = 'India'; // Always India
             document.getElementById('serverStatus').value = server.status;
             
-            document.getElementById('serverModal').style.display = 'block';
+            showModal('serverModal');
         }
 
         // Handle server form submission
@@ -558,7 +561,7 @@
         // Delete server
         function deleteServer(serverId) {
             deletingServerId = serverId;
-            document.getElementById('deleteModal').style.display = 'block';
+            showModal('deleteModal');
         }
 
         // Confirm delete server
@@ -586,12 +589,12 @@
 
         // Close modals
         function closeServerModal() {
-            document.getElementById('serverModal').style.display = 'none';
+            hideModal('serverModal');
             editingServerId = null;
         }
 
         function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
+            hideModal('deleteModal');
             deletingServerId = null;
         }
 

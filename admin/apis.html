@@ -3,21 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect APIs - OTP Bot Platform</title>
+    <title>API Management - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/app.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Remove underlines from all anchor tags */
+        a {
+            text-decoration: none;
+        }
+        
+                 /* Enhanced Button Styles */
+         .btn-primary {
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+             color: white !important;
+             border: none !important;
+             padding: 12px 24px !important;
+             border-radius: 8px !important;
+             font-weight: 600 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             display: inline-flex !important;
+             align-items: center !important;
+             justify-content: center !important;
+             gap: 8px !important;
+             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+             width: auto !important;
+         }
+         
+         .btn-primary:hover {
+             transform: translateY(-2px) !important;
+             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+         }
+         
+         .btn-secondary {
+             background: #f3f4f6 !important;
+             color: #374151 !important;
+             border: 2px solid #e5e7eb !important;
+             padding: 10px 20px !important;
+             border-radius: 8px !important;
+             font-weight: 500 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             width: auto !important;
+         }
+         
+         .btn-secondary:hover {
+             background: #e5e7eb !important;
+             transform: translateY(-1px) !important;
+         }
+        
+        /* Action Button Styles */
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-btn-edit {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .action-btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .action-btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+    </style>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#3b82f6'
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: '#2563eb',
+                                secondary: '#1e40af',
+                                accent: '#3b82f6'
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
     </script>
+    <style>
+        .url-truncate {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+            .url-truncate {
+                max-width: 120px;
+            }
+        }
+        
+        .mobile-card {
+            display: none;
+        }
+        
+        .desktop-table {
+            display: table;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-card {
+                display: block;
+            }
+            
+            .desktop-table {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
@@ -25,17 +160,17 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="flex-shrink-0 mr-8">
-                        <h1 class="text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
+                    <a href="/" class="flex-shrink-0 mr-4 sm:mr-8">
+                        <h1 class="text-lg sm:text-xl font-bold text-primary">📱 OTP Bot Platform</h1>
                     </a>
                     <div class="hidden md:block">
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Servers</a>
-                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                            <a href="/admin/apis" class="bg-primary text-white px-3 py-2 rounded-md text-sm font-medium">APIs</a>
-                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Orders</a>
-                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                        <div class="ml-6 sm:ml-10 flex items-baseline space-x-2 sm:space-x-4">
+                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Servers</a>
+                            <a href="/admin/services" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                            <a href="/admin/apis" class="bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium">APIs</a>
+                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Orders</a>
+                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Users</a>
                         </div>
                     </div>
                 </div>
@@ -50,65 +185,113 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
-                            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
-                <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
-                <a href="/admin/apis" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">APIs</a>
-                <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
-                <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
-            </div>
+            <div class="mobile-menu md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
+                    <a href="/admin/services" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                    <a href="/admin/apis" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">APIs</a>
+                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
+                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <!-- Page Header -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Connect APIs</h1>
-                <p class="text-gray-600 mt-2">Connect to SMS providers for phone numbers and OTP messages</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">API Management</h1>
+                <p class="text-gray-600 mt-2">Connect and manage SMS providers for phone numbers and OTP messages</p>
             </div>
-            <button onclick="openAddApiModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md flex items-center">
-                <span class="mr-2">➕</span>
-                Add API Provider
+            <button onclick="openAddApiModal()" class="btn-primary">
+                <span>🔌</span>
+                Connect API
             </button>
         </div>
 
-        <!-- API Providers Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
-                <div class="text-center text-gray-500">
-                    <span class="text-4xl mb-4 block">🔌</span>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No APIs Connected</h3>
-                    <p class="text-sm text-gray-500">Add your first API provider to get started with phone number services.</p>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🔌</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total APIs</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalApis">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🟢</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Active APIs</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="activeApis">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🔴</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Inactive APIs</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="inactiveApis">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">💰</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Balance</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalBalance">₹0</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- APIs List -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
+        <!-- Desktop Table View -->
+        <div class="bg-white rounded-lg shadow desktop-table">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">Connected APIs</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Get Number URL</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="apisTable">
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                No APIs connected. Add your first API provider to get started.
+                            <td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">
+                                No APIs connected. Click "Connect API" to add your first API provider.
                             </td>
                         </tr>
                     </tbody>
@@ -116,101 +299,45 @@
             </div>
         </div>
 
-        <!-- Direct Web Links Section -->
-        <div class="bg-white rounded-lg shadow mt-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+        <!-- Mobile Card View -->
+        <div class="mobile-card space-y-4" id="mobileApisList">
+            <!-- Mobile cards will be populated here -->
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow mt-6 sm:mt-8">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <a href="/admin/dashboard" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">📊</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Dashboard</h4>
-                            <p class="text-sm text-gray-600">Main admin dashboard</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/servers" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
+            <div class="p-4 sm:p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <button onclick="openAddApiModal()" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors w-full text-left">
                         <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🖥️</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Servers</h4>
-                            <p class="text-sm text-gray-600">Manage OTP servers</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/services" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🔧</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Services</h4>
-                            <p class="text-sm text-gray-600">Manage OTP services</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/apis" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
                             <span class="text-white text-lg">🔌</span>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-gray-900">APIs</h4>
-                            <p class="text-sm text-gray-600">Manage API connections</p>
+                            <h4 class="font-semibold text-gray-900">Connect API</h4>
+                            <p class="text-sm text-gray-600">Connect new OTP provider</p>
+                        </div>
+                    </button>
+                    
+                    <a href="/admin/servers" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🖥️</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Manage Servers</h4>
+                            <p class="text-sm text-gray-600">Add/edit server configurations</p>
                         </div>
                     </a>
                     
-                    <a href="/admin/orders" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">📋</span>
+                    <a href="/admin/services" class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-white text-lg">🔧</span>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-gray-900">Orders</h4>
-                            <p class="text-sm text-gray-600">View all orders</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/users" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">👥</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Users</h4>
-                            <p class="text-sm text-gray-600">Manage users</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/transactions" class="flex items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                        <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">💰</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Transactions</h4>
-                            <p class="text-sm text-gray-600">View transactions</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/promo-codes" class="flex items-center p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                        <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">🎫</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Promo Codes</h4>
-                            <p class="text-sm text-gray-600">Manage promo codes</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/api-config" class="flex items-center p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                        <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-lg">⚙️</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">API Config</h4>
-                            <p class="text-sm text-gray-600">Configure APIs</p>
+                            <h4 class="font-semibold text-gray-900">Manage Services</h4>
+                            <p class="text-sm text-gray-600">Configure OTP services</p>
                         </div>
                     </a>
                 </div>
@@ -218,80 +345,105 @@
         </div>
     </div>
 
-    <!-- Add/Edit API Modal -->
-    <div id="apiModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add API Provider</h3>
-                    <button onclick="closeApiModal()" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+    <!-- Enhanced Add/Edit API Modal -->
+    <div id="apiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Connect an OTP API</h3>
+                <button onclick="closeApiModal()" class="modal-close">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Description -->
+                <p class="text-gray-600 mb-6">Choose a server and add an SMS/OTP API to all the services available in that server.</p>
                 
+                <!-- Enhanced Form -->
                 <form id="apiForm" class="space-y-4">
                     <input type="hidden" id="apiId" name="apiId">
                     
-                    <div>
-                        <label for="providerName" class="block text-sm font-medium text-gray-700">Provider Name</label>
-                        <input type="text" id="providerName" name="providerName" placeholder="SMS Activate" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="form-group">
+                        <label for="serverId" class="form-label">Select Server</label>
+                        <select id="serverId" name="serverId" required class="form-select">
+                            <option value="">Select Server</option>
+                        </select>
                     </div>
                     
-                    <div>
-                        <label for="providerUrl" class="block text-sm font-medium text-gray-700">Provider URL</label>
-                        <input type="url" id="providerUrl" name="providerUrl" placeholder="https://sms-activate.org" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="form-group">
+                        <label for="name" class="form-label">API Name *</label>
+                        <input type="text" id="name" name="name" required class="form-input" placeholder="My Api">
                     </div>
                     
-                    <div>
-                        <label for="apiKey" class="block text-sm font-medium text-gray-700">API Key</label>
-                        <input type="password" id="apiKey" name="apiKey" placeholder="Enter your API key" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="form-group">
+                        <label for="authHeaders" class="form-label">
+                            <input type="checkbox" id="authHeaders" name="authHeaders" class="mr-2">
+                            Does your API uses Authorization Headers?
+                        </label>
                     </div>
                     
-                    <div>
-                        <label for="getNumbersUrl" class="block text-sm font-medium text-gray-700">Get Numbers API URL</label>
-                        <input type="url" id="getNumbersUrl" name="getNumbersUrl" placeholder="https://api.example.com/getNumbers" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="getSmsUrl" class="block text-sm font-medium text-gray-700">Get SMS API URL</label>
-                        <input type="url" id="getSmsUrl" name="getSmsUrl" placeholder="https://api.example.com/getSms" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="responseFormat" class="block text-sm font-medium text-gray-700">Response Format</label>
-                        <select id="responseFormat" name="responseFormat" required 
-                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="form-group">
+                        <label for="responseType" class="form-label">API response type</label>
+                        <select id="responseType" name="responseType" class="form-select">
+                            <option value="text">Text</option>
                             <option value="json">JSON</option>
-                            <option value="text">Plain Text</option>
-                            <option value="xml">XML</option>
                         </select>
                     </div>
                     
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="status" name="status" required 
-                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="testing">Testing</option>
-                        </select>
+                    <div class="form-group">
+                        <label for="getNumberUrl" class="form-label">API Get Number URL *</label>
+                        <input type="url" id="getNumberUrl" name="getNumberUrl" required class="form-input" placeholder="https://api.myservice.com/handler?a">
                     </div>
                     
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeApiModal()" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="getMessageUrl" class="form-label">API Get Message/Status URL *</label>
+                        <input type="url" id="getMessageUrl" name="getMessageUrl" required class="form-input" placeholder="https://api.myservice.com/handler?a">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="bg-gray-100 p-3 rounded-lg mb-3">
+                            <p class="text-sm text-gray-700 mb-2">
+                                How to know that get status url has sent is a success message indicating user has received his otp. Also what is the path to message text if response type is json. ⓘ
+                            </p>
+                            <input type="text" id="responseStartsWith" name="responseStartsWith" required class="form-input" placeholder="STATUS_SUCCESS">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activateNextUrl" class="form-label">API Activate Next Message URL</label>
+                        <input type="url" id="activateNextUrl" name="activateNextUrl" class="form-input" placeholder="https://api.myservice.com/handler?a">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cancelNumberUrl" class="form-label">API Cancel Number URL *</label>
+                        <input type="url" id="cancelNumberUrl" name="cancelNumberUrl" required class="form-input" placeholder="https://api.myservice.com/handler?a">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="autoCancelMinutes" class="form-label">API AutoCancel Number in Minutes *</label>
+                        <input type="number" id="autoCancelMinutes" name="autoCancelMinutes" required min="0" class="form-input" placeholder="5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="retryTimes" class="form-label">API Retry Get Number URL _ times *</label>
+                        <input type="number" id="retryTimes" name="retryTimes" required min="0" class="form-input" placeholder="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Your Selected Server will include following services:</label>
+                        <div class="bg-white p-3 rounded-lg border">
+                            <span id="selectedServerServices">No services available</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" onclick="closeApiModal()" class="btn-secondary flex-1">
                             Cancel
                         </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">
-                            Save API
+                        <button type="submit" class="btn-primary flex-1">
+                            <span id="submitBtnText">Submit</span>
                         </button>
                     </div>
                 </form>
@@ -308,58 +460,90 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // API modal functions
+        // Enhanced API modal functions
         function openAddApiModal() {
-            document.getElementById('modalTitle').textContent = 'Add API Provider';
+            document.getElementById('modalTitle').textContent = 'Connect an OTP API';
+            document.getElementById('submitBtnText').textContent = 'Submit';
             document.getElementById('apiForm').reset();
             document.getElementById('apiId').value = '';
-            document.getElementById('apiModal').classList.remove('hidden');
+            showModal('apiModal');
+            loadServersForDropdown();
         }
 
         function closeApiModal() {
-            document.getElementById('apiModal').classList.add('hidden');
+            hideModal('apiModal');
+            // Reset form when closing
+            document.getElementById('apiForm').reset();
         }
 
         function editApi(id) {
-            // Reset form
+            document.getElementById('modalTitle').textContent = 'Edit API';
+            document.getElementById('submitBtnText').textContent = 'Submit';
             document.getElementById('apiForm').reset();
             document.getElementById('apiId').value = id || '';
-            document.getElementById('modalTitle').textContent = id ? 'Edit API' : 'Add New API';
             
             if (id) {
                 // Load API data for editing
                 loadApiForEditing(id);
             }
             
-            document.getElementById('apiModal').classList.remove('hidden');
+            showModal('apiModal');
+            loadServersForDropdown();
+        }
+
+        async function loadServersForDropdown() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    const data = await response.json();
+                    const servers = data.data || data;
+                    
+                    const serverSelect = document.getElementById('serverId');
+                    serverSelect.innerHTML = '<option value="">Select Server</option>';
+                    
+                    if (Array.isArray(servers)) {
+                        servers.forEach(server => {
+                            const option = document.createElement('option');
+                            option.value = server.id || server._id;
+                            option.textContent = `${server.serverName || server.name} (${server.countryName || server.countryCode})`;
+                            serverSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading servers for dropdown:', error);
+            }
         }
 
         async function loadApiForEditing(id) {
             try {
                 const response = await fetch(`/api/apis/${id}`);
                 if (response.ok) {
-                    const api = await response.json();
-                    document.getElementById('providerName').value = api.providerName || '';
-                    document.getElementById('providerUrl').value = api.providerUrl || '';
-                    document.getElementById('apiKey').value = api.apiKey || '';
-                    document.getElementById('getNumbersUrl').value = api.getNumbersUrl || '';
-                    document.getElementById('getSmsUrl').value = api.getSmsUrl || '';
-                    document.getElementById('responseFormat').value = api.responseFormat || 'json';
-                    document.getElementById('status').value = api.status || 'active';
+                    const apiData = await response.json();
+                    const api = apiData.data || apiData;
+                    
+                    document.getElementById('name').value = api.name || '';
+                    document.getElementById('getNumberUrl').value = api.getNumberUrl || '';
+                    document.getElementById('getMessageUrl').value = api.getMessageUrl || '';
+                    document.getElementById('cancelNumberUrl').value = api.cancelNumberUrl || '';
+                    document.getElementById('activateNextUrl').value = api.activateNextUrl || '';
+                    document.getElementById('autoCancelMinutes').value = api.autoCancelMinutes || '';
+                    document.getElementById('retryTimes').value = api.retryTimes || '';
+                    document.getElementById('responseStartsWith').value = api.responseStartsWith || '';
+                    document.getElementById('responseType').value = api.responseType || 'text';
+                    document.getElementById('authHeaders').checked = api.authHeaders || false;
+                } else {
+                    console.error('Failed to load API data');
+                    alert('Failed to load API data for editing');
                 }
             } catch (error) {
                 console.error('Error loading API for editing:', error);
+                alert('Error loading API data. Please try again.');
             }
         }
 
-        function testApi(apiId) {
-            // In real app, make API call to test the connection
-            console.log('Testing API:', apiId);
-            alert('Testing API connection... Check console for results.');
-        }
-
         async function deleteApi(apiId) {
-            if (confirm('Are you sure you want to delete this API provider?')) {
+            if (confirm('Are you sure you want to delete this API?')) {
                 try {
                     const response = await fetch(`/api/apis/${apiId}`, {
                         method: 'DELETE'
@@ -367,14 +551,26 @@
                     
                     if (response.ok) {
                         loadApis(); // Reload the APIs list
+                        alert('API deleted successfully');
                     } else {
-                        const error = await response.json();
+                        const errorData = await response.json();
+                        const error = errorData.data || errorData;
                         alert('Error: ' + (error.message || 'Failed to delete API'));
                     }
                 } catch (error) {
                     console.error('Error deleting API:', error);
                     alert('Error deleting API. Please try again.');
                 }
+            }
+        }
+
+        async function testApi(apiId) {
+            try {
+                alert('Testing API functionality...');
+                // Add actual API testing logic here
+            } catch (error) {
+                console.error('Error testing API:', error);
+                alert('Error testing API. Please try again.');
             }
         }
 
@@ -385,13 +581,18 @@
             const formData = new FormData(this);
             const apiId = formData.get('apiId');
             const apiData = {
-                providerName: formData.get('providerName'),
-                providerUrl: formData.get('providerUrl'),
-                apiKey: formData.get('apiKey'),
-                getNumbersUrl: formData.get('getNumbersUrl'),
-                getSmsUrl: formData.get('getSmsUrl'),
-                responseFormat: formData.get('responseFormat'),
-                status: formData.get('status')
+                name: formData.get('name'),
+                serverId: formData.get('serverId'),
+                authHeaders: formData.get('authHeaders') === 'on',
+                responseType: formData.get('responseType'),
+                getNumberUrl: formData.get('getNumberUrl'),
+                getMessageUrl: formData.get('getMessageUrl'),
+                responseStartsWith: formData.get('responseStartsWith'),
+                activateNextUrl: formData.get('activateNextUrl'),
+                cancelNumberUrl: formData.get('cancelNumberUrl'),
+                autoCancelMinutes: parseInt(formData.get('autoCancelMinutes')) || 5,
+                retryTimes: parseInt(formData.get('retryTimes')) || 0,
+                status: 'active'
             };
             
             try {
@@ -415,8 +616,10 @@
                 if (response.ok) {
                     closeApiModal();
                     loadApis(); // Reload the APIs list
+                    alert(apiId ? 'API updated successfully' : 'API created successfully');
                 } else {
-                    const error = await response.json();
+                    const errorData = await response.json();
+                    const error = errorData.data || errorData;
                     alert('Error: ' + (error.message || 'Failed to save API'));
                 }
             } catch (error) {
@@ -434,60 +637,154 @@
             try {
                 const response = await fetch('/api/apis');
                 if (response.ok) {
-                    const apis = await response.json();
+                    const data = await response.json();
+                    const apis = data.data || data;
+                    
+                    if (!Array.isArray(apis)) {
+                        console.error('APIs response is not an array:', apis);
+                        updateApisList([]);
+                        return;
+                    }
+                    
                     updateApisList(apis);
+                    updateStats(apis);
                 } else {
-                    console.error('Failed to load APIs');
+                    console.error('Failed to load APIs:', response.status);
+                    updateApisList([]);
                 }
             } catch (error) {
                 console.error('APIs loading failed:', error);
+                updateApisList([]);
             }
+        }
+
+        function updateStats(apis) {
+            const totalApis = apis.length;
+            const activeApis = apis.filter(api => api.status === 'active').length;
+            const inactiveApis = apis.filter(api => api.status === 'inactive').length;
+            const totalBalance = apis.reduce((sum, api) => sum + (parseFloat(api.balance) || 0), 0);
+            
+            document.getElementById('totalApis').textContent = totalApis;
+            document.getElementById('activeApis').textContent = activeApis;
+            document.getElementById('inactiveApis').textContent = inactiveApis;
+            document.getElementById('totalBalance').textContent = `₹${totalBalance.toFixed(2)}`;
         }
 
         function updateApisList(apis) {
             const tbody = document.getElementById('apisTable');
+            const mobileList = document.getElementById('mobileApisList');
             
-            if (apis.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No APIs connected. Add your first API provider to get started.</td></tr>';
+            if (!apis || apis.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">No APIs connected. Click "Connect API" to add your first API provider.</td></tr>';
+                mobileList.innerHTML = '<div class="text-center text-gray-500 py-8">No APIs connected. Click "Connect API" to add your first API provider.</div>';
                 return;
             }
             
+            // Desktop table view
             tbody.innerHTML = apis.map(api => `
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <span class="text-2xl mr-3">🔌</span>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">${api.providerName}</div>
-                                <div class="text-sm text-gray-500">${api.providerUrl}</div>
+                                <div class="text-sm font-medium text-gray-900">${api.name || api.providerName || 'Unknown'}</div>
+                                <div class="text-sm text-gray-500 url-truncate" title="${api.url || api.providerUrl || 'N/A'}">${api.url || api.providerUrl || 'N/A'}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             api.status === 'active' ? 'bg-green-100 text-green-800' : 
                             api.status === 'inactive' ? 'bg-red-100 text-red-800' : 
                             'bg-yellow-100 text-yellow-800'
                         }">
-                            ${api.status}
+                            ${api.status || 'unknown'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${api.apiKey ? '***' + api.apiKey.slice(-4) : 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${api.balance || 0}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${api.getNumbersUrl}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="testApi('${api._id}')" class="text-blue-600 hover:text-blue-900 mr-3">Test</button>
-                        <button onclick="editApi('${api._id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
-                        <button onclick="deleteApi('${api._id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${api.apiKey ? '***' + api.apiKey.slice(-4) : 'N/A'}</td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${api.balance || 0}</td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div class="url-truncate" title="${api.getNumberUrl || api.getNumbersUrl || 'N/A'}">${api.getNumberUrl || api.getNumbersUrl || 'N/A'}</div>
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button onclick="testApi('${api._id || api.id}')" class="action-btn action-btn-edit">
+                                <span>🧪</span>
+                                Test
+                            </button>
+                            <button onclick="editApi('${api._id || api.id}')" class="action-btn action-btn-edit">
+                                <span>✏️</span>
+                                Edit
+                            </button>
+                            <button onclick="deleteApi('${api._id || api.id}')" class="action-btn action-btn-delete">
+                                <span>🗑️</span>
+                                Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
+            
+            // Mobile card view
+            mobileList.innerHTML = apis.map(api => `
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🔌</span>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">${api.name || api.providerName || 'Unknown'}</div>
+                                <div class="text-xs text-gray-500">${api.type || 'Unknown Type'}</div>
+                            </div>
+                        </div>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            api.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            api.status === 'inactive' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${api.status || 'unknown'}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">API Key:</span>
+                            <span class="text-gray-900">${api.apiKey ? '***' + api.apiKey.slice(-4) : 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Balance:</span>
+                            <span class="text-gray-900">₹${api.balance || 0}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">URL:</span>
+                            <span class="text-gray-900 url-truncate" title="${api.url || api.providerUrl || 'N/A'}">${api.url || api.providerUrl || 'N/A'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-200">
+                        <button onclick="testApi('${api._id || api.id}')" class="action-btn action-btn-edit">
+                            <span>🧪</span>
+                            Test
+                        </button>
+                        <button onclick="editApi('${api._id || api.id}')" class="action-btn action-btn-edit">
+                            <span>✏️</span>
+                            Edit
+                        </button>
+                        <button onclick="deleteApi('${api._id || api.id}')" class="action-btn action-btn-delete">
+                            <span>🗑️</span>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Load APIs when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadApis();
-        });
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('apiModal');
+            if (event.target === modal) {
+                closeApiModal();
+            }
+        }
     </script>
 </body>
 </html>

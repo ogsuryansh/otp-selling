@@ -3,20 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Services - OTP Bot Platform</title>
+    <title>Service Management - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/app.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Remove underlines from all anchor tags */
+        a {
+            text-decoration: none;
+        }
+        
+        /* Container centering fix */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Navigation styles */
+        .nav-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .nav-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        /* Custom styles for better alignment and responsiveness */
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile menu improvements */
+        .mobile-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Loading animation */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Grid improvements */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Modal improvements */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            transition: all 0.3s ease;
+        }
+        
+                 /* Enhanced Button Styles */
+         .btn-primary {
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+             color: white !important;
+             border: none !important;
+             padding: 12px 24px !important;
+             border-radius: 8px !important;
+             font-weight: 600 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             display: inline-flex !important;
+             align-items: center !important;
+             justify-content: center !important;
+             gap: 8px !important;
+             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+             width: auto !important;
+         }
+         
+         .btn-primary:hover {
+             transform: translateY(-2px) !important;
+             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+         }
+         
+         .btn-secondary {
+             background: #f3f4f6 !important;
+             color: #374151 !important;
+             border: 2px solid #e5e7eb !important;
+             padding: 10px 20px !important;
+             border-radius: 8px !important;
+             font-weight: 500 !important;
+             font-size: 0.875rem !important;
+             cursor: pointer !important;
+             transition: all 0.3s ease-in-out !important;
+             width: auto !important;
+         }
+         
+         .btn-secondary:hover {
+             background: #e5e7eb !important;
+             transform: translateY(-1px) !important;
+         }
+        
+        /* Action Button Styles */
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-btn-edit {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .action-btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .action-btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Color utilities */
+        .bg-primary { background-color: #2563eb; }
+        .bg-secondary { background-color: #1e40af; }
+        .bg-accent { background-color: #3b82f6; }
+        .text-primary { color: #2563eb; }
+        .text-secondary { color: #1e40af; }
+        .text-accent { color: #3b82f6; }
+        
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-white { background-color: #ffffff; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-green-500 { background-color: #10b981; }
+        .bg-green-600 { background-color: #059669; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-orange-600 { background-color: #ea580c; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .bg-yellow-600 { background-color: #ca8a04; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .bg-purple-600 { background-color: #7c3aed; }
+        
+        .text-white { color: #ffffff; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-900 { color: #111827; }
+        
+        .border-gray-200 { border-color: #e5e7eb; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .border-green-200 { border-color: #bbf7d0; }
+        .border-purple-200 { border-color: #ddd6fe; }
+        .border-orange-200 { border-color: #fed7aa; }
+        .border-red-200 { border-color: #fecaca; }
+        .border-yellow-200 { border-color: #fef3c7; }
+        
+        .hover\:bg-blue-100:hover { background-color: #dbeafe; }
+        .hover\:bg-green-100:hover { background-color: #dcfce7; }
+        .hover\:bg-purple-100:hover { background-color: #f3e8ff; }
+        .hover\:bg-orange-100:hover { background-color: #ffedd5; }
+        .hover\:bg-red-100:hover { background-color: #fee2e2; }
+        .hover\:bg-yellow-100:hover { background-color: #fef3c7; }
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        .hover\:text-primary:hover { color: #2563eb; }
+        .hover\:text-gray-600:hover { color: #4b5563; }
+        .hover\:text-gray-800:hover { color: #1f2937; }
+        .hover\:text-gray-900:hover { color: #111827; }
+        
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-green-600:hover { background-color: #059669; }
+        .hover\:bg-red-600:hover { background-color: #dc2626; }
+        .hover\:bg-orange-600:hover { background-color: #ea580c; }
+        .hover\:bg-yellow-600:hover { background-color: #ca8a04; }
+        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
+    </style>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#3b82f6'
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: '#2563eb',
+                                secondary: '#1e40af',
+                                accent: '#3b82f6'
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -30,18 +311,18 @@
                     </a>
                     <div class="hidden md:block">
                         <div class="ml-6 sm:ml-10 flex items-baseline space-x-2 sm:space-x-4">
-                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Servers</a>
-                            <a href="/admin/services" class="bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">APIs</a>
-                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Orders</a>
-                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium">Users</a>
+                            <a href="/admin/dashboard" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Dashboard</a>
+                            <a href="/admin/servers" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servers</a>
+                            <a href="/admin/services" class="bg-primary text-white px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Services</a>
+                            <a href="/admin/apis" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">APIs</a>
+                            <a href="/admin/orders" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Orders</a>
+                            <a href="/admin/users" class="text-gray-700 hover:text-primary px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Users</a>
                         </div>
                     </div>
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                    <button type="button" class="mobile-menu-button bg-white p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors duration-200">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -50,14 +331,14 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
-                    <a href="/admin/services" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium">Services</a>
-                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">APIs</a>
-                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Orders</a>
-                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Users</a>
+                    <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Servers</a>
+                    <a href="/admin/services" class="bg-primary text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Services</a>
+                    <a href="/admin/apis" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">APIs</a>
+                    <a href="/admin/orders" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Orders</a>
+                    <a href="/admin/users" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Users</a>
                 </div>
             </div>
         </div>
@@ -66,226 +347,172 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
-            <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Manage Services</h1>
-                <p class="text-gray-600 mt-2">Add and manage OTP verification services</p>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Service Management</h1>
+                <p class="text-gray-600 mt-2">Configure OTP services and their pricing</p>
             </div>
-            <button onclick="openAddServiceModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md flex items-center justify-center w-full sm:w-auto">
-                <span class="mr-2">➕</span>
+            <button onclick="openAddServiceModal()" class="btn-primary">
+                <span>➕</span>
                 Add Service
             </button>
         </div>
 
-        <!-- View Toggle -->
-        <div class="flex justify-center mb-6">
-            <div class="bg-white rounded-lg shadow p-1">
-                <button onclick="switchView('grid')" id="gridBtn" class="px-3 py-2 text-sm font-medium rounded-md bg-primary text-white">Grid View</button>
-                <button onclick="switchView('table')" id="tableBtn" class="px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-primary">Table View</button>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🔧</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Services</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="totalServices">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🟢</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Active Services</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="activeServices">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🔴</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Inactive Services</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="inactiveServices">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">💰</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Avg. Price</p>
+                        <p class="text-lg sm:text-xl font-semibold text-gray-900" id="avgPrice">₹0</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Grid View -->
-        <div id="gridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <!-- Services will be loaded here -->
-        </div>
-
-        <!-- Table View -->
-        <div id="tableView" class="hidden">
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">OTP Services</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="servicesTable">
-                            <tr>
-                                <td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">
-                                    No services found. Add your first service to get started.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Direct Web Links Section -->
-        <div class="bg-white rounded-lg shadow mt-6 sm:mt-8">
+        <!-- Services List -->
+        <div class="bg-white rounded-lg shadow">
             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">🔗 Direct Web Links</h3>
-                <p class="text-sm text-gray-600 mt-1">Quick access to all admin panel sections</p>
+                <h3 class="text-lg font-semibold text-gray-900">Service List</h3>
             </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                    <a href="/admin/dashboard" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📊</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Dashboard</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Main admin dashboard</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/servers" class="flex items-center p-3 sm:p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🖥️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Servers</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP servers</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/services" class="flex items-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔧</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Services</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage OTP services</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/apis" class="flex items-center p-3 sm:p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🔌</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">APIs</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage API connections</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/orders" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">📋</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Orders</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View all orders</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/admin/users" class="flex items-center p-3 sm:p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">👥</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Users</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage users</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/transactions" class="flex items-center p-3 sm:p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">💰</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Transactions</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">View transactions</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/promo-codes" class="flex items-center p-3 sm:p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-pink-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">🎫</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">Promo Codes</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Manage promo codes</p>
-                        </div>
-                    </a>
-                    
-                    <a href="/api-config" class="flex items-center p-3 sm:p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
-                            <span class="text-white text-sm sm:text-lg">⚙️</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">API Config</h4>
-                            <p class="text-xs sm:text-sm text-gray-600">Configure APIs</p>
-                        </div>
-                    </a>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="servicesTable">
+                        <tr>
+                            <td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">
+                                No services found. Add your first service to get started.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Add/Edit Service Modal -->
-    <div id="serviceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-4 sm:top-20 mx-auto p-4 sm:p-5 border w-full max-w-sm sm:max-w-md shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Service</h3>
-                    <button onclick="closeServiceModal()" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+    <!-- Enhanced Add/Edit Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Service</h3>
+                <button onclick="closeServiceModal()" class="modal-close">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Description -->
+                <p class="text-gray-600 mb-6">Select a server and add a service to it. You can later connect an API to this service. Users will be buying this service using their 💎</p>
                 
+                <!-- Enhanced Form -->
                 <form id="serviceForm" class="space-y-4">
                     <input type="hidden" id="serviceId" name="serviceId">
                     
-                    <div>
-                        <label for="serviceName" class="block text-sm font-medium text-gray-700">Service Name</label>
-                        <input type="text" id="serviceName" name="serviceName" placeholder="WhatsApp" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="serviceCode" class="block text-sm font-medium text-gray-700">Service Code</label>
-                        <input type="text" id="serviceCode" name="serviceCode" placeholder="whatsapp" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="price" class="block text-sm font-medium text-gray-700">Price (₹)</label>
-                        <input type="number" id="price" name="price" step="0.01" placeholder="25.00" required 
-                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea id="description" name="description" rows="3" placeholder="WhatsApp verification service" 
-                                  class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary"></textarea>
-                    </div>
-                    
-                    <div>
-                        <label for="serverId" class="block text-sm font-medium text-gray-700">Server</label>
-                        <select id="serverId" name="serverId" required 
-                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                            <option value="">Select a server</option>
+                    <div class="form-group">
+                        <label for="serverId" class="form-label">Select Server</label>
+                        <select id="serverId" name="serverId" required class="form-select">
+                            <option value="">Select Server</option>
                         </select>
                     </div>
                     
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="status" name="status" required 
-                                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                    <div class="form-group">
+                        <label for="serviceIdField" class="form-label">Service ID *</label>
+                        <input type="text" id="serviceIdField" name="serviceIdField" required class="form-input" placeholder="Other">
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
-                        <button type="button" onclick="closeServiceModal()" 
-                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="serviceName" class="form-label">Service Name *</label>
+                        <input type="text" id="serviceName" name="serviceName" required class="form-input" placeholder="My Service">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceLogo" class="form-label">Service Logo *</label>
+                        <input type="url" id="serviceLogo" name="serviceLogo" required class="form-input" placeholder="Service Logo Url">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceCode" class="form-label">Service Code *</label>
+                        <input type="text" id="serviceCode" name="serviceCode" required class="form-input" placeholder="Serv1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="form-label">Service Description *</label>
+                        <textarea id="description" name="description" rows="3" class="form-input" placeholder="My Small Service Description..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price" class="form-label">Service Price *</label>
+                        <input type="number" id="price" name="price" required min="0" step="0.01" class="form-input" placeholder="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="disableCancellation" class="form-label">Disable Cancellation till __ minutes</label>
+                        <input type="number" id="disableCancellation" name="disableCancellation" min="0" class="form-input" placeholder="0">
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" onclick="closeServiceModal()" class="btn-secondary flex-1">
                             Cancel
                         </button>
-                        <button type="submit" 
-                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">
-                            Save Service
+                        <button type="submit" class="btn-primary flex-1">
+                            <span id="submitBtnText">Submit</span>
                         </button>
                     </div>
                 </form>
@@ -302,65 +529,82 @@
             mobileMenu.classList.toggle('hidden');
         });
 
-        // View switching
-        function switchView(view) {
-            const gridView = document.getElementById('gridView');
-            const tableView = document.getElementById('tableView');
-            const gridBtn = document.getElementById('gridBtn');
-            const tableBtn = document.getElementById('tableBtn');
-            
-            if (view === 'grid') {
-                gridView.classList.remove('hidden');
-                tableView.classList.add('hidden');
-                gridBtn.classList.add('bg-primary', 'text-white');
-                gridBtn.classList.remove('text-gray-700', 'hover:text-primary');
-                tableBtn.classList.remove('bg-primary', 'text-white');
-                tableBtn.classList.add('text-gray-700', 'hover:text-primary');
-            } else {
-                gridView.classList.add('hidden');
-                tableView.classList.remove('hidden');
-                tableBtn.classList.add('bg-primary', 'text-white');
-                tableBtn.classList.remove('text-gray-700', 'hover:text-primary');
-                gridBtn.classList.remove('bg-primary', 'text-white');
-                gridBtn.classList.add('text-gray-700', 'hover:text-primary');
-            }
-        }
-
-        // Service modal functions
+        // Enhanced Service modal functions
         function openAddServiceModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Service';
+            document.getElementById('modalTitle').textContent = 'Add Service';
+            document.getElementById('submitBtnText').textContent = 'Submit';
             document.getElementById('serviceForm').reset();
             document.getElementById('serviceId').value = '';
-            document.getElementById('serviceModal').classList.remove('hidden');
-            loadServers();
+            showModal('serviceModal');
+            loadServersForDropdown();
         }
 
         function closeServiceModal() {
-            document.getElementById('serviceModal').classList.add('hidden');
+            hideModal('serviceModal');
+            // Reset form when closing
+            document.getElementById('serviceForm').reset();
         }
 
         function editService(id) {
             document.getElementById('modalTitle').textContent = 'Edit Service';
-            document.getElementById('serviceId').value = id;
-            loadServers();
-            loadServiceForEditing(id);
-            document.getElementById('serviceModal').classList.remove('hidden');
+            document.getElementById('submitBtnText').textContent = 'Submit';
+            document.getElementById('serviceForm').reset();
+            document.getElementById('serviceId').value = id || '';
+            
+            if (id) {
+                loadServiceForEditing(id);
+            }
+            
+            loadServersForDropdown();
+            showModal('serviceModal');
+        }
+
+        async function loadServersForDropdown() {
+            try {
+                const response = await fetch('/api/servers');
+                if (response.ok) {
+                    const data = await response.json();
+                    const servers = data.data || data;
+                    
+                    const serverSelect = document.getElementById('serverId');
+                    serverSelect.innerHTML = '<option value="">Select a server...</option>';
+                    
+                    if (Array.isArray(servers)) {
+                        servers.forEach(server => {
+                            const option = document.createElement('option');
+                            option.value = server.id || server._id;
+                            option.textContent = `${server.serverName || server.name} (${server.countryName || server.countryCode})`;
+                            serverSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading servers for dropdown:', error);
+            }
         }
 
         async function loadServiceForEditing(id) {
             try {
                 const response = await fetch(`/api/services/${id}`);
                 if (response.ok) {
-                    const service = await response.json();
-                    document.getElementById('serviceName').value = service.serviceName || '';
-                    document.getElementById('serviceCode').value = service.serviceCode || '';
-                    document.getElementById('price').value = service.price || '';
-                    document.getElementById('description').value = service.description || '';
-                    document.getElementById('serverId').value = service.serverId || '';
-                    document.getElementById('status').value = service.status || 'active';
+                    const serviceData = await response.json();
+                    const service = serviceData.data || serviceData;
+                    
+                                         document.getElementById('serviceName').value = service.serviceName || service.name || '';
+                     document.getElementById('serviceIdField').value = service.serviceId || '';
+                     document.getElementById('serviceLogo').value = service.serviceLogo || '';
+                     document.getElementById('serviceCode').value = service.serviceCode || '';
+                     document.getElementById('serverId').value = service.serverId || '';
+                     document.getElementById('price').value = service.price || '';
+                     document.getElementById('description').value = service.description || '';
+                     document.getElementById('disableCancellation').value = service.disableCancellation || 0;
+                } else {
+                    console.error('Failed to load service data');
+                    alert('Failed to load service data for editing');
                 }
             } catch (error) {
                 console.error('Error loading service for editing:', error);
+                alert('Error loading service data. Please try again.');
             }
         }
 
@@ -373,30 +617,16 @@
                     
                     if (response.ok) {
                         loadServices();
+                        alert('Service deleted successfully');
                     } else {
-                        const error = await response.json();
+                        const errorData = await response.json();
+                        const error = errorData.data || errorData;
                         alert('Error: ' + (error.message || 'Failed to delete service'));
                     }
                 } catch (error) {
                     console.error('Error deleting service:', error);
                     alert('Error deleting service. Please try again.');
                 }
-            }
-        }
-
-        async function loadServers() {
-            try {
-                const response = await fetch('/api/servers');
-                if (response.ok) {
-                    const servers = await response.json();
-                    const serverSelect = document.getElementById('serverId');
-                    serverSelect.innerHTML = '<option value="">Select a server</option>';
-                    servers.forEach(server => {
-                        serverSelect.innerHTML += `<option value="${server._id}">${server.serverName}</option>`;
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading servers:', error);
             }
         }
 
@@ -408,24 +638,25 @@
             const serviceId = formData.get('serviceId');
             const serviceData = {
                 serviceName: formData.get('serviceName'),
+                serviceId: formData.get('serviceIdField'),
+                serviceLogo: formData.get('serviceLogo'),
                 serviceCode: formData.get('serviceCode'),
-                price: parseFloat(formData.get('price')),
-                description: formData.get('description'),
                 serverId: formData.get('serverId'),
-                status: formData.get('status')
+                price: parseFloat(formData.get('price')) || 0,
+                description: formData.get('description'),
+                disableCancellation: parseInt(formData.get('disableCancellation')) || 0,
+                status: 'active'
             };
             
             try {
                 let response;
                 if (serviceId) {
-                    // Update existing service
                     response = await fetch(`/api/services/${serviceId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(serviceData)
                     });
                 } else {
-                    // Create new service
                     response = await fetch('/api/services', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -436,8 +667,10 @@
                 if (response.ok) {
                     closeServiceModal();
                     loadServices();
+                    alert(serviceId ? 'Service updated successfully' : 'Service created successfully');
                 } else {
-                    const error = await response.json();
+                    const errorData = await response.json();
+                    const error = errorData.data || errorData;
                     alert('Error: ' + (error.message || 'Failed to save service'));
                 }
             } catch (error) {
@@ -455,59 +688,45 @@
             try {
                 const response = await fetch('/api/services');
                 if (response.ok) {
-                    const services = await response.json();
-                    updateServicesGrid(services);
-                    updateServicesTable(services);
+                    const data = await response.json();
+                    const services = data.data || data;
+                    
+                    if (!Array.isArray(services)) {
+                        console.error('Services response is not an array:', services);
+                        updateServicesList([]);
+                        return;
+                    }
+                    
+                    updateServicesList(services);
+                    updateStats(services);
                 } else {
-                    console.error('Failed to load services');
+                    console.error('Failed to load services:', response.status);
+                    updateServicesList([]);
                 }
             } catch (error) {
                 console.error('Services loading failed:', error);
+                updateServicesList([]);
             }
         }
 
-        function updateServicesGrid(services) {
-            const gridView = document.getElementById('gridView');
+        function updateStats(services) {
+            const totalServices = services.length;
+            const activeServices = services.filter(service => service.status === 'active').length;
+            const inactiveServices = services.filter(service => service.status === 'inactive').length;
+            const avgPrice = services.length > 0 
+                ? services.reduce((sum, service) => sum + (parseFloat(service.price) || 0), 0) / services.length 
+                : 0;
             
-            if (services.length === 0) {
-                gridView.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No services found. Add your first service to get started.</div>';
-                return;
-            }
-            
-            gridView.innerHTML = services.map(service => `
-                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-lg">${service.logo || '📱'}</span>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">${service.serviceName}</h3>
-                                <p class="text-sm text-gray-500">${service.serviceCode}</p>
-                            </div>
-                        </div>
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
-                            service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }">
-                            ${service.status}
-                        </span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">${service.description || 'No description available'}</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-lg font-bold text-gray-900">₹${service.price}</span>
-                        <div class="flex space-x-2">
-                            <button onclick="editService('${service._id}')" class="text-primary hover:text-secondary text-sm">Edit</button>
-                            <button onclick="deleteService('${service._id}')" class="text-red-600 hover:text-red-900 text-sm">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            document.getElementById('totalServices').textContent = totalServices;
+            document.getElementById('activeServices').textContent = activeServices;
+            document.getElementById('inactiveServices').textContent = inactiveServices;
+            document.getElementById('avgPrice').textContent = `₹${avgPrice.toFixed(2)}`;
         }
 
-        function updateServicesTable(services) {
+        function updateServicesList(services) {
             const tbody = document.getElementById('servicesTable');
             
-            if (services.length === 0) {
+            if (!services || services.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">No services found. Add your first service to get started.</td></tr>';
                 return;
             }
@@ -516,36 +735,51 @@
                 <tr>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white text-sm">${service.logo || '📱'}</span>
-                            </div>
+                            <span class="text-2xl mr-3">🔧</span>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">${service.serviceName}</div>
-                                <div class="text-sm text-gray-500">${service.serviceCode}</div>
+                                <div class="text-sm font-medium text-gray-900">${service.serviceName || service.name || 'Unknown'}</div>
+                                <div class="text-sm text-gray-500">${service.description || 'No description'}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${service.price}</td>
-                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${service.serverId || '-'}</td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${service.serverName || 'Unknown Server'}
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ₹${service.price || 0}
+                    </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            service.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            service.status === 'inactive' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'
                         }">
-                            ${service.status}
+                            ${service.status || 'unknown'}
                         </span>
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editService('${service._id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
-                        <button onclick="deleteService('${service._id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button onclick="editService('${service._id || service.id}')" class="action-btn action-btn-edit">
+                                <span>✏️</span>
+                                Edit
+                            </button>
+                            <button onclick="deleteService('${service._id || service.id}')" class="action-btn action-btn-delete">
+                                <span>🗑️</span>
+                                Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
-        // Load services when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadServices();
-        });
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('serviceModal');
+            if (event.target === modal) {
+                closeServiceModal();
+            }
+        }
     </script>
 </body>
 </html>

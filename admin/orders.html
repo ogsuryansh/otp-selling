@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Orders - OTP Bot Platform</title>
+    <title>Order Management - OTP Bot Platform</title>
+    <link rel="stylesheet" href="../assets/css/output.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <script src="../assets/js/app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -50,7 +54,7 @@
             </div>
             
             <!-- Mobile menu -->
-            <div class="mobile-menu hidden md:hidden">
+            <div class="mobile-menu md:hidden">
                             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="/admin/dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
                 <a href="/admin/servers" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Servers</a>
@@ -301,38 +305,32 @@
 
         // Order functions
         function viewOrder(orderId) {
-            console.log('Viewing order:', orderId);
             alert(`Viewing order #${orderId}`);
         }
 
         function resendSMS(orderId) {
             if (confirm(`Resend SMS for order #${orderId}?`)) {
-                console.log('Resending SMS for order:', orderId);
                 alert('SMS resent successfully!');
             }
         }
 
         function approveOrder(orderId) {
             if (confirm(`Approve order #${orderId}?`)) {
-                console.log('Approving order:', orderId);
                 alert('Order approved successfully!');
             }
         }
 
         function forwardSMS(orderId) {
             if (confirm(`Forward SMS for order #${orderId}?`)) {
-                console.log('Forwarding SMS for order:', orderId);
                 alert('SMS forwarded successfully!');
             }
         }
 
         function exportOrders() {
-            console.log('Exporting orders...');
             alert('Orders exported successfully!');
         }
 
         function refreshOrders() {
-            console.log('Refreshing orders...');
             loadOrders();
         }
 
@@ -341,13 +339,11 @@
             const service = document.getElementById('serviceFilter').value;
             const date = document.getElementById('dateFilter').value;
             
-            console.log('Filtering orders:', { status, service, date });
             // In real app, apply filters and reload orders
         }
 
         function searchOrders() {
             const searchTerm = document.getElementById('searchOrders').value;
-            console.log('Searching orders:', searchTerm);
             // In real app, apply search and reload orders
         }
 
@@ -366,18 +362,16 @@
                     updateOrderStats(orders);
                 }
             } catch (error) {
-                console.log('Orders loading failed, using default data');
+                // Handle error silently
             }
         }
 
         function updateOrdersList(orders) {
             // Implementation for updating the orders list
-            console.log('Updating orders list:', orders);
         }
 
         function updateOrderStats(orders) {
             // Implementation for updating order statistics
-            console.log('Updating order stats:', orders);
         }
 
         // Load orders when page loads

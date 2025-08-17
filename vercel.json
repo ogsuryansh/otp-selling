@@ -6,15 +6,39 @@
       "use": "@vercel/node"
     },
     {
-      "src": "assets/**/*",
+      "src": "**/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "*.html",
+      "src": "**/*.css",
       "use": "@vercel/static"
     },
     {
-      "src": "favicon.ico",
+      "src": "**/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.ico",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.jpg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.jpeg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.gif",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.svg",
       "use": "@vercel/static"
     }
   ],
@@ -24,12 +48,48 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "src": "/admin/(.*)",
+      "dest": "/api/index.js"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
+      "src": "/dashboard",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/services",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/servers",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/users",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/transactions",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/promo-codes",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/api-config",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/api-config/connection",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/test-api",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
@@ -38,11 +98,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
-  },
-  "buildCommand": "npm run build:css"
+  }
 }

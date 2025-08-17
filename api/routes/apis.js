@@ -134,7 +134,7 @@ router.put('/:id', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const updateData = {
@@ -184,7 +184,7 @@ router.delete('/:id', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const result = await db.collection('apis').deleteOne({ _id: new ObjectId(id) });

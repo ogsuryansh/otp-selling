@@ -145,10 +145,10 @@ app.get('/promo-codes', (req, res) => {
 app.use(errorHandler);
 
 // Connect to MongoDB on startup
-connectToMongoDB().then(success => {
-    if (success && process.env.NODE_ENV === 'development') {
+connectToMongoDB().then(({ db }) => {
+    if (db && process.env.NODE_ENV === 'development') {
         console.log('✅ MongoDB connected successfully on startup');
-    } else if (!success && process.env.NODE_ENV === 'development') {
+    } else if (!db && process.env.NODE_ENV === 'development') {
         console.log('❌ MongoDB connection failed on startup');
     }
 });

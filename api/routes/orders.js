@@ -108,7 +108,7 @@ router.put('/:id', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const updateData = {
@@ -142,7 +142,7 @@ router.get('/stats/summary', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(500).json(errorResponse('Database connection failed'));
+            return res.status(503).json(errorResponse('Database not available'));
         }
         
         const pipeline = [

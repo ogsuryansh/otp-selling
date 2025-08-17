@@ -6,6 +6,8 @@
 2. **Database Connection**: Made MongoDB connection optional for deployment without database
 3. **Build Process**: Added proper build command for Tailwind CSS
 4. **Error Handling**: Updated API routes to handle missing database gracefully
+5. **Status Codes**: Changed all database connection failures from 500 to 503 (Service Unavailable)
+6. **MongoDB Connection**: Fixed connection check in main API file
 
 ## Environment Variables Required
 
@@ -43,6 +45,8 @@ NODE_ENV=production
 ### 4. Error Handling
 - Updated API routes to handle database unavailability
 - Better error responses for production
+- Changed database connection errors from 500 to 503 status codes
+- Fixed MongoDB connection check in main API file
 
 ## Testing Deployment
 

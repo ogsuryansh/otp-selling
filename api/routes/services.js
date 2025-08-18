@@ -20,7 +20,6 @@ router.get('/', async (req, res, next) => {
         const services = await db.collection('services').find({}).toArray();
         res.json(successResponse(services));
     } catch (error) {
-        console.error('Error fetching services:', error);
         next(new AppError('Failed to fetch services', 500));
     }
 });
@@ -48,7 +47,6 @@ router.get('/:id', async (req, res, next) => {
         
         res.json(successResponse(service));
     } catch (error) {
-        console.error('Error fetching service:', error);
         next(new AppError('Failed to fetch service', 500));
     }
 });
@@ -57,19 +55,18 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     try {
         const { 
-            serviceName, 
-            serviceId, 
-            serviceLogo, 
-            serviceCode, 
-            serverId, 
-            price, 
-            description, 
-            disableCancellation, 
-            status = 'active' 
+            name, 
+            description = '', 
+            price = 0, 
+            countryCode, 
+            countryName, 
+            status = 'active',
+            provider = '5sim',
+            category = 'otp'
         } = req.body;
         
-        if (!validateRequired(serviceName) || !validateRequired(serverId)) {
-            return res.status(400).json(errorResponse('Service name and server ID are required'));
+        if (!validateRequired(name)) {
+            return res.status(400).json(errorResponse('Name is required'));
         }
         
         const { db } = await connectToMongoDB();
@@ -79,15 +76,14 @@ router.post('/', async (req, res, next) => {
         }
         
         const newService = {
-            serviceName,
-            serviceId,
-            serviceLogo,
-            serviceCode,
-            serverId,
-            price: parseFloat(price) || 0,
+            name,
             description,
-            disableCancellation: parseInt(disableCancellation) || 0,
+            price: parseFloat(price) || 0,
+            countryCode,
+            countryName,
             status,
+            provider,
+            category,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -95,9 +91,8 @@ router.post('/', async (req, res, next) => {
         const result = await db.collection('services').insertOne(newService);
         newService._id = result.insertedId;
         
-        res.status(201).json(successResponse(newService));
+        res.status(201).json(successResponse(newService, 'Service created successfully'));
     } catch (error) {
-        console.error('Error creating service:', error);
         next(new AppError('Failed to create service', 500));
     }
 });
@@ -107,15 +102,14 @@ router.put('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         const { 
-            serviceName, 
-            serviceId, 
-            serviceLogo, 
-            serviceCode, 
-            serverId, 
-            price, 
+            name, 
             description, 
-            disableCancellation, 
-            status 
+            price, 
+            countryCode, 
+            countryName, 
+            status,
+            provider,
+            category
         } = req.body;
         
         if (!validateObjectId(id)) {
@@ -132,15 +126,14 @@ router.put('/:id', async (req, res, next) => {
             updatedAt: new Date()
         };
         
-        if (serviceName !== undefined) updateData.serviceName = serviceName;
-        if (serviceId !== undefined) updateData.serviceId = serviceId;
-        if (serviceLogo !== undefined) updateData.serviceLogo = serviceLogo;
-        if (serviceCode !== undefined) updateData.serviceCode = serviceCode;
-        if (serverId !== undefined) updateData.serverId = serverId;
-        if (price !== undefined) updateData.price = parseFloat(price) || 0;
+        if (name !== undefined) updateData.name = name;
         if (description !== undefined) updateData.description = description;
-        if (disableCancellation !== undefined) updateData.disableCancellation = parseInt(disableCancellation) || 0;
+        if (price !== undefined) updateData.price = parseFloat(price) || 0;
+        if (countryCode !== undefined) updateData.countryCode = countryCode;
+        if (countryName !== undefined) updateData.countryName = countryName;
         if (status !== undefined) updateData.status = status;
+        if (provider !== undefined) updateData.provider = provider;
+        if (category !== undefined) updateData.category = category;
         
         const result = await db.collection('services').updateOne(
             { _id: new ObjectId(id) },
@@ -155,7 +148,6 @@ router.put('/:id', async (req, res, next) => {
         
         res.json(successResponse(updatedService, 'Service updated successfully'));
     } catch (error) {
-        console.error('Error updating service:', error);
         next(new AppError('Failed to update service', 500));
     }
 });
@@ -183,7 +175,6 @@ router.delete('/:id', async (req, res, next) => {
         
         res.json(successResponse(null, 'Service deleted successfully'));
     } catch (error) {
-        console.error('Error deleting service:', error);
         next(new AppError('Failed to delete service', 500));
     }
 });

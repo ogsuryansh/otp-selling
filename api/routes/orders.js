@@ -10,7 +10,6 @@ const router = express.Router();
 // GET all orders
 router.get('/', async (req, res, next) => {
     try {
-        const { limit } = req.query;
         const { db } = await connectToMongoDB();
         
         if (!db) {
@@ -18,17 +17,9 @@ router.get('/', async (req, res, next) => {
             return res.json(successResponse([]));
         }
         
-        let query = {};
-        if (limit) {
-            query = db.collection('orders').find({}).limit(parseInt(limit));
-        } else {
-            query = db.collection('orders').find({});
-        }
-        
-        const orders = await query.toArray();
+        const orders = await db.collection('orders').find({}).toArray();
         res.json(successResponse(orders));
     } catch (error) {
-        console.error('Error fetching orders:', error);
         next(new AppError('Failed to fetch orders', 500));
     }
 });
@@ -56,7 +47,6 @@ router.get('/:id', async (req, res, next) => {
         
         res.json(successResponse(order));
     } catch (error) {
-        console.error('Error fetching order:', error);
         next(new AppError('Failed to fetch order', 500));
     }
 });
@@ -64,10 +54,19 @@ router.get('/:id', async (req, res, next) => {
 // POST create new order
 router.post('/', async (req, res, next) => {
     try {
-        const { userId, serviceId, amount, status = 'pending' } = req.body;
+        const { 
+            userId, 
+            serviceId, 
+            phone, 
+            country, 
+            product, 
+            cost = 0,
+            status = 'pending',
+            provider = '5sim'
+        } = req.body;
         
-        if (!validateRequired(userId) || !validateRequired(serviceId) || !validateRequired(amount)) {
-            return res.status(400).json(errorResponse('User ID, Service ID, and Amount are required'));
+        if (!validateRequired(userId) || !validateRequired(serviceId)) {
+            return res.status(400).json(errorResponse('User ID and service ID are required'));
         }
         
         const { db } = await connectToMongoDB();
@@ -79,8 +78,12 @@ router.post('/', async (req, res, next) => {
         const newOrder = {
             userId,
             serviceId,
-            amount: parseFloat(amount) || 0,
+            phone,
+            country,
+            product,
+            cost: parseFloat(cost) || 0,
             status,
+            provider,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -88,9 +91,8 @@ router.post('/', async (req, res, next) => {
         const result = await db.collection('orders').insertOne(newOrder);
         newOrder._id = result.insertedId;
         
-        res.status(201).json(successResponse(newOrder));
+        res.status(201).json(successResponse(newOrder, 'Order created successfully'));
     } catch (error) {
-        console.error('Error creating order:', error);
         next(new AppError('Failed to create order', 500));
     }
 });
@@ -99,7 +101,15 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { status, amount } = req.body;
+        const { 
+            status, 
+            phone, 
+            sms, 
+            code,
+            cost,
+            completedAt,
+            cancelledAt
+        } = req.body;
         
         if (!validateObjectId(id)) {
             return res.status(400).json(errorResponse('Invalid order ID'));
@@ -116,7 +126,12 @@ router.put('/:id', async (req, res, next) => {
         };
         
         if (status !== undefined) updateData.status = status;
-        if (amount !== undefined) updateData.amount = parseFloat(amount) || 0;
+        if (phone !== undefined) updateData.phone = phone;
+        if (sms !== undefined) updateData.sms = sms;
+        if (code !== undefined) updateData.code = code;
+        if (cost !== undefined) updateData.cost = parseFloat(cost) || 0;
+        if (completedAt !== undefined) updateData.completedAt = completedAt;
+        if (cancelledAt !== undefined) updateData.cancelledAt = cancelledAt;
         
         const result = await db.collection('orders').updateOne(
             { _id: new ObjectId(id) },
@@ -131,7 +146,6 @@ router.put('/:id', async (req, res, next) => {
         
         res.json(successResponse(updatedOrder, 'Order updated successfully'));
     } catch (error) {
-        console.error('Error updating order:', error);
         next(new AppError('Failed to update order', 500));
     }
 });
@@ -142,40 +156,44 @@ router.get('/stats/summary', async (req, res, next) => {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            return res.status(503).json(errorResponse('Database not available'));
+            return res.json(successResponse({
+                totalOrders: 0,
+                totalRevenue: 0,
+                completedOrders: 0,
+                pendingOrders: 0,
+                cancelledOrders: 0
+            }));
         }
         
-        const pipeline = [
+        const stats = await db.collection('orders').aggregate([
             {
                 $group: {
                     _id: null,
                     totalOrders: { $sum: 1 },
-                    totalAmount: { $sum: '$amount' },
+                    totalRevenue: { $sum: '$cost' },
                     completedOrders: {
                         $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
                     },
                     pendingOrders: {
                         $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
                     },
-                    failedOrders: {
-                        $sum: { $cond: [{ $eq: ['$status', 'failed'] }, 1, 0] }
+                    cancelledOrders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
                     }
                 }
             }
-        ];
+        ]).toArray();
         
-        const stats = await db.collection('orders').aggregate(pipeline).toArray();
         const summary = stats[0] || {
             totalOrders: 0,
-            totalAmount: 0,
+            totalRevenue: 0,
             completedOrders: 0,
             pendingOrders: 0,
-            failedOrders: 0
+            cancelledOrders: 0
         };
         
         res.json(successResponse(summary));
     } catch (error) {
-        console.error('Error fetching order statistics:', error);
         next(new AppError('Failed to fetch order statistics', 500));
     }
 });

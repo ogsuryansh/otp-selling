@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 // MongoDB configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/otp_bot';
+const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'otp_bot';
 
 let client = null;
@@ -11,7 +11,7 @@ let db = null;
 async function connectToMongoDB() {
     try {
         // If no MongoDB URI is provided, return null (for development without DB)
-        if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/otp_bot') {
+        if (!MONGODB_URI) {
             console.warn('MongoDB URI not configured, running without database');
             return { db: null, client: null };
         }
@@ -34,7 +34,7 @@ async function connectToMongoDB() {
         await db.admin().ping();
         
         // Create collections if they don't exist
-        const collections = ['servers', 'services', 'apis', 'orders', 'users', 'transactions', 'promo_codes'];
+        const collections = ['servers', 'services', 'apis', 'orders', 'users', 'transactions', 'promo_codes', 'promo_usage'];
         for (const collectionName of collections) {
             try {
                 await db.createCollection(collectionName);

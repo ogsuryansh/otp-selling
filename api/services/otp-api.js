@@ -7,7 +7,7 @@ class OTPAPIService {
     constructor() {
         this.services = {
             '5sim': {
-                baseUrl: 'https://5sim.net/v1',
+                baseUrl: process.env.FIVESIM_BASE_URL || 'https://5sim.net/v1',
                 apiKey: process.env.FIVESIM_API_KEY || '',
                 endpoints: {
                     countries: '/countries',
@@ -19,7 +19,7 @@ class OTPAPIService {
                 }
             },
             'sms-activate': {
-                baseUrl: 'https://api.sms-activate.org/stubs/handler_api.php',
+                baseUrl: process.env.SMS_ACTIVATE_BASE_URL || 'https://api.sms-activate.org/stubs/handler_api.php',
                 apiKey: process.env.SMS_ACTIVATE_API_KEY || '',
                 endpoints: {
                     getNumbers: 'getNumbers',
@@ -29,7 +29,7 @@ class OTPAPIService {
                 }
             },
             'smshub': {
-                baseUrl: 'https://smshub.org/stubs/handler_api.php',
+                baseUrl: process.env.SMSHUB_BASE_URL || 'https://smshub.org/stubs/handler_api.php',
                 apiKey: process.env.SMSHUB_API_KEY || '',
                 endpoints: {
                     getNumbers: 'getNumbers',
@@ -73,7 +73,6 @@ class OTPAPIService {
             // For other services, return default countries
             return this.getDefaultCountries();
         } catch (error) {
-            console.error(`Error getting countries for ${service}:`, error);
             throw error;
         }
     }
@@ -107,7 +106,6 @@ class OTPAPIService {
             // For other services, return default products
             return this.getDefaultProducts();
         } catch (error) {
-            console.error(`Error getting products for ${service}:`, error);
             throw error;
         }
     }
@@ -160,7 +158,6 @@ class OTPAPIService {
             // For other services
             return this.buyNumberOtherService(service, country, product);
         } catch (error) {
-            console.error(`Error buying number from ${service}:`, error);
             throw error;
         }
     }
@@ -217,7 +214,6 @@ class OTPAPIService {
             // For other services
             return this.checkSMSOtherService(service, orderId);
         } catch (error) {
-            console.error(`Error checking SMS from ${service}:`, error);
             throw error;
         }
     }
@@ -257,7 +253,6 @@ class OTPAPIService {
             // For other services
             return this.finishOrderOtherService(service, orderId);
         } catch (error) {
-            console.error(`Error finishing order from ${service}:`, error);
             throw error;
         }
     }
@@ -297,7 +292,6 @@ class OTPAPIService {
             // For other services
             return this.cancelOrderOtherService(service, orderId);
         } catch (error) {
-            console.error(`Error cancelling order from ${service}:`, error);
             throw error;
         }
     }
@@ -336,7 +330,6 @@ class OTPAPIService {
             // For other services
             return this.getBalanceOtherService(service);
         } catch (error) {
-            console.error(`Error getting balance from ${service}:`, error);
             throw error;
         }
     }

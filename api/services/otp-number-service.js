@@ -1,23 +1,15 @@
 /**
- * OTP Number Selling Service - Focused on phone number operations only
- * Handles phone number purchasing, OTP receiving, and service management
- * No mail selling functionality included
+ * OTP Number Service - Enhanced service for managing phone numbers and OTP operations
+ * Integrates with multiple providers and manages orders in MongoDB
  */
 
-const { MongoClient } = require('mongodb');
+const { connectToMongoDB } = require('../config/database');
 
 class OTPNumberService {
     constructor() {
-        this.mongoUri = process.env.MONGODB_URI;
-        this.database = process.env.MONGODB_DATABASE || 'otp_bot';
-        this.client = null;
-        this.db = null;
-        
-        // Supported OTP providers
         this.providers = {
             '5sim': {
-                name: '5sim.net',
-                baseUrl: 'https://5sim.net/v1',
+                baseUrl: process.env.FIVESIM_BASE_URL || 'https://5sim.net/v1',
                 apiKey: process.env.FIVESIM_API_KEY || '',
                 endpoints: {
                     countries: '/countries',
@@ -29,8 +21,7 @@ class OTPNumberService {
                 }
             },
             'sms-activate': {
-                name: 'SMS-Activate',
-                baseUrl: 'https://api.sms-activate.org/stubs/handler_api.php',
+                baseUrl: process.env.SMS_ACTIVATE_BASE_URL || 'https://api.sms-activate.org/stubs/handler_api.php',
                 apiKey: process.env.SMS_ACTIVATE_API_KEY || '',
                 endpoints: {
                     getNumbers: 'getNumbers',
@@ -40,8 +31,7 @@ class OTPNumberService {
                 }
             },
             'smshub': {
-                name: 'SMSHub',
-                baseUrl: 'https://smshub.org/stubs/handler_api.php',
+                baseUrl: process.env.SMSHUB_BASE_URL || 'https://smshub.org/stubs/handler_api.php',
                 apiKey: process.env.SMSHUB_API_KEY || '',
                 endpoints: {
                     getNumbers: 'getNumbers',
@@ -53,57 +43,30 @@ class OTPNumberService {
         };
         
         this.activeOrders = new Map();
-        this.serviceStatus = new Map();
+        this.initDatabase();
     }
 
-    /**
-     * Connect to MongoDB
-     */
-    async connectToMongoDB() {
+    async initDatabase() {
         try {
-            if (!this.mongoUri) {
-                throw new Error('MongoDB URI not configured');
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return;
             }
-            
-            this.client = new MongoClient(this.mongoUri, {
-                serverSelectionTimeoutMS: 15000,
-                maxPoolSize: 10,
-                retryWrites: true,
-                w: 'majority'
-            });
-            
-            await this.client.connect();
-            this.db = this.client.db(this.database);
-            
-            // Initialize collections if they don't exist
-            await this.initializeCollections();
-            
-            return true;
-        } catch (error) {
-            console.error('MongoDB connection failed:', error);
-            return false;
-        }
-    }
 
-    /**
-     * Initialize required collections
-     */
-    async initializeCollections() {
-        try {
-            const collections = ['otp_orders', 'otp_services', 'otp_providers'];
-            
+            // Create collections if they don't exist
+            const collections = ['orders', 'users', 'transactions'];
             for (const collectionName of collections) {
-                const collection = this.db.collection(collectionName);
-                await collection.createIndex({ createdAt: -1 });
-                
-                if (collectionName === 'otp_orders') {
-                    await collection.createIndex({ user_id: 1 });
-                    await collection.createIndex({ status: 1 });
-                    await collection.createIndex({ provider: 1 });
+                try {
+                    await db.createCollection(collectionName);
+                } catch (error) {
+                    // Collection might already exist
+                    if (error.code !== 48) {
+                        console.warn(`Warning creating collection ${collectionName}:`, error.message);
+                    }
                 }
             }
         } catch (error) {
-            console.error('Error initializing collections:', error);
+            console.warn('Database initialization failed:', error.message);
         }
     }
 
@@ -136,13 +99,12 @@ class OTPNumberService {
             // For other providers, return default countries
             return this.getDefaultCountries();
         } catch (error) {
-            console.error(`Error getting countries for ${provider}:`, error);
             throw error;
         }
     }
 
     /**
-     * Get available products/services for a country
+     * Get available products/services
      */
     async getProducts(provider = '5sim', country = 'russia') {
         try {
@@ -164,19 +126,18 @@ class OTPNumberService {
                 }
 
                 const products = await response.json();
-                return this.formatProducts(products, provider, country);
+                return this.formatProducts(products, provider);
             }
 
             // For other providers, return default products
-            return this.getDefaultProducts(country);
+            return this.getDefaultProducts();
         } catch (error) {
-            console.error(`Error getting products for ${provider}/${country}:`, error);
             throw error;
         }
     }
 
     /**
-     * Buy a phone number for OTP
+     * Purchase a phone number
      */
     async buyNumber(provider = '5sim', country = 'russia', product = 'any', operator = 'any', userId = null) {
         try {
@@ -185,59 +146,63 @@ class OTPNumberService {
                 throw new Error(`Provider ${provider} not supported`);
             }
 
-            let orderResult;
-            
             if (provider === '5sim') {
-                const response = await fetch(`${providerConfig.baseUrl}${providerConfig.endpoints.buy}`, {
+                const response = await fetch(`${providerConfig.baseUrl}${providerConfig.endpoints.buy}/activation/${country}/${operator}/${product}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${providerConfig.apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        country: country,
-                        product: product,
-                        operator: operator
-                    })
+                        'Accept': 'application/json'
+                    }
                 });
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                orderResult = await response.json();
-            } else {
-                // For other providers, implement their specific logic
-                orderResult = await this.buyNumberFromOtherProvider(provider, country, product, operator);
+                const order = await response.json();
+                
+                // Store order information
+                this.activeOrders.set(order.id, {
+                    provider,
+                    order,
+                    timestamp: Date.now(),
+                    status: 'waiting'
+                });
+
+                // Save to database if available
+                await this.saveOrder({
+                    orderId: order.id,
+                    phone: order.phone,
+                    country: country,
+                    product: product,
+                    provider: provider,
+                    cost: order.cost,
+                    userId: userId,
+                    status: 'waiting',
+                    createdAt: new Date()
+                });
+
+                return {
+                    success: true,
+                    orderId: order.id,
+                    phone: order.phone,
+                    country: country,
+                    product: product,
+                    cost: order.cost,
+                    provider: provider,
+                    expires: order.expires || (Date.now() + 20 * 60 * 1000) // 20 minutes default
+                };
             }
 
-            // Save order to database
-            const order = {
-                order_id: orderResult.id || orderResult.phone,
-                provider: provider,
-                country: country,
-                product: product,
-                operator: operator,
-                phone: orderResult.phone,
-                status: 'pending',
-                user_id: userId,
-                created_at: new Date(),
-                updated_at: new Date(),
-                provider_data: orderResult
-            };
-
-            await this.saveOrder(order);
-            this.activeOrders.set(order.order_id, order);
-
-            return order;
+            // For other providers
+            return this.buyNumberOtherProvider(provider, country, product, userId);
         } catch (error) {
-            console.error(`Error buying number from ${provider}:`, error);
             throw error;
         }
     }
 
     /**
-     * Check for OTP/SMS messages
+     * Check for SMS/OTP
      */
     async checkSMS(provider = '5sim', orderId) {
         try {
@@ -246,8 +211,6 @@ class OTPNumberService {
                 throw new Error(`Provider ${provider} not supported`);
             }
 
-            let smsResult;
-            
             if (provider === '5sim') {
                 const response = await fetch(`${providerConfig.baseUrl}${providerConfig.endpoints.check}/${orderId}`, {
                     headers: {
@@ -260,32 +223,50 @@ class OTPNumberService {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                smsResult = await response.json();
-            } else {
-                // For other providers, implement their specific logic
-                smsResult = await this.checkSMSFromOtherProvider(provider, orderId);
-            }
+                const result = await response.json();
+                
+                if (result.sms && result.sms.length > 0) {
+                    // Update order status
+                    const order = this.activeOrders.get(orderId);
+                    if (order) {
+                        order.status = 'received';
+                        order.sms = result.sms;
+                    }
 
-            // Update order with SMS data
-            if (smsResult.sms && smsResult.sms.length > 0) {
-                const order = await this.getOrder(orderId);
-                if (order) {
-                    order.sms = smsResult.sms;
-                    order.status = 'sms_received';
-                    order.updated_at = new Date();
-                    await this.updateOrder(order);
+                    // Update in database
+                    await this.updateOrder(orderId, {
+                        status: 'received',
+                        sms: result.sms,
+                        code: this.extractCode(result.sms[0].text),
+                        receivedAt: new Date()
+                    });
+
+                    return {
+                        success: true,
+                        sms: result.sms,
+                        code: this.extractCode(result.sms[0].text),
+                        fullText: result.sms[0].text,
+                        sender: result.sms[0].sender,
+                        timestamp: result.sms[0].date
+                    };
                 }
+
+                return {
+                    success: true,
+                    sms: [],
+                    waiting: true
+                };
             }
 
-            return smsResult;
+            // For other providers
+            return this.checkSMSOtherProvider(provider, orderId);
         } catch (error) {
-            console.error(`Error checking SMS from ${provider}:`, error);
             throw error;
         }
     }
 
     /**
-     * Finish/complete an order
+     * Finish order (mark as completed)
      */
     async finishOrder(provider = '5sim', orderId) {
         try {
@@ -294,8 +275,6 @@ class OTPNumberService {
                 throw new Error(`Provider ${provider} not supported`);
             }
 
-            let finishResult;
-            
             if (provider === '5sim') {
                 const response = await fetch(`${providerConfig.baseUrl}${providerConfig.endpoints.finish}/${orderId}`, {
                     method: 'POST',
@@ -309,33 +288,30 @@ class OTPNumberService {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                finishResult = await response.json();
-            } else {
-                // For other providers, implement their specific logic
-                finishResult = await this.finishOrderFromOtherProvider(provider, orderId);
+                // Update order status
+                const order = this.activeOrders.get(orderId);
+                if (order) {
+                    order.status = 'completed';
+                }
+
+                // Update in database
+                await this.updateOrder(orderId, {
+                    status: 'completed',
+                    completedAt: new Date()
+                });
+
+                return { success: true };
             }
 
-            // Update order status
-            const order = await this.getOrder(orderId);
-            if (order) {
-                order.status = 'completed';
-                order.updated_at = new Date();
-                order.completed_at = new Date();
-                await this.updateOrder(order);
-            }
-
-            // Remove from active orders
-            this.activeOrders.delete(orderId);
-
-            return finishResult;
+            // For other providers
+            return this.finishOrderOtherProvider(provider, orderId);
         } catch (error) {
-            console.error(`Error finishing order from ${provider}:`, error);
             throw error;
         }
     }
 
     /**
-     * Cancel an order
+     * Cancel order
      */
     async cancelOrder(provider = '5sim', orderId) {
         try {
@@ -344,8 +320,6 @@ class OTPNumberService {
                 throw new Error(`Provider ${provider} not supported`);
             }
 
-            let cancelResult;
-            
             if (provider === '5sim') {
                 const response = await fetch(`${providerConfig.baseUrl}${providerConfig.endpoints.cancel}/${orderId}`, {
                     method: 'POST',
@@ -359,27 +333,24 @@ class OTPNumberService {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                cancelResult = await response.json();
-            } else {
-                // For other providers, implement their specific logic
-                cancelResult = await this.cancelOrderFromOtherProvider(provider, orderId);
+                // Update order status
+                const order = this.activeOrders.get(orderId);
+                if (order) {
+                    order.status = 'cancelled';
+                }
+
+                // Update in database
+                await this.updateOrder(orderId, {
+                    status: 'cancelled',
+                    cancelledAt: new Date()
+                });
+
+                return { success: true };
             }
 
-            // Update order status
-            const order = await this.getOrder(orderId);
-            if (order) {
-                order.status = 'cancelled';
-                order.updated_at = new Date();
-                order.cancelled_at = new Date();
-                await this.updateOrder(order);
-            }
-
-            // Remove from active orders
-            this.activeOrders.delete(orderId);
-
-            return cancelResult;
+            // For other providers
+            return this.cancelOrderOtherProvider(provider, orderId);
         } catch (error) {
-            console.error(`Error cancelling order from ${provider}:`, error);
             throw error;
         }
     }
@@ -408,52 +379,37 @@ class OTPNumberService {
 
                 const profile = await response.json();
                 return {
-                    balance: profile.balance || 0,
-                    currency: profile.currency || 'RUB',
-                    provider: provider
+                    success: true,
+                    balance: profile.balance,
+                    email: profile.email,
+                    status: profile.status
                 };
             }
 
-            // For other providers, implement their specific logic
-            return await this.getBalanceFromOtherProvider(provider);
+            // For other providers
+            return this.getBalanceOtherProvider(provider);
         } catch (error) {
-            console.error(`Error getting balance from ${provider}:`, error);
             throw error;
         }
     }
 
     /**
-     * Get all orders for a user
+     * Get user orders
      */
-    async getUserOrders(userId, limit = 50, page = 1) {
+    async getUserOrders(userId) {
         try {
-            if (!this.db) {
-                await this.connectToMongoDB();
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return [];
             }
 
-            const collection = this.db.collection('otp_orders');
-            const skip = (page - 1) * limit;
-
-            const orders = await collection
-                .find({ user_id: userId })
-                .sort({ created_at: -1 })
-                .skip(skip)
-                .limit(limit)
+            const orders = await db.collection('orders')
+                .find({ userId: userId })
+                .sort({ createdAt: -1 })
                 .toArray();
 
-            const total = await collection.countDocuments({ user_id: userId });
-
-            return {
-                orders,
-                pagination: {
-                    page,
-                    limit,
-                    total,
-                    totalPages: Math.ceil(total / limit)
-                }
-            };
+            return orders;
         } catch (error) {
-            console.error('Error getting user orders:', error);
             throw error;
         }
     }
@@ -463,168 +419,194 @@ class OTPNumberService {
      */
     async getOrderStatistics(userId = null) {
         try {
-            if (!this.db) {
-                await this.connectToMongoDB();
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return {
+                    total: 0,
+                    completed: 0,
+                    pending: 0,
+                    cancelled: 0,
+                    totalEarnings: 0
+                };
             }
 
-            const collection = this.db.collection('otp_orders');
-            let matchStage = {};
+            const matchStage = userId ? { userId: userId } : {};
             
-            if (userId) {
-                matchStage.user_id = userId;
-            }
-
-            const stats = await collection.aggregate([
+            const stats = await db.collection('orders').aggregate([
                 { $match: matchStage },
                 {
                     $group: {
-                        _id: '$status',
-                        count: { $sum: 1 },
-                        total_cost: { $sum: '$cost' || 0 }
+                        _id: null,
+                        total: { $sum: 1 },
+                        totalEarnings: { $sum: '$cost' },
+                        completed: {
+                            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                        },
+                        pending: {
+                            $sum: { $cond: [{ $eq: ['$status', 'waiting'] }, 1, 0] }
+                        },
+                        cancelled: {
+                            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
+                        }
                     }
                 }
             ]).toArray();
 
-            const totalOrders = await collection.countDocuments(matchStage);
-            const totalCost = await collection.aggregate([
-                { $match: matchStage },
-                { $group: { _id: null, total: { $sum: '$cost' || 0 } } }
-            ]).toArray();
-
-            return {
-                totalOrders,
-                totalCost: totalCost[0]?.total || 0,
-                byStatus: stats,
-                activeOrders: this.activeOrders.size
+            return stats[0] || {
+                total: 0,
+                completed: 0,
+                pending: 0,
+                cancelled: 0,
+                totalEarnings: 0
             };
         } catch (error) {
-            console.error('Error getting order statistics:', error);
             throw error;
         }
     }
 
-    // Database operations
-    async saveOrder(order) {
+    /**
+     * Save order to database
+     */
+    async saveOrder(orderData) {
         try {
-            if (!this.db) {
-                await this.connectToMongoDB();
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return null;
             }
 
-            const collection = this.db.collection('otp_orders');
-            await collection.insertOne(order);
+            const result = await db.collection('orders').insertOne(orderData);
+            return result.insertedId;
         } catch (error) {
-            console.error('Error saving order:', error);
             throw error;
         }
     }
 
+    /**
+     * Get order from database
+     */
     async getOrder(orderId) {
         try {
-            if (!this.db) {
-                await this.connectToMongoDB();
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return null;
             }
 
-            const collection = this.db.collection('otp_orders');
-            return await collection.findOne({ order_id: orderId });
+            const order = await db.collection('orders').findOne({ orderId: orderId });
+            return order;
         } catch (error) {
-            console.error('Error getting order:', error);
             throw error;
         }
     }
 
-    async updateOrder(order) {
+    /**
+     * Update order in database
+     */
+    async updateOrder(orderId, updateData) {
         try {
-            if (!this.db) {
-                await this.connectToMongoDB();
+            const { db } = await connectToMongoDB();
+            if (!db) {
+                return false;
             }
 
-            const collection = this.db.collection('otp_orders');
-            await collection.updateOne(
-                { order_id: order.order_id },
-                { $set: order }
+            const result = await db.collection('orders').updateOne(
+                { orderId: orderId },
+                { $set: { ...updateData, updatedAt: new Date() } }
             );
+
+            return result.modifiedCount > 0;
         } catch (error) {
-            console.error('Error updating order:', error);
             throw error;
         }
     }
 
-    // Helper methods
+    /**
+     * Get active orders
+     */
+    getActiveOrders() {
+        return Array.from(this.activeOrders.entries()).map(([id, order]) => ({
+            id,
+            ...order
+        }));
+    }
+
+    /**
+     * Helper methods
+     */
     formatCountries(countries, provider) {
         if (provider === '5sim') {
-            return Object.entries(countries).map(([code, data]) => ({
+            return Object.keys(countries).map(code => ({
                 code,
-                name: data.country,
-                flag: data.flag || '',
-                count: data.count || 0
+                name: countries[code].title,
+                flag: countries[code].flag,
+                products: countries[code].products
             }));
         }
-        return countries;
+        return [];
     }
 
-    formatProducts(products, provider, country) {
+    formatProducts(products, provider) {
         if (provider === '5sim') {
-            return Object.entries(products).map(([service, data]) => ({
-                service,
-                name: data.name || service,
-                count: data.count || 0,
-                price: data.price || 0,
-                cost: data.cost || 0
+            return Object.keys(products).map(name => ({
+                name,
+                count: products[name].count,
+                price: products[name].price,
+                operators: products[name].operators
             }));
         }
-        return products;
+        return [];
     }
 
     getDefaultCountries() {
         return [
-            { code: 'russia', name: 'Russia', flag: '🇷🇺', count: 1000 },
-            { code: 'usa', name: 'United States', flag: '🇺🇸', count: 500 },
-            { code: 'uk', name: 'United Kingdom', flag: '🇬🇧', count: 300 },
-            { code: 'germany', name: 'Germany', flag: '🇩🇪', count: 250 },
-            { code: 'france', name: 'France', flag: '🇫🇷', count: 200 }
+            { code: 'russia', name: 'Russia', flag: '🇷🇺' },
+            { code: 'ukraine', name: 'Ukraine', flag: '🇺🇦' },
+            { code: 'kazakhstan', name: 'Kazakhstan', flag: '🇰🇿' },
+            { code: 'china', name: 'China', flag: '🇨🇳' },
+            { code: 'usa', name: 'United States', flag: '🇺🇸' },
+            { code: 'india', name: 'India', flag: '🇮🇳' }
         ];
     }
 
-    getDefaultProducts(country) {
+    getDefaultProducts() {
         return [
-            { service: 'telegram', name: 'Telegram', count: 100, price: 10, cost: 10 },
-            { service: 'whatsapp', name: 'WhatsApp', count: 80, price: 15, cost: 15 },
-            { service: 'uber', name: 'Uber', count: 50, price: 20, cost: 20 },
-            { service: 'gmail', name: 'Gmail', count: 120, price: 25, cost: 25 }
+            { name: 'any', count: 100, price: 1.0 },
+            { name: 'google', count: 50, price: 1.5 },
+            { name: 'whatsapp', count: 30, price: 2.0 },
+            { name: 'telegram', count: 25, price: 2.5 },
+            { name: 'uber', count: 20, price: 3.0 }
         ];
+    }
+
+    extractCode(smsText) {
+        // Extract 4-6 digit code from SMS text
+        const codeMatch = smsText.match(/\b\d{4,6}\b/);
+        return codeMatch ? codeMatch[0] : null;
     }
 
     // Placeholder methods for other providers
-    async buyNumberFromOtherProvider(provider, country, product, operator) {
-        // Implement specific logic for other providers
-        throw new Error(`Buy number not implemented for ${provider}`);
+    async buyNumberOtherProvider(provider, country, product, userId) {
+        // Implementation for other providers
+        throw new Error(`${provider} integration not implemented yet`);
     }
 
-    async checkSMSFromOtherProvider(provider, orderId) {
-        // Implement specific logic for other providers
-        throw new Error(`Check SMS not implemented for ${provider}`);
+    async checkSMSOtherProvider(provider, orderId) {
+        // Implementation for other providers
+        throw new Error(`${provider} integration not implemented yet`);
     }
 
-    async finishOrderFromOtherProvider(provider, orderId) {
-        // Implement specific logic for other providers
-        throw new Error(`Finish order not implemented for ${provider}`);
+    async finishOrderOtherProvider(provider, orderId) {
+        // Implementation for other providers
+        throw new Error(`${provider} integration not implemented yet`);
     }
 
-    async cancelOrderFromOtherProvider(provider, orderId) {
-        // Implement specific logic for other providers
-        throw new Error(`Cancel order not implemented for ${provider}`);
+    async cancelOrderOtherProvider(provider, orderId) {
+        // Implementation for other providers
+        throw new Error(`${provider} integration not implemented yet`);
     }
 
-    async getBalanceFromOtherProvider(provider) {
-        // Implement specific logic for other providers
-        throw new Error(`Get balance not implemented for ${provider}`);
-    }
-
-    // Cleanup
-    async close() {
-        if (this.client) {
-            await this.client.close();
-        }
+    async getBalanceOtherProvider(provider) {
+        // Implementation for other providers
+        throw new Error(`${provider} integration not implemented yet`);
     }
 }
 

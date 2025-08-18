@@ -2,7 +2,7 @@ const express = require('express');
 const { ObjectId } = require('mongodb');
 const { connectToMongoDB } = require('../config/database');
 const { successResponse, errorResponse } = require('../middleware/logger');
-const { validateRequired, validateObjectId } = require('../utils/validation');
+const { validateRequired, validateObjectId, validateEmail } = require('../utils/validation');
 const { AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
@@ -20,7 +20,6 @@ router.get('/', async (req, res, next) => {
         const users = await db.collection('users').find({}).toArray();
         res.json(successResponse(users));
     } catch (error) {
-        console.error('Error fetching users:', error);
         next(new AppError('Failed to fetch users', 500));
     }
 });
@@ -48,7 +47,6 @@ router.get('/:id', async (req, res, next) => {
         
         res.json(successResponse(user));
     } catch (error) {
-        console.error('Error fetching user:', error);
         next(new AppError('Failed to fetch user', 500));
     }
 });
@@ -56,10 +54,23 @@ router.get('/:id', async (req, res, next) => {
 // POST create new user
 router.post('/', async (req, res, next) => {
     try {
-        const { username, telegramId, balance = 0, status = 'active' } = req.body;
+        const { 
+            username, 
+            email, 
+            password, 
+            role = 'user',
+            status = 'active',
+            balance = 0
+        } = req.body;
         
-        if (!validateRequired(username) || !validateRequired(telegramId)) {
-            return res.status(400).json(errorResponse('Username and Telegram ID are required'));
+        if (!validateRequired(username) || !validateRequired(email)) {
+            return res.status(400).json(errorResponse('Username and email are required'));
+        }
+        
+        try {
+            validateEmail(email);
+        } catch (error) {
+            return res.status(400).json(errorResponse('Invalid email format'));
         }
         
         const { db } = await connectToMongoDB();
@@ -69,16 +80,21 @@ router.post('/', async (req, res, next) => {
         }
         
         // Check if user already exists
-        const existingUser = await db.collection('users').findOne({ telegramId });
+        const existingUser = await db.collection('users').findOne({ 
+            $or: [{ email }, { username }] 
+        });
+        
         if (existingUser) {
-            return res.status(409).json(errorResponse('User with this Telegram ID already exists'));
+            return res.status(400).json(errorResponse('User with this email or username already exists'));
         }
         
         const newUser = {
             username,
-            telegramId,
-            balance: parseFloat(balance) || 0,
+            email,
+            password: password || '', // In production, hash the password
+            role,
             status,
+            balance: parseFloat(balance) || 0,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -86,9 +102,11 @@ router.post('/', async (req, res, next) => {
         const result = await db.collection('users').insertOne(newUser);
         newUser._id = result.insertedId;
         
-        res.status(201).json(successResponse(newUser));
+        // Remove password from response
+        delete newUser.password;
+        
+        res.status(201).json(successResponse(newUser, 'User created successfully'));
     } catch (error) {
-        console.error('Error creating user:', error);
         next(new AppError('Failed to create user', 500));
     }
 });
@@ -97,7 +115,14 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { username, telegramId, balance, status, action, banReason } = req.body;
+        const { 
+            username, 
+            email, 
+            password, 
+            role, 
+            status,
+            balance
+        } = req.body;
         
         if (!validateObjectId(id)) {
             return res.status(400).json(errorResponse('Invalid user ID'));
@@ -109,47 +134,23 @@ router.put('/:id', async (req, res, next) => {
             return res.status(503).json(errorResponse('Database not available'));
         }
         
-        // Get current user
-        const currentUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
-        if (!currentUser) {
-            return res.status(404).json(errorResponse('User not found'));
-        }
-        
         const updateData = {
             updatedAt: new Date()
         };
         
-        // Handle balance updates
-        if (balance !== undefined) {
-            let newBalance = currentUser.balance || 0;
-            
-            if (action === 'add_balance') {
-                newBalance += parseFloat(balance) || 0;
-            } else if (action === 'cut_balance') {
-                newBalance -= parseFloat(balance) || 0;
-                if (newBalance < 0) newBalance = 0; // Prevent negative balance
-            } else {
-                newBalance = parseFloat(balance) || 0;
-            }
-            
-            updateData.balance = newBalance;
-        }
-        
-        // Handle status updates
-        if (status !== undefined) {
-            updateData.status = status;
-            if (status === 'banned' && banReason) {
-                updateData.banReason = banReason;
-                updateData.bannedAt = new Date();
-            } else if (status === 'active') {
-                updateData.banReason = null;
-                updateData.bannedAt = null;
-            }
-        }
-        
-        // Handle other field updates
         if (username !== undefined) updateData.username = username;
-        if (telegramId !== undefined) updateData.telegramId = telegramId;
+        if (email !== undefined) {
+            try {
+                validateEmail(email);
+                updateData.email = email;
+            } catch (error) {
+                return res.status(400).json(errorResponse('Invalid email format'));
+            }
+        }
+        if (password !== undefined) updateData.password = password; // In production, hash the password
+        if (role !== undefined) updateData.role = role;
+        if (status !== undefined) updateData.status = status;
+        if (balance !== undefined) updateData.balance = parseFloat(balance) || 0;
         
         const result = await db.collection('users').updateOne(
             { _id: new ObjectId(id) },
@@ -160,12 +161,15 @@ router.put('/:id', async (req, res, next) => {
             return res.status(404).json(errorResponse('User not found'));
         }
         
-        // Get updated user
         const updatedUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        
+        // Remove password from response
+        if (updatedUser) {
+            delete updatedUser.password;
+        }
         
         res.json(successResponse(updatedUser, 'User updated successfully'));
     } catch (error) {
-        console.error('Error updating user:', error);
         next(new AppError('Failed to update user', 500));
     }
 });
@@ -193,47 +197,51 @@ router.delete('/:id', async (req, res, next) => {
         
         res.json(successResponse(null, 'User deleted successfully'));
     } catch (error) {
-        console.error('Error deleting user:', error);
         next(new AppError('Failed to delete user', 500));
     }
 });
 
 // GET user statistics
-router.get('/stats/summary', async (req, res, next) => {
+router.get('/:id/stats', async (req, res, next) => {
     try {
+        const { id } = req.params;
+        
+        if (!validateObjectId(id)) {
+            return res.status(400).json(errorResponse('Invalid user ID'));
+        }
+        
         const { db } = await connectToMongoDB();
         
         if (!db) {
             return res.status(503).json(errorResponse('Database not available'));
         }
         
-        const pipeline = [
+        const stats = await db.collection('orders').aggregate([
+            { $match: { userId: id } },
             {
                 $group: {
                     _id: null,
-                    totalUsers: { $sum: 1 },
-                    totalBalance: { $sum: '$balance' },
-                    activeUsers: {
-                        $sum: { $cond: [{ $eq: ['$status', 'active'] }, 1, 0] }
+                    totalOrders: { $sum: 1 },
+                    totalSpent: { $sum: '$cost' },
+                    completedOrders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
                     },
-                    bannedUsers: {
-                        $sum: { $cond: [{ $eq: ['$status', 'banned'] }, 1, 0] }
+                    pendingOrders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'waiting'] }, 1, 0] }
                     }
                 }
             }
-        ];
+        ]).toArray();
         
-        const stats = await db.collection('users').aggregate(pipeline).toArray();
-        const summary = stats[0] || {
-            totalUsers: 0,
-            totalBalance: 0,
-            activeUsers: 0,
-            bannedUsers: 0
+        const userStats = stats[0] || {
+            totalOrders: 0,
+            totalSpent: 0,
+            completedOrders: 0,
+            pendingOrders: 0
         };
         
-        res.json(successResponse(summary));
+        res.json(successResponse(userStats));
     } catch (error) {
-        console.error('Error fetching user statistics:', error);
         next(new AppError('Failed to fetch user statistics', 500));
     }
 });

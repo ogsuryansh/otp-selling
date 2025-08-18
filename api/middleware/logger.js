@@ -1,10 +1,5 @@
-// Logging middleware
+// Logger middleware
 function logger(req, res, next) {
-    // Disable logging in production
-    if (process.env.NODE_ENV === 'production') {
-        return next();
-    }
-    
     const start = Date.now();
     
     // Log request in development only
@@ -12,9 +7,10 @@ function logger(req, res, next) {
         console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
     }
     
-    // Log response time
     res.on('finish', () => {
         const duration = Date.now() - start;
+        
+        // Log response in development only
         if (process.env.NODE_ENV === 'development') {
             console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
         }
@@ -28,16 +24,18 @@ function successResponse(data, message = 'Success') {
     return {
         success: true,
         message,
-        data
+        data,
+        timestamp: new Date().toISOString()
     };
 }
 
 // Error response helper
-function errorResponse(message = 'Error occurred', statusCode = 500) {
+function errorResponse(message, status = 400) {
     return {
         success: false,
         message,
-        statusCode
+        status,
+        timestamp: new Date().toISOString()
     };
 }
 

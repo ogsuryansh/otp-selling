@@ -16,6 +16,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const apisRoutes = require('./routes/apis');
 const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
+const promoCodesRoutes = require('./routes/promo-codes');
 
 // Import database config
 const { connectToMongoDB } = require('./config/database');
@@ -57,6 +58,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/apis', apisRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/promo-codes', promoCodesRoutes);
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -139,27 +141,21 @@ app.get('/promo-codes', (req, res) => {
     res.sendFile(path.join(__dirname, '../promo-codes/index.html'));
 });
 
-
-
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
 // Connect to MongoDB on startup
 connectToMongoDB().then(({ db }) => {
     if (db && process.env.NODE_ENV === 'development') {
-        console.log('✅ MongoDB connected successfully on startup');
-    } else if (!db && process.env.NODE_ENV === 'development') {
-        console.log('❌ MongoDB connection failed on startup');
+        console.log('✅ MongoDB connected successfully');
     }
 });
 
 // Start local server for development
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
-        console.log(`🚀 Local development server running on http://localhost:${PORT}`);
-        console.log(`📁 Serving files from: ${__dirname}`);
+        console.log(`🚀 Server running on port ${PORT}`);
         console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🗄️ MongoDB: ${process.env.MONGODB_URI ? 'Connected' : 'Not configured'}`);
     });
 }
 

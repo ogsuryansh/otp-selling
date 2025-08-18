@@ -313,11 +313,16 @@
             try {
                 const response = await fetch(`/api/promo-codes/${id}`);
                 if (response.ok) {
-                    const promo = await response.json();
+                    const result = await response.json();
+                    const promo = result.data || result;
+                    
+                    // Format the expiry date for datetime-local input
+                    const expiryDate = promo.expiryDate ? new Date(promo.expiryDate).toISOString().slice(0, 16) : '';
+                    
                     document.getElementById('promoCode').value = promo.code || '';
                     document.getElementById('amount').value = promo.amount || '';
                     document.getElementById('usageLimit').value = promo.usageLimit || '';
-                    document.getElementById('expiryDate').value = promo.expiryDate || '';
+                    document.getElementById('expiryDate').value = expiryDate;
                     document.getElementById('description').value = promo.description || '';
                     document.getElementById('status').value = promo.status || 'active';
                 }
@@ -401,17 +406,42 @@
             try {
                 const response = await fetch('/api/promo-codes');
                 if (response.ok) {
-                    const promoCodes = await response.json();
+                    const result = await response.json();
+                    const promoCodes = result.data || result;
                     updatePromoCodesList(promoCodes);
                 } else {
                     console.error('Failed to load promo codes');
+                    // Use mock data for now
+                    const mockPromoCodes = [
+                        {
+                            _id: '1',
+                            code: 'WELCOME50',
+                            amount: 50,
+                            usageLimit: 100,
+                            usedCount: 25,
+                            status: 'active',
+                            expiryDate: '2024-12-31T23:59:59',
+                            description: 'Welcome bonus for new users'
+                        },
+                        {
+                            _id: '2',
+                            code: 'BONUS100',
+                            amount: 100,
+                            usageLimit: 50,
+                            usedCount: 10,
+                            status: 'active',
+                            expiryDate: '2024-06-30T23:59:59',
+                            description: 'Special bonus code'
+                        }
+                    ];
+                    updatePromoCodesList(mockPromoCodes);
                 }
             } catch (error) {
                 console.error('Promo codes loading failed:', error);
                 // Use mock data for now
                 const mockPromoCodes = [
                     {
-                        id: '1',
+                        _id: '1',
                         code: 'WELCOME50',
                         amount: 50,
                         usageLimit: 100,
@@ -421,7 +451,7 @@
                         description: 'Welcome bonus for new users'
                     },
                     {
-                        id: '2',
+                        _id: '2',
                         code: 'BONUS100',
                         amount: 100,
                         usageLimit: 50,
@@ -470,8 +500,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(promo.expiryDate).toLocaleDateString()}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="editPromo('${promo.id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
-                            <button onclick="deletePromo('${promo.id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                            <button onclick="editPromo('${promo._id}')" class="text-primary hover:text-secondary mr-3">Edit</button>
+                            <button onclick="deletePromo('${promo._id}')" class="text-red-600 hover:text-red-900">Delete</button>
                         </td>
                     </tr>
                 `;

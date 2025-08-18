@@ -20,7 +20,6 @@ router.get('/', async (req, res, next) => {
         const apis = await db.collection('apis').find({}).toArray();
         res.json(successResponse(apis));
     } catch (error) {
-        console.error('Error fetching APIs:', error);
         next(new AppError('Failed to fetch APIs', 500));
     }
 });
@@ -48,7 +47,6 @@ router.get('/:id', async (req, res, next) => {
         
         res.json(successResponse(api));
     } catch (error) {
-        console.error('Error fetching API:', error);
         next(new AppError('Failed to fetch API', 500));
     }
 });
@@ -58,21 +56,16 @@ router.post('/', async (req, res, next) => {
     try {
         const { 
             name, 
-            serverId, 
-            authHeaders, 
-            responseType, 
-            getNumberUrl, 
-            getMessageUrl, 
-            responseStartsWith, 
-            activateNextUrl, 
-            cancelNumberUrl, 
-            autoCancelMinutes, 
-            retryTimes, 
-            status = 'active' 
+            baseUrl, 
+            apiKey, 
+            provider = '5sim',
+            status = 'active',
+            description = '',
+            endpoints = {}
         } = req.body;
         
-        if (!validateRequired(name) || !validateRequired(serverId)) {
-            return res.status(400).json(errorResponse('API name and server ID are required'));
+        if (!validateRequired(name) || !validateRequired(baseUrl)) {
+            return res.status(400).json(errorResponse('Name and base URL are required'));
         }
         
         const { db } = await connectToMongoDB();
@@ -83,17 +76,12 @@ router.post('/', async (req, res, next) => {
         
         const newApi = {
             name,
-            serverId,
-            authHeaders: Boolean(authHeaders),
-            responseType: responseType || 'text',
-            getNumberUrl,
-            getMessageUrl,
-            responseStartsWith,
-            activateNextUrl,
-            cancelNumberUrl,
-            autoCancelMinutes: parseInt(autoCancelMinutes) || 5,
-            retryTimes: parseInt(retryTimes) || 0,
+            baseUrl,
+            apiKey: apiKey || '',
+            provider,
             status,
+            description,
+            endpoints,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -101,9 +89,8 @@ router.post('/', async (req, res, next) => {
         const result = await db.collection('apis').insertOne(newApi);
         newApi._id = result.insertedId;
         
-        res.status(201).json(successResponse(newApi));
+        res.status(201).json(successResponse(newApi, 'API created successfully'));
     } catch (error) {
-        console.error('Error creating API:', error);
         next(new AppError('Failed to create API', 500));
     }
 });
@@ -114,17 +101,12 @@ router.put('/:id', async (req, res, next) => {
         const { id } = req.params;
         const { 
             name, 
-            serverId, 
-            authHeaders, 
-            responseType, 
-            getNumberUrl, 
-            getMessageUrl, 
-            responseStartsWith, 
-            activateNextUrl, 
-            cancelNumberUrl, 
-            autoCancelMinutes, 
-            retryTimes, 
-            status 
+            baseUrl, 
+            apiKey, 
+            provider, 
+            status,
+            description,
+            endpoints
         } = req.body;
         
         if (!validateObjectId(id)) {
@@ -142,17 +124,12 @@ router.put('/:id', async (req, res, next) => {
         };
         
         if (name !== undefined) updateData.name = name;
-        if (serverId !== undefined) updateData.serverId = serverId;
-        if (authHeaders !== undefined) updateData.authHeaders = Boolean(authHeaders);
-        if (responseType !== undefined) updateData.responseType = responseType;
-        if (getNumberUrl !== undefined) updateData.getNumberUrl = getNumberUrl;
-        if (getMessageUrl !== undefined) updateData.getMessageUrl = getMessageUrl;
-        if (responseStartsWith !== undefined) updateData.responseStartsWith = responseStartsWith;
-        if (activateNextUrl !== undefined) updateData.activateNextUrl = activateNextUrl;
-        if (cancelNumberUrl !== undefined) updateData.cancelNumberUrl = cancelNumberUrl;
-        if (autoCancelMinutes !== undefined) updateData.autoCancelMinutes = parseInt(autoCancelMinutes) || 5;
-        if (retryTimes !== undefined) updateData.retryTimes = parseInt(retryTimes) || 0;
+        if (baseUrl !== undefined) updateData.baseUrl = baseUrl;
+        if (apiKey !== undefined) updateData.apiKey = apiKey;
+        if (provider !== undefined) updateData.provider = provider;
         if (status !== undefined) updateData.status = status;
+        if (description !== undefined) updateData.description = description;
+        if (endpoints !== undefined) updateData.endpoints = endpoints;
         
         const result = await db.collection('apis').updateOne(
             { _id: new ObjectId(id) },
@@ -167,7 +144,6 @@ router.put('/:id', async (req, res, next) => {
         
         res.json(successResponse(updatedApi, 'API updated successfully'));
     } catch (error) {
-        console.error('Error updating API:', error);
         next(new AppError('Failed to update API', 500));
     }
 });
@@ -195,7 +171,6 @@ router.delete('/:id', async (req, res, next) => {
         
         res.json(successResponse(null, 'API deleted successfully'));
     } catch (error) {
-        console.error('Error deleting API:', error);
         next(new AppError('Failed to delete API', 500));
     }
 });

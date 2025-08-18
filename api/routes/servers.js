@@ -20,7 +20,6 @@ router.get('/', async (req, res, next) => {
         const servers = await db.collection('servers').find({}).toArray();
         res.json(successResponse(servers));
     } catch (error) {
-        console.error('Error fetching servers:', error);
         next(new AppError('Failed to fetch servers', 500));
     }
 });
@@ -48,7 +47,6 @@ router.get('/:id', async (req, res, next) => {
         
         res.json(successResponse(server));
     } catch (error) {
-        console.error('Error fetching server:', error);
         next(new AppError('Failed to fetch server', 500));
     }
 });
@@ -81,9 +79,8 @@ router.post('/', async (req, res, next) => {
         const result = await db.collection('servers').insertOne(newServer);
         newServer._id = result.insertedId;
         
-        res.status(201).json(successResponse(newServer));
+        res.status(201).json(successResponse(newServer, 'Server created successfully'));
     } catch (error) {
-        console.error('Error creating server:', error);
         next(new AppError('Failed to create server', 500));
     }
 });
@@ -127,8 +124,34 @@ router.put('/:id', async (req, res, next) => {
         
         res.json(successResponse(updatedServer, 'Server updated successfully'));
     } catch (error) {
-        console.error('Error updating server:', error);
         next(new AppError('Failed to update server', 500));
+    }
+});
+
+// DELETE server
+router.delete('/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        
+        if (!validateObjectId(id)) {
+            return res.status(400).json(errorResponse('Invalid server ID'));
+        }
+        
+        const { db } = await connectToMongoDB();
+        
+        if (!db) {
+            return res.status(503).json(errorResponse('Database not available'));
+        }
+        
+        const result = await db.collection('servers').deleteOne({ _id: new ObjectId(id) });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json(errorResponse('Server not found'));
+        }
+        
+        res.json(successResponse(null, 'Server deleted successfully'));
+    } catch (error) {
+        next(new AppError('Failed to delete server', 500));
     }
 });
 

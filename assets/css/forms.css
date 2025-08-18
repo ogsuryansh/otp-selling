@@ -1,0 +1,273 @@
+/* Modern Form Design System - Fixes all form design issues */
+
+/* Base Form Styles */
+.form-container {
+    @apply max-w-md mx-auto bg-white rounded-xl shadow-2xl border border-gray-100;
+}
+
+.form-header {
+    @apply flex items-center justify-between p-6 border-b border-gray-100;
+}
+
+.form-title {
+    @apply text-xl font-semibold text-gray-900;
+}
+
+.form-close-btn {
+    @apply p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-200;
+}
+
+.form-body {
+    @apply p-6 space-y-6;
+}
+
+.form-group {
+    @apply space-y-2;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500;
+}
+
+.form-input:disabled {
+    @apply bg-gray-50 text-gray-600 cursor-not-allowed;
+}
+
+.form-input.error {
+    @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.form-input.success {
+    @apply border-green-300 focus:ring-green-500 focus:border-green-500;
+}
+
+.form-textarea {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500 resize-none;
+    min-height: 100px;
+}
+
+.form-select {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 bg-white;
+}
+
+.form-checkbox {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded;
+}
+
+.form-radio {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300;
+}
+
+/* Form Actions */
+.form-actions {
+    @apply flex gap-3 pt-6 border-t border-gray-100;
+}
+
+.btn {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm;
+}
+
+.btn-secondary {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500;
+}
+
+.btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm;
+}
+
+.btn-warning {
+    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500 shadow-sm;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm;
+}
+
+.btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.modal-content {
+    @apply bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto;
+}
+
+/* Form Validation */
+.form-error {
+    @apply text-sm text-red-600 mt-1 flex items-center gap-1;
+}
+
+.form-success {
+    @apply text-sm text-green-600 mt-1 flex items-center gap-1;
+}
+
+.form-help {
+    @apply text-xs text-gray-500 mt-1;
+}
+
+/* Input Groups */
+.input-group {
+    @apply flex;
+}
+
+.input-group .form-input {
+    @apply rounded-r-none;
+}
+
+.input-group .input-addon {
+    @apply px-3 py-3 bg-gray-50 border border-l-0 border-gray-300 text-gray-500 text-sm rounded-r-lg;
+}
+
+/* Currency Input */
+.currency-input {
+    @apply relative;
+}
+
+.currency-input .form-input {
+    @apply pl-8;
+}
+
+.currency-input::before {
+    content: "₹";
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .form-container {
+        @apply mx-4;
+    }
+    
+    .form-actions {
+        @apply flex-col;
+    }
+    
+    .btn {
+        @apply w-full;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading States */
+.form-loading {
+    @apply opacity-50 pointer-events-none;
+}
+
+.btn-loading {
+    @apply relative;
+}
+
+.btn-loading::after {
+    content: "";
+    @apply absolute inset-0 bg-white bg-opacity-20 rounded-lg;
+}
+
+.btn-loading .spinner {
+    @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2;
+}
+
+/* Custom Form Components */
+.balance-display {
+    @apply bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-center;
+}
+
+.balance-amount {
+    @apply text-2xl font-bold text-gray-900;
+}
+
+.balance-label {
+    @apply text-sm text-gray-600;
+}
+
+/* Form Grid */
+.form-grid {
+    @apply grid gap-4;
+}
+
+.form-grid-2 {
+    @apply grid-cols-1 sm:grid-cols-2 gap-4;
+}
+
+.form-grid-3 {
+    @apply grid-cols-1 sm:grid-cols-3 gap-4;
+}
+
+/* Enhanced Focus States */
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    @apply shadow-lg;
+}
+
+/* Hover Effects */
+.form-input:hover:not(:disabled) {
+    @apply border-gray-400;
+}
+
+/* Success/Error States */
+.form-group.has-error .form-label {
+    @apply text-red-600;
+}
+
+.form-group.has-success .form-label {
+    @apply text-green-600;
+}
+
+/* Accessibility */
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.form-select:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Print Styles */
+@media print {
+    .form-actions,
+    .form-close-btn {
+        @apply hidden;
+    }
+    
+    .form-container {
+        @apply shadow-none border-none;
+    }
+}

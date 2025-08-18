@@ -104,47 +104,7 @@
             50% { opacity: 0.5; }
         }
         
-                 /* Enhanced Button Styles */
-         .btn-primary {
-             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-             color: white !important;
-             border: none !important;
-             padding: 12px 24px !important;
-             border-radius: 8px !important;
-             font-weight: 600 !important;
-             font-size: 0.875rem !important;
-             cursor: pointer !important;
-             transition: all 0.3s ease-in-out !important;
-             display: inline-flex !important;
-             align-items: center !important;
-             justify-content: center !important;
-             gap: 8px !important;
-             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
-             width: auto !important;
-         }
-         
-         .btn-primary:hover {
-             transform: translateY(-2px) !important;
-             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
-         }
-         
-         .btn-secondary {
-             background: #f3f4f6 !important;
-             color: #374151 !important;
-             border: 2px solid #e5e7eb !important;
-             padding: 10px 20px !important;
-             border-radius: 8px !important;
-             font-weight: 500 !important;
-             font-size: 0.875rem !important;
-             cursor: pointer !important;
-             transition: all 0.3s ease-in-out !important;
-             width: auto !important;
-         }
-         
-         .btn-secondary:hover {
-             background: #e5e7eb !important;
-             transform: translateY(-1px) !important;
-         }
+
         
         /* Action Button Styles */
         .action-btn {
@@ -382,7 +342,7 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Server Management</h1>
                 <p class="text-gray-600 mt-2">Manage OTP servers and their configurations</p>
             </div>
-            <button onclick="openAddServerModal()" class="btn-primary">
+            <button onclick="openAddServerModal()" class="btn btn-primary">
                 <span>➕</span>
                 Add Server
             </button>
@@ -530,11 +490,11 @@
                         </select>
                     </div>
                     
-                    <div class="flex space-x-3 pt-4">
-                        <button type="button" onclick="closeServerModal()" class="btn-secondary flex-1">
+                    <div class="form-buttons">
+                        <button type="button" onclick="closeServerModal()" class="btn btn-secondary">
                             Cancel
                         </button>
-                        <button type="submit" class="btn-primary flex-1">
+                        <button type="submit" class="btn btn-primary">
                             <span id="submitBtnText">Submit</span>
                         </button>
                     </div>
@@ -757,7 +717,7 @@
                         ${server.servicesCount || 0} services
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex flex-col sm:flex-row gap-2">
+                        <div class="btn-group">
                             <button onclick="editServer('${server._id || server.id}')" class="action-btn action-btn-edit">
                                 <span>✏️</span>
                                 Edit

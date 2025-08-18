@@ -147,47 +147,7 @@
             transition: all 0.3s ease;
         }
         
-                 /* Enhanced Button Styles */
-         .btn-primary {
-             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-             color: white !important;
-             border: none !important;
-             padding: 12px 24px !important;
-             border-radius: 8px !important;
-             font-weight: 600 !important;
-             font-size: 0.875rem !important;
-             cursor: pointer !important;
-             transition: all 0.3s ease-in-out !important;
-             display: inline-flex !important;
-             align-items: center !important;
-             justify-content: center !important;
-             gap: 8px !important;
-             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
-             width: auto !important;
-         }
-         
-         .btn-primary:hover {
-             transform: translateY(-2px) !important;
-             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
-         }
-         
-         .btn-secondary {
-             background: #f3f4f6 !important;
-             color: #374151 !important;
-             border: 2px solid #e5e7eb !important;
-             padding: 10px 20px !important;
-             border-radius: 8px !important;
-             font-weight: 500 !important;
-             font-size: 0.875rem !important;
-             cursor: pointer !important;
-             transition: all 0.3s ease-in-out !important;
-             width: auto !important;
-         }
-         
-         .btn-secondary:hover {
-             background: #e5e7eb !important;
-             transform: translateY(-1px) !important;
-         }
+
         
         /* Action Button Styles */
         .action-btn {
@@ -352,7 +312,7 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Service Management</h1>
                 <p class="text-gray-600 mt-2">Configure OTP services and their pricing</p>
             </div>
-            <button onclick="openAddServiceModal()" class="btn-primary">
+            <button onclick="openAddServiceModal()" class="btn btn-primary">
                 <span>➕</span>
                 Add Service
             </button>
@@ -511,7 +471,7 @@
                         <button type="button" onclick="closeServiceModal()" class="btn-secondary flex-1">
                             Cancel
                         </button>
-                        <button type="submit" class="btn-primary flex-1">
+                        <button type="submit" class="btn btn-primary">
                             <span id="submitBtnText">Submit</span>
                         </button>
                     </div>

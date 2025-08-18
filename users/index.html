@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/forms.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="../assets/js/app.js"></script>
     <script>
@@ -303,53 +304,91 @@
     </div>
 
     <!-- Add Balance Modal -->
-    <div id="addBalanceModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg md:text-xl font-bold text-gray-800">Add Balance</h3>
-                <button onclick="closeModal('addBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <div id="addBalanceModal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <div class="form-header">
+                <h3 class="form-title">Add Balance</h3>
+                <button onclick="closeModal('addBalanceModal')" class="form-close-btn">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
-                <input type="text" id="addBalanceUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Current Balance:</label>
-                <input type="text" id="addBalanceCurrent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Amount to Add:</label>
-                <input type="number" id="addBalanceAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" step="0.01" min="0.01">
-            </div>
-            <div class="flex gap-3">
-                <button onclick="addBalance()" class="btn btn-success flex-1">Add Balance</button>
-                <button onclick="closeModal('addBalanceModal')" class="btn btn-secondary flex-1">Cancel</button>
+            <div class="form-body">
+                <form id="addBalanceForm">
+                    <input type="hidden" id="addBalanceUserId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">User ID</label>
+                        <input type="text" id="addBalanceUserIdDisplay" class="form-input" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Balance</label>
+                        <div class="balance-display">
+                            <div class="balance-amount" id="addBalanceCurrent">₹0.00</div>
+                            <div class="balance-label">Available Balance</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount to Add</label>
+                        <div class="currency-input">
+                            <input type="number" id="addBalanceAmount" required min="0.01" step="0.01" class="form-input" placeholder="Enter amount">
+                        </div>
+                        <div class="form-help">Enter the amount you want to add to user's balance</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" onclick="closeModal('addBalanceModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="button" onclick="addBalance()" class="btn btn-success">Add Balance</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- Cut Balance Modal -->
-    <div id="cutBalanceModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg md:text-xl font-bold text-gray-800">Cut Balance</h3>
-                <button onclick="closeModal('cutBalanceModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <div id="cutBalanceModal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <div class="form-header">
+                <h3 class="form-title">Cut Balance</h3>
+                <button onclick="closeModal('cutBalanceModal')" class="form-close-btn">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
-                <input type="text" id="cutBalanceUserId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Current Balance:</label>
-                <input type="text" id="cutBalanceCurrent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" readonly>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Amount to Cut:</label>
-                <input type="number" id="cutBalanceAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" step="0.01" min="0.01">
-            </div>
-            <div class="flex gap-3">
-                <button onclick="cutBalance()" class="btn btn-warning flex-1">Cut Balance</button>
-                <button onclick="closeModal('cutBalanceModal')" class="btn btn-secondary flex-1">Cancel</button>
+            <div class="form-body">
+                <form id="cutBalanceForm">
+                    <input type="hidden" id="cutBalanceUserId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">User ID</label>
+                        <input type="text" id="cutBalanceUserIdDisplay" class="form-input" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Balance</label>
+                        <div class="balance-display">
+                            <div class="balance-amount" id="cutBalanceCurrent">₹0.00</div>
+                            <div class="balance-label">Available Balance</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount to Cut</label>
+                        <div class="currency-input">
+                            <input type="number" id="cutBalanceAmount" required min="0.01" step="0.01" class="form-input" placeholder="Enter amount">
+                        </div>
+                        <div class="form-help">Enter the amount you want to deduct from user's balance</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" onclick="closeModal('cutBalanceModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="button" onclick="cutBalance()" class="btn btn-warning">Cut Balance</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -449,7 +488,7 @@
                 document.getElementById('totalUsers').textContent = data.totalUsers || 0;
                 document.getElementById('activeUsers').textContent = data.activeUsers || 0;
                 document.getElementById('bannedUsers').textContent = data.bannedUsers || 0;
-                document.getElementById('totalBalance').textContent = `$${(data.totalBalance || 0).toFixed(2)}`;
+                document.getElementById('totalBalance').textContent = `₹${(data.totalBalance || 0).toFixed(2)}`;
             } catch (error) {
                 console.error('Error loading statistics:', error);
             }
@@ -498,7 +537,7 @@
                         <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">${user.id}</td>
                         <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">${user.name}</td>
                         <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm hidden md:table-cell">${user.username}</td>
-                        <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">$${user.balance.toFixed(2)}</td>
+                                                 <td class="py-3 px-2 md:px-4 text-white text-xs md:text-sm">₹${user.balance.toFixed(2)}</td>
                         <td class="py-3 px-2 md:px-4">
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </td>
@@ -535,7 +574,7 @@
                                 <div class="text-gray-400 text-sm">${user.username}</div>
                             </div>
                             <div class="text-right">
-                                <div class="text-white font-bold text-lg">$${user.balance.toFixed(2)}</div>
+                                <div class="text-white font-bold text-lg">₹${user.balance.toFixed(2)}</div>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                         </div>
@@ -591,7 +630,7 @@
         // User action functions
         function editBalance(userId, userName, currentBalance) {
             document.getElementById('balanceUserId').value = userId;
-            document.getElementById('currentBalance').value = `$${currentBalance.toFixed(2)}`;
+            document.getElementById('currentBalance').value = `₹${currentBalance.toFixed(2)}`;
             document.getElementById('newBalance').value = currentBalance;
             document.getElementById('balanceModalTitle').textContent = `Edit Balance - ${userName}`;
             showModal('balanceModal');
@@ -599,14 +638,16 @@
 
         function addBalanceModal(userId, userName, currentBalance) {
             document.getElementById('addBalanceUserId').value = userId;
-            document.getElementById('addBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
+            document.getElementById('addBalanceUserIdDisplay').value = userId;
+            document.getElementById('addBalanceCurrent').textContent = `₹${currentBalance.toFixed(2)}`;
             document.getElementById('addBalanceAmount').value = '';
             showModal('addBalanceModal');
         }
 
         function cutBalanceModal(userId, userName, currentBalance) {
             document.getElementById('cutBalanceUserId').value = userId;
-            document.getElementById('cutBalanceCurrent').value = `$${currentBalance.toFixed(2)}`;
+            document.getElementById('cutBalanceUserIdDisplay').value = userId;
+            document.getElementById('cutBalanceCurrent').textContent = `₹${currentBalance.toFixed(2)}`;
             document.getElementById('cutBalanceAmount').value = '';
             showModal('cutBalanceModal');
         }

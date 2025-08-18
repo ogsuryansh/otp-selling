@@ -268,11 +268,10 @@ class App {
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal && document.body) {
-        modal.style.display = 'flex';
-        // Trigger reflow to ensure display change is applied
-        modal.offsetHeight;
-        modal.classList.remove('hide');
+        // Remove any existing classes
+        modal.classList.remove('hide', 'hidden');
         modal.classList.add('show');
+        
         // Prevent body scroll when modal is open
         document.body.style.overflow = 'hidden';
         
@@ -281,6 +280,11 @@ function showModal(modalId) {
         if (firstInput) {
             setTimeout(() => firstInput.focus(), 100);
         }
+        
+        // Ensure modal is properly positioned
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
     }
 }
 
@@ -289,8 +293,15 @@ function hideModal(modalId) {
     if (modal && document.body) {
         modal.classList.remove('show');
         modal.classList.add('hide');
+        
         // Restore body scroll
         document.body.style.overflow = '';
+        
+        // Hide modal after animation
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('hide');
+        }, 300);
     }
 }
 
@@ -310,10 +321,8 @@ function setupModalEscapeKey() {
         if (event.key === 'Escape') {
             const openModals = document.querySelectorAll('.modal.show');
             openModals.forEach(modal => {
-                modal.classList.remove('show');
-                modal.classList.add('hide');
+                hideModal(modal.id);
             });
-            document.body.style.overflow = '';
         }
     });
 }

@@ -7,31 +7,111 @@ const { AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 
-// GET all users
+// GET all users with enhanced balance information
 router.get('/', async (req, res, next) => {
     try {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            // Return empty array if database is not available
-            return res.json(successResponse([]));
+            return res.json([]);
         }
         
         const users = await db.collection('users').find({}).toArray();
-        res.json(successResponse(users));
+        
+        // Get transaction statistics for each user
+        const usersWithStats = await Promise.all(users.map(async (user) => {
+            // Get user's transaction statistics
+            const transactionStats = await db.collection('transactions').aggregate([
+                { $match: { user_id: user.user_id } },
+                {
+                    $group: {
+                        _id: null,
+                        total_credits: {
+                            $sum: {
+                                $cond: [{ $eq: ['$type', 'credit'] }, '$amount', 0]
+                            }
+                        },
+                        total_debits: {
+                            $sum: {
+                                $cond: [{ $eq: ['$type', 'debit'] }, '$amount', 0]
+                            }
+                        },
+                        transaction_count: { $sum: 1 },
+                        last_transaction: { $max: '$timestamp' }
+                    }
+                }
+            ]).toArray();
+            
+            const stats = transactionStats[0] || {
+                total_credits: 0,
+                total_debits: 0,
+                transaction_count: 0,
+                last_transaction: null
+            };
+            
+            // Get user's order statistics
+            const orderStats = await db.collection('orders').aggregate([
+                { $match: { user_id: user.user_id } },
+                {
+                    $group: {
+                        _id: null,
+                        total_orders: { $sum: 1 },
+                        completed_orders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                        },
+                        total_spent: { $sum: '$cost' }
+                    }
+                }
+            ]).toArray();
+            
+            const orderData = orderStats[0] || {
+                total_orders: 0,
+                completed_orders: 0,
+                total_spent: 0
+            };
+            
+            // Calculate total balance (should match user.balance but for verification)
+            const calculatedBalance = stats.total_credits - stats.total_debits;
+            const actualBalance = parseFloat(user.balance) || 0;
+            
+            return {
+                id: user.user_id || user._id?.toString(),
+                user_id: user.user_id,
+                name: user.first_name || user.username || `User ${user.user_id}`,
+                username: user.username || `@user${user.user_id}`,
+                balance: actualBalance, // Use actual balance from user document
+                calculated_balance: calculatedBalance, // For verification
+                balance_verified: Math.abs(actualBalance - calculatedBalance) < 0.01, // Check if balances match
+                status: user.status || 'active',
+                registration_date: user.createdAt || user.registration_date || new Date(),
+                last_activity: user.updatedAt || user.last_activity || new Date(),
+                email: user.email || '',
+                role: user.role || 'user',
+                is_banned: user.is_banned || false,
+                ban_reason: user.ban_reason || null,
+                // Transaction statistics
+                total_credits: stats.total_credits,
+                total_debits: stats.total_debits,
+                transaction_count: stats.transaction_count,
+                last_transaction: stats.last_transaction,
+                // Order statistics
+                total_orders: orderData.total_orders,
+                completed_orders: orderData.completed_orders,
+                total_spent: orderData.total_spent
+            };
+        }));
+        
+        res.json(usersWithStats);
     } catch (error) {
-        next(new AppError('Failed to fetch users', 500));
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Failed to fetch users' });
     }
 });
 
-// GET user by ID
+// GET user by ID with detailed information
 router.get('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        
-        if (!validateObjectId(id)) {
-            return res.status(400).json(errorResponse('Invalid user ID'));
-        }
         
         const { db } = await connectToMongoDB();
         
@@ -39,13 +119,93 @@ router.get('/:id', async (req, res, next) => {
             return res.status(503).json(errorResponse('Database not available'));
         }
         
-        const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        // Try to find user by user_id (numeric) first, then by _id (ObjectId)
+        let user = await db.collection('users').findOne({ user_id: parseInt(id) });
+        
+        if (!user && validateObjectId(id)) {
+            user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        }
         
         if (!user) {
             return res.status(404).json(errorResponse('User not found'));
         }
         
-        res.json(successResponse(user));
+        // Get user's transaction statistics
+        const transactionStats = await db.collection('transactions').aggregate([
+            { $match: { user_id: user.user_id } },
+            {
+                $group: {
+                    _id: null,
+                    total_credits: {
+                        $sum: {
+                            $cond: [{ $eq: ['$type', 'credit'] }, '$amount', 0]
+                        }
+                    },
+                    total_debits: {
+                        $sum: {
+                            $cond: [{ $eq: ['$type', 'debit'] }, '$amount', 0]
+                        }
+                    },
+                    transaction_count: { $sum: 1 },
+                    last_transaction: { $max: '$timestamp' }
+                }
+            }
+        ]).toArray();
+        
+        const stats = transactionStats[0] || {
+            total_credits: 0,
+            total_debits: 0,
+            transaction_count: 0,
+            last_transaction: null
+        };
+        
+        // Get user's recent transactions
+        const recentTransactions = await db.collection('transactions')
+            .find({ user_id: user.user_id })
+            .sort({ timestamp: -1 })
+            .limit(10)
+            .toArray();
+        
+        // Get user's order statistics
+        const orderStats = await db.collection('orders').aggregate([
+            { $match: { user_id: user.user_id } },
+            {
+                $group: {
+                    _id: null,
+                    total_orders: { $sum: 1 },
+                    completed_orders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                    },
+                    total_spent: { $sum: '$cost' }
+                }
+            }
+        ]).toArray();
+        
+        const orderData = orderStats[0] || {
+            total_orders: 0,
+            completed_orders: 0,
+            total_spent: 0
+        };
+        
+        // Calculate total balance
+        const calculatedBalance = stats.total_credits - stats.total_debits;
+        const actualBalance = parseFloat(user.balance) || 0;
+        
+        const userWithDetails = {
+            ...user,
+            calculated_balance: calculatedBalance,
+            balance_verified: Math.abs(actualBalance - calculatedBalance) < 0.01,
+            total_credits: stats.total_credits,
+            total_debits: stats.total_debits,
+            transaction_count: stats.transaction_count,
+            last_transaction: stats.last_transaction,
+            total_orders: orderData.total_orders,
+            completed_orders: orderData.completed_orders,
+            total_spent: orderData.total_spent,
+            recent_transactions: recentTransactions
+        };
+        
+        res.json(successResponse(userWithDetails));
     } catch (error) {
         next(new AppError('Failed to fetch user', 500));
     }
@@ -124,10 +284,6 @@ router.put('/:id', async (req, res, next) => {
             balance
         } = req.body;
         
-        if (!validateObjectId(id)) {
-            return res.status(400).json(errorResponse('Invalid user ID'));
-        }
-        
         const { db } = await connectToMongoDB();
         
         if (!db) {
@@ -152,16 +308,28 @@ router.put('/:id', async (req, res, next) => {
         if (status !== undefined) updateData.status = status;
         if (balance !== undefined) updateData.balance = parseFloat(balance) || 0;
         
-        const result = await db.collection('users').updateOne(
-            { _id: new ObjectId(id) },
+        // Try to update by user_id (numeric) first, then by _id (ObjectId)
+        let result = await db.collection('users').updateOne(
+            { user_id: parseInt(id) },
             { $set: updateData }
         );
+        
+        if (result.matchedCount === 0 && validateObjectId(id)) {
+            result = await db.collection('users').updateOne(
+                { _id: new ObjectId(id) },
+                { $set: updateData }
+            );
+        }
         
         if (result.matchedCount === 0) {
             return res.status(404).json(errorResponse('User not found'));
         }
         
-        const updatedUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        // Get updated user
+        let updatedUser = await db.collection('users').findOne({ user_id: parseInt(id) });
+        if (!updatedUser && validateObjectId(id)) {
+            updatedUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        }
         
         // Remove password from response
         if (updatedUser) {
@@ -179,17 +347,18 @@ router.delete('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         
-        if (!validateObjectId(id)) {
-            return res.status(400).json(errorResponse('Invalid user ID'));
-        }
-        
         const { db } = await connectToMongoDB();
         
         if (!db) {
             return res.status(503).json(errorResponse('Database not available'));
         }
         
-        const result = await db.collection('users').deleteOne({ _id: new ObjectId(id) });
+        // Try to delete by user_id (numeric) first, then by _id (ObjectId)
+        let result = await db.collection('users').deleteOne({ user_id: parseInt(id) });
+        
+        if (result.deletedCount === 0 && validateObjectId(id)) {
+            result = await db.collection('users').deleteOne({ _id: new ObjectId(id) });
+        }
         
         if (result.deletedCount === 0) {
             return res.status(404).json(errorResponse('User not found'));
@@ -201,14 +370,10 @@ router.delete('/:id', async (req, res, next) => {
     }
 });
 
-// GET user statistics
+// GET user statistics with enhanced information
 router.get('/:id/stats', async (req, res, next) => {
     try {
         const { id } = req.params;
-        
-        if (!validateObjectId(id)) {
-            return res.status(400).json(errorResponse('Invalid user ID'));
-        }
         
         const { db } = await connectToMongoDB();
         
@@ -216,28 +381,87 @@ router.get('/:id/stats', async (req, res, next) => {
             return res.status(503).json(errorResponse('Database not available'));
         }
         
-        const stats = await db.collection('orders').aggregate([
-            { $match: { userId: id } },
-            {
-                $group: {
-                    _id: null,
-                    totalOrders: { $sum: 1 },
-                    totalSpent: { $sum: '$cost' },
-                    completedOrders: {
-                        $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
-                    },
-                    pendingOrders: {
-                        $sum: { $cond: [{ $eq: ['$status', 'waiting'] }, 1, 0] }
+        // Try to find user by user_id (numeric) first, then by _id (ObjectId)
+        let user = await db.collection('users').findOne({ user_id: parseInt(id) });
+        
+        if (!user && validateObjectId(id)) {
+            user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        }
+        
+        if (!user) {
+            return res.status(404).json(errorResponse('User not found'));
+        }
+        
+        // Get comprehensive user statistics
+        const [orderStats, transactionStats, recentTransactions] = await Promise.all([
+            // Order statistics
+            db.collection('orders').aggregate([
+                { $match: { user_id: parseInt(id) } },
+                {
+                    $group: {
+                        _id: null,
+                        totalOrders: { $sum: 1 },
+                        totalSpent: { $sum: '$cost' },
+                        completedOrders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                        },
+                        pendingOrders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'waiting'] }, 1, 0] }
+                        }
                     }
                 }
-            }
-        ]).toArray();
+            ]).toArray(),
+            
+            // Transaction statistics
+            db.collection('transactions').aggregate([
+                { $match: { user_id: parseInt(id) } },
+                {
+                    $group: {
+                        _id: null,
+                        totalTransactions: { $sum: 1 },
+                        totalCredits: {
+                            $sum: { $cond: [{ $eq: ['$type', 'credit'] }, '$amount', 0] }
+                        },
+                        totalDebits: {
+                            $sum: { $cond: [{ $eq: ['$type', 'debit'] }, '$amount', 0] }
+                        },
+                        lastTransaction: { $max: '$timestamp' }
+                    }
+                }
+            ]).toArray(),
+            
+            // Recent transactions
+            db.collection('transactions')
+                .find({ user_id: parseInt(id) })
+                .sort({ timestamp: -1 })
+                .limit(5)
+                .toArray()
+        ]);
         
-        const userStats = stats[0] || {
+        const orderData = orderStats[0] || {
             totalOrders: 0,
             totalSpent: 0,
             completedOrders: 0,
             pendingOrders: 0
+        };
+        
+        const transactionData = transactionStats[0] || {
+            totalTransactions: 0,
+            totalCredits: 0,
+            totalDebits: 0,
+            lastTransaction: null
+        };
+        
+        const calculatedBalance = transactionData.totalCredits - transactionData.totalDebits;
+        const actualBalance = parseFloat(user.balance) || 0;
+        
+        const userStats = {
+            ...orderData,
+            ...transactionData,
+            currentBalance: actualBalance,
+            calculatedBalance: calculatedBalance,
+            balanceVerified: Math.abs(actualBalance - calculatedBalance) < 0.01,
+            recentTransactions: recentTransactions
         };
         
         res.json(successResponse(userStats));

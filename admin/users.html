@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../assets/css/output.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/forms.css">
     <script src="../assets/js/app.js"></script>
     <style>
         /* Reset and base styles */
@@ -272,13 +273,13 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Manage Users</h1>
                 <p class="text-gray-600 mt-2">View and manage all bot users</p>
             </div>
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <button onclick="refreshUsers()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center transition-colors duration-200">
-                    <span class="mr-2">🔄</span>
+            <div class="btn-group">
+                <button onclick="refreshUsers()" class="btn btn-primary">
+                    <span>🔄</span>
                     Refresh
                 </button>
-                <button onclick="exportUsers()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center justify-center transition-colors duration-200">
-                    <span class="mr-2">📊</span>
+                <button onclick="exportUsers()" class="btn btn-success">
+                    <span>📊</span>
                     Export
                 </button>
             </div>
@@ -398,30 +399,39 @@
     </div>
 
     <!-- Add Balance Modal -->
-    <div id="addBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 modal-overlay">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white modal-content">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Add Balance</h3>
-                    <button onclick="closeModal('addBalanceModal')" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <form id="addBalanceForm" class="space-y-4">
+    <div id="addBalanceModal" class="modal">
+        <div class="modal-content fade-in">
+            <div class="form-header">
+                <h3 class="form-title">Add Balance</h3>
+                <button onclick="closeModal('addBalanceModal')" class="form-close-btn">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="form-body">
+                <form id="addBalanceForm">
                     <input type="hidden" id="addBalanceUserId">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
-                        <input type="text" id="addBalanceCurrent" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Balance</label>
+                        <div class="balance-display">
+                            <div class="balance-amount" id="addBalanceCurrent">₹0.00</div>
+                            <div class="balance-label">Available Balance</div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount to Add</label>
-                        <input type="number" id="addBalanceAmount" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount to Add</label>
+                        <div class="currency-input">
+                            <input type="number" id="addBalanceAmount" required min="0.01" step="0.01" class="form-input" placeholder="Enter amount">
+                        </div>
+                        <div class="form-help">Enter the amount you want to add to user's balance</div>
                     </div>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="closeModal('addBalanceModal')" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200">Add Balance</button>
+                    
+                    <div class="form-buttons">
+                        <button type="button" onclick="closeModal('addBalanceModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-success">Add Balance</button>
                     </div>
                 </form>
             </div>
@@ -429,30 +439,39 @@
     </div>
 
     <!-- Cut Balance Modal -->
-    <div id="cutBalanceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 modal-overlay">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white modal-content">
-            <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Cut Balance</h3>
-                    <button onclick="closeModal('cutBalanceModal')" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <form id="cutBalanceForm" class="space-y-4">
+    <div id="cutBalanceModal" class="modal">
+        <div class="modal-content fade-in">
+            <div class="form-header">
+                <h3 class="form-title">Cut Balance</h3>
+                <button onclick="closeModal('cutBalanceModal')" class="form-close-btn">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="form-body">
+                <form id="cutBalanceForm">
                     <input type="hidden" id="cutBalanceUserId">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
-                        <input type="text" id="cutBalanceCurrent" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Balance</label>
+                        <div class="balance-display">
+                            <div class="balance-amount" id="cutBalanceCurrent">₹0.00</div>
+                            <div class="balance-label">Available Balance</div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount to Cut</label>
-                        <input type="number" id="cutBalanceAmount" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount to Cut</label>
+                        <div class="currency-input">
+                            <input type="number" id="cutBalanceAmount" required min="0.01" step="0.01" class="form-input" placeholder="Enter amount">
+                        </div>
+                        <div class="form-help">Enter the amount you want to deduct from user's balance</div>
                     </div>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="closeModal('cutBalanceModal')" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors duration-200">Cut Balance</button>
+                    
+                    <div class="form-buttons">
+                        <button type="button" onclick="closeModal('cutBalanceModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Cut Balance</button>
                     </div>
                 </form>
             </div>
@@ -489,11 +508,11 @@
                         <textarea id="banReason" required rows="3" class="form-input" placeholder="Enter the reason for banning this user..."></textarea>
                     </div>
                     
-                    <div class="flex space-x-3 pt-4">
-                        <button type="button" onclick="closeModal('banUserModal')" class="btn-secondary flex-1">
+                    <div class="form-buttons">
+                        <button type="button" onclick="closeModal('banUserModal')" class="btn btn-secondary">
                             Cancel
                         </button>
-                        <button type="submit" class="btn-primary flex-1 bg-red-500 hover:bg-red-600">
+                        <button type="submit" class="btn btn-danger">
                             Ban User
                         </button>
                     </div>
@@ -687,12 +706,12 @@
                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.createdAt || user.registration_date)}</td>
                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.updatedAt || user.last_activity)}</td>
                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
-                            <button onclick="openAddBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded transition-colors duration-200">➕ Add</button>
-                            <button onclick="openCutBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="text-yellow-600 hover:text-yellow-900 text-xs px-2 py-1 bg-yellow-100 rounded transition-colors duration-200">➖ Cut</button>
+                        <div class="btn-group">
+                            <button onclick="openAddBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="action-btn action-btn-edit">➕ Add</button>
+                            <button onclick="openCutBalanceModal('${user._id || user.id}', '${user.name || user.username}', ${parseFloat(user.balance) || 0})" class="action-btn action-btn-edit">➖ Cut</button>
                             ${(user.status || 'active') === 'active' ? 
-                                `<button onclick="openBanUserModal('${user._id || user.id}', '${user.name || user.username}')" class="text-red-600 hover:text-red-900 text-xs px-2 py-1 bg-red-100 rounded transition-colors duration-200">🚫 Ban</button>` :
-                                `<button onclick="unbanUser('${user._id || user.id}')" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 bg-green-100 rounded transition-colors duration-200">✅ Unban</button>`
+                                `<button onclick="openBanUserModal('${user._id || user.id}', '${user.name || user.username}')" class="action-btn action-btn-delete">🚫 Ban</button>` :
+                                `<button onclick="unbanUser('${user._id || user.id}')" class="action-btn action-btn-edit">✅ Unban</button>`
                             }
                         </div>
                     </td>
@@ -711,14 +730,14 @@
 
         function openAddBalanceModal(userId, userName, currentBalance) {
             document.getElementById('addBalanceUserId').value = userId;
-            document.getElementById('addBalanceCurrent').value = `₹${currentBalance.toFixed(2)}`;
+            document.getElementById('addBalanceCurrent').textContent = `₹${currentBalance.toFixed(2)}`;
             document.getElementById('addBalanceAmount').value = '';
             openModal('addBalanceModal');
         }
 
         function openCutBalanceModal(userId, userName, currentBalance) {
             document.getElementById('cutBalanceUserId').value = userId;
-            document.getElementById('cutBalanceCurrent').value = `₹${currentBalance.toFixed(2)}`;
+            document.getElementById('cutBalanceCurrent').textContent = `₹${currentBalance.toFixed(2)}`;
             document.getElementById('cutBalanceAmount').value = '';
             openModal('cutBalanceModal');
         }

@@ -83,6 +83,73 @@
             </div>
         </div>
 
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 sm:mb-8">
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-primary">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">📊</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Transactions</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="totalTransactions">
+                            <span class="loading-pulse">0</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">➕</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Credits</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="totalCredits">
+                            <span class="loading-pulse">₹0.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-red-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">➖</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Total Debits</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="totalDebits">
+                            <span class="loading-pulse">₹0.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-blue-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm">🕒</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-500">Recent (24h)</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900" id="recentTransactions">
+                            <span class="loading-pulse">0</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Search Bar -->
         <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
             <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
@@ -228,6 +295,17 @@
         </div>
     </div>
 
+    <style>
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+    
     <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
@@ -244,6 +322,7 @@
 
         function refreshTransactions() {
             loadTransactions();
+            loadStatistics();
         }
 
         function searchTransactions() {
@@ -254,7 +333,25 @@
         // Load transactions data
         document.addEventListener('DOMContentLoaded', function() {
             loadTransactions();
+            loadStatistics();
         });
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/transactions/statistics');
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalTransactions').textContent = stats.total_transactions || 0;
+                    document.getElementById('totalCredits').textContent = `₹${(stats.total_credits || 0).toFixed(2)}`;
+                    document.getElementById('totalDebits').textContent = `₹${(stats.total_debits || 0).toFixed(2)}`;
+                    document.getElementById('recentTransactions').textContent = stats.recent_transactions || 0;
+                } else {
+                    console.error('Failed to load statistics:', response.status);
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
 
         async function loadTransactions(searchTerm = '') {
             try {
@@ -282,7 +379,9 @@
                     txn.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     txn.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     txn.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    txn.type.toLowerCase().includes(searchTerm.toLowerCase())
+                    txn.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    txn.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (txn.promo_code && txn.promo_code.toLowerCase().includes(searchTerm.toLowerCase()))
                 );
             }
             
@@ -292,9 +391,30 @@
             }
             
             tbody.innerHTML = filteredTransactions.map(txn => {
-                // Determine transaction type display
-                const typeDisplay = txn.type === 'add_balance' ? 'Credit' : 'Debit';
-                const typeClass = txn.type === 'add_balance' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                // Determine transaction type display and styling
+                let typeDisplay, typeClass, typeIcon;
+                
+                switch(txn.type) {
+                    case 'add_balance':
+                        typeDisplay = 'Credit';
+                        typeClass = 'bg-green-100 text-green-800';
+                        typeIcon = '➕';
+                        break;
+                    case 'cut_balance':
+                        typeDisplay = 'Debit';
+                        typeClass = 'bg-red-100 text-red-800';
+                        typeIcon = '➖';
+                        break;
+                    case 'admin_action':
+                        typeDisplay = 'Admin Action';
+                        typeClass = 'bg-purple-100 text-purple-800';
+                        typeIcon = '⚙️';
+                        break;
+                    default:
+                        typeDisplay = txn.type || 'System';
+                        typeClass = 'bg-gray-100 text-gray-800';
+                        typeIcon = '❓';
+                }
                 
                 // Determine source display and styling
                 let sourceDisplay = '';
@@ -317,6 +437,16 @@
                         sourceClass = 'bg-yellow-100 text-yellow-800';
                         sourceIcon = '🎫';
                         break;
+                    case 'promo_code':
+                        sourceDisplay = 'Promo Code';
+                        sourceClass = 'bg-yellow-100 text-yellow-800';
+                        sourceIcon = '🎫';
+                        break;
+                    case 'system':
+                        sourceDisplay = 'System';
+                        sourceClass = 'bg-gray-100 text-gray-800';
+                        sourceIcon = '⚙️';
+                        break;
                     default:
                         sourceDisplay = txn.source || 'Unknown';
                         sourceClass = 'bg-gray-100 text-gray-800';
@@ -326,6 +456,18 @@
                 // Format date
                 const date = new Date(txn.created_at);
                 const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                
+                // Format description to show promo code if available
+                let displayDescription = txn.description;
+                if (txn.promo_code && txn.source === 'promo') {
+                    displayDescription = `Promo Code: ${txn.promo_code}`;
+                }
+                
+                // Format amount display
+                let amountDisplay = `₹${txn.amount}`;
+                if (txn.type === 'admin_action' && txn.amount === 0) {
+                    amountDisplay = 'N/A';
+                }
                 
                 return `
                     <tr>
@@ -340,11 +482,11 @@
                         </td>
                         <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${typeClass}">
-                                ${typeDisplay}
+                                ${typeIcon} ${typeDisplay}
                             </span>
                         </td>
                         <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            ₹${txn.amount}
+                            ${amountDisplay}
                         </td>
                         <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${sourceClass}">
@@ -352,7 +494,7 @@
                             </span>
                         </td>
                         <td class="px-3 sm:px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                            ${txn.description}
+                            ${displayDescription}
                         </td>
                         <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             ${formattedDate}

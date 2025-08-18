@@ -10,7 +10,8 @@
     "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css",
     "start": "node api/index.js",
     "debug": "DEBUG=true NODE_ENV=development node api/index.js",
-    "debug:vercel": "vercel dev --debug"
+    "debug:vercel": "vercel dev --debug",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [
     "otp-bot",

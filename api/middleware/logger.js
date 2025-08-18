@@ -1,46 +1,55 @@
-// Logger middleware
-function logger(req, res, next) {
+const logger = (req, res, next) => {
     const start = Date.now();
     
-    // Log request in development only
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-    }
+    // Log request
+    console.log(`📥 ${req.method} ${req.path} - ${new Date().toISOString()}`);
     
-    res.on('finish', () => {
+    // Override res.json to log responses
+    const originalJson = res.json;
+    res.json = function(data) {
         const duration = Date.now() - start;
-        
-        // Log response in development only
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
-        }
-    });
+        console.log(`📤 ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+        return originalJson.call(this, data);
+    };
     
     next();
-}
+};
 
-// Success response helper
-function successResponse(data, message = 'Success') {
-    return {
-        success: true,
-        message,
-        data,
-        timestamp: new Date().toISOString()
-    };
-}
+// Helper functions for consistent response formatting
+const successResponse = (data, message = 'Success') => ({
+    success: true,
+    message,
+    data,
+    timestamp: new Date().toISOString()
+});
 
-// Error response helper
-function errorResponse(message, status = 400) {
-    return {
-        success: false,
-        message,
-        status,
-        timestamp: new Date().toISOString()
+const errorResponse = (message = 'Error occurred', statusCode = 500, details = null) => ({
+    success: false,
+    message,
+    statusCode,
+    details,
+    timestamp: new Date().toISOString()
+});
+
+// Request validation helper
+const validateRequest = (requiredFields) => {
+    return (req, res, next) => {
+        const missingFields = requiredFields.filter(field => !req.body[field]);
+        
+        if (missingFields.length > 0) {
+            return res.status(400).json(errorResponse(
+                `Missing required fields: ${missingFields.join(', ')}`,
+                400
+            ));
+        }
+        
+        next();
     };
-}
+};
 
 module.exports = {
     logger,
     successResponse,
-    errorResponse
+    errorResponse,
+    validateRequest
 };

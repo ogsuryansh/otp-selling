@@ -14,6 +14,7 @@ class App {
         this.setupLoadingSystem();
         this.setupFormValidation();
         this.setupModalEnhancements();
+        this.setupPerformanceOptimizations();
     }
 
     // Enhanced Toast Notification System
@@ -32,6 +33,9 @@ class App {
 
     showToast(message, type = 'info', duration = 5000) {
         const toastContainer = document.getElementById('toast-container');
+        
+        // Use DocumentFragment for better performance
+        const fragment = document.createDocumentFragment();
         const toast = document.createElement('div');
         
         const typeClasses = {
@@ -61,22 +65,25 @@ class App {
             </button>
         `;
 
-        toastContainer.appendChild(toast);
+        fragment.appendChild(toast);
+        toastContainer.appendChild(fragment);
 
-        // Animate in
-        setTimeout(() => {
+        // Use requestAnimationFrame for better performance
+        requestAnimationFrame(() => {
             toast.classList.remove('translate-x-full');
-        }, 100);
+        });
 
-        // Auto remove
-        setTimeout(() => {
+        // Auto remove with optimized timing
+        const removeToast = () => {
             toast.classList.add('translate-x-full');
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.remove();
                 }
             }, 300);
-        }, duration);
+        };
+
+        setTimeout(removeToast, duration);
     }
 
     // Loading System
@@ -97,6 +104,107 @@ class App {
             `;
             document.body.appendChild(spinner);
         }
+    }
+
+    // Performance optimizations
+    setupPerformanceOptimizations() {
+        // Add debouncing for form inputs
+        this.setupDebouncing();
+        
+        // Add caching for API responses
+        this.setupCaching();
+        
+        // Optimize images and resources
+        this.setupResourceOptimization();
+    }
+
+    setupDebouncing() {
+        // Debounce function for performance
+        window.debounce = function(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+
+        // Apply debouncing to search inputs
+        const searchInputs = document.querySelectorAll('input[type="search"], input[placeholder*="search"], input[placeholder*="Search"]');
+        searchInputs.forEach(input => {
+            const originalHandler = input.oninput;
+            if (originalHandler) {
+                input.oninput = debounce(originalHandler, 300);
+            }
+        });
+    }
+
+    setupCaching() {
+        // Simple in-memory cache for API responses
+        window.apiCache = new Map();
+        window.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+
+        // Enhanced fetch with caching
+        window.cachedFetch = async function(url, options = {}) {
+            const cacheKey = `${url}-${JSON.stringify(options)}`;
+            const cached = apiCache.get(cacheKey);
+            
+            if (cached && Date.now() - cached.timestamp < cacheTimeout) {
+                return cached.data;
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                apiCache.set(cacheKey, {
+                    data: data,
+                    timestamp: Date.now()
+                });
+                
+                return data;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        };
+    }
+
+    setupResourceOptimization() {
+        // Lazy load images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+
+        // Preload critical resources
+        const criticalResources = [
+            '/assets/css/output.css',
+            '/assets/js/app.js'
+        ];
+
+        criticalResources.forEach(resource => {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.href = resource;
+            link.as = resource.endsWith('.css') ? 'style' : 'script';
+            document.head.appendChild(link);
+        });
     }
 
     showLoading(show = true) {

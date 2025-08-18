@@ -7,20 +7,79 @@ const { AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 
+// Initialize services in database if empty
+async function initializeServices() {
+    try {
+        const { db } = await connectToMongoDB();
+        if (!db) return;
+
+        const existingServices = await db.collection('services').countDocuments();
+        if (existingServices === 0) {
+            console.log('No services found in database. Please add services through the admin panel.');
+        }
+    } catch (error) {
+        console.error('Error checking services:', error);
+    }
+}
+
+// Initialize services on startup
+initializeServices();
+
 // GET all services
 router.get('/', async (req, res, next) => {
     try {
         const { db } = await connectToMongoDB();
         
         if (!db) {
-            // Return empty array if database is not available
-            return res.json(successResponse([]));
+            // Return available services if database is not available
+            return res.json(successResponse([])); // Return empty array if DB not available
         }
         
         const services = await db.collection('services').find({}).toArray();
         res.json(successResponse(services));
     } catch (error) {
         next(new AppError('Failed to fetch services', 500));
+    }
+});
+
+// GET search services
+router.get('/search/:query', async (req, res, next) => {
+    try {
+        const { query } = req.params;
+        const { db } = await connectToMongoDB();
+        
+        if (!db) {
+            // Search in available services if database is not available
+            return res.json(successResponse([])); // Return empty array if DB not available
+        }
+        
+        const services = await db.collection('services').find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { code: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } }
+            ]
+        }).toArray();
+        
+        res.json(successResponse(services));
+    } catch (error) {
+        next(new AppError('Failed to search services', 500));
+    }
+});
+
+// GET available services list (for search suggestions)
+router.get('/available/list', async (req, res, next) => {
+    try {
+        const { db } = await connectToMongoDB();
+        
+        if (!db) {
+            return res.json(successResponse([])); // Return empty array if DB not available
+        }
+        
+        const services = await db.collection('services').find({}, { name: 1, code: 1 }).toArray();
+        res.json(successResponse(services));
+    } catch (error) {
+        next(new AppError('Failed to fetch available services', 500));
     }
 });
 
@@ -62,7 +121,12 @@ router.post('/', async (req, res, next) => {
             countryName, 
             status = 'active',
             provider = '5sim',
-            category = 'otp'
+            category = 'otp',
+            serverId,
+            serviceIdField,
+            serviceLogo,
+            serviceCode,
+            disableCancellation = 0
         } = req.body;
         
         if (!validateRequired(name)) {
@@ -84,6 +148,11 @@ router.post('/', async (req, res, next) => {
             status,
             provider,
             category,
+            serverId,
+            serviceIdField,
+            serviceLogo,
+            serviceCode,
+            disableCancellation: parseInt(disableCancellation) || 0,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -109,7 +178,12 @@ router.put('/:id', async (req, res, next) => {
             countryName, 
             status,
             provider,
-            category
+            category,
+            serverId,
+            serviceIdField,
+            serviceLogo,
+            serviceCode,
+            disableCancellation
         } = req.body;
         
         if (!validateObjectId(id)) {
@@ -134,6 +208,11 @@ router.put('/:id', async (req, res, next) => {
         if (status !== undefined) updateData.status = status;
         if (provider !== undefined) updateData.provider = provider;
         if (category !== undefined) updateData.category = category;
+        if (serverId !== undefined) updateData.serverId = serverId;
+        if (serviceIdField !== undefined) updateData.serviceIdField = serviceIdField;
+        if (serviceLogo !== undefined) updateData.serviceLogo = serviceLogo;
+        if (serviceCode !== undefined) updateData.serviceCode = serviceCode;
+        if (disableCancellation !== undefined) updateData.disableCancellation = parseInt(disableCancellation) || 0;
         
         const result = await db.collection('services').updateOne(
             { _id: new ObjectId(id) },

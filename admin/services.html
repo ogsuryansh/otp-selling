@@ -384,15 +384,17 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
+                                         <thead class="bg-gray-50">
+                         <tr>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server & ID</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price & Provider</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancel Time</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                         </tr>
+                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="servicesTable">
                         <tr>
                             <td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">
@@ -447,15 +449,20 @@
                         <input type="url" id="serviceLogo" name="serviceLogo" required class="form-input" placeholder="Service Logo Url">
                     </div>
                     
-                    <div class="form-group">
-                        <label for="serviceCode" class="form-label">Service Code *</label>
-                        <input type="text" id="serviceCode" name="serviceCode" required class="form-input" placeholder="Serv1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description" class="form-label">Service Description *</label>
-                        <textarea id="description" name="description" rows="3" class="form-input" placeholder="My Small Service Description..."></textarea>
-                    </div>
+                                         <div class="form-group">
+                         <label for="serviceCode" class="form-label">Service Code *</label>
+                         <input type="text" id="serviceCode" name="serviceCode" required class="form-input" placeholder="Serv1">
+                     </div>
+                     
+                     <div class="form-group">
+                         <label for="provider" class="form-label">Provider *</label>
+                         <input type="text" id="provider" name="provider" required class="form-input" placeholder="5sim, sms-activate, etc.">
+                     </div>
+                     
+                     <div class="form-group">
+                         <label for="description" class="form-label">Service Description *</label>
+                         <textarea id="description" name="description" rows="3" class="form-input" placeholder="My Small Service Description..."></textarea>
+                     </div>
                     
                     <div class="form-group">
                         <label for="price" class="form-label">Service Price *</label>
@@ -550,14 +557,16 @@
                     const serviceData = await response.json();
                     const service = serviceData.data || serviceData;
                     
-                    document.getElementById('serviceName').value = service.serviceName || service.name || '';
-                     document.getElementById('serviceIdField').value = service.serviceId || '';
+                                         document.getElementById('serviceId').value = service._id || '';
+                     document.getElementById('serviceName').value = service.name || '';
+                     document.getElementById('price').value = service.price || '';
+                     document.getElementById('description').value = service.description || '';
+                     document.getElementById('serverId').value = service.serverId || '';
+                     document.getElementById('serviceIdField').value = service.serviceIdField || '';
                      document.getElementById('serviceLogo').value = service.serviceLogo || '';
                      document.getElementById('serviceCode').value = service.serviceCode || '';
-                    document.getElementById('serverId').value = service.serverId || '';
-                    document.getElementById('price').value = service.price || '';
-                    document.getElementById('description').value = service.description || '';
-                     document.getElementById('disableCancellation').value = service.disableCancellation || 0;
+                     document.getElementById('provider').value = service.provider || '';
+                     document.getElementById('disableCancellation').value = service.disableCancellation || '';
                 } else {
                     console.error('Failed to load service data');
                     alert('Failed to load service data for editing');
@@ -597,24 +606,37 @@
             const formData = new FormData(this);
             const serviceId = formData.get('serviceId');
             const serviceData = {
-                serviceName: formData.get('serviceName'),
-                serviceId: formData.get('serviceIdField'),
+                name: formData.get('serviceName'),
+                description: formData.get('description'),
+                price: parseFloat(formData.get('price')) || 0,
+                status: 'active',
+                provider: formData.get('provider') || '5sim',
+                category: 'otp',
+                serverId: formData.get('serverId'),
+                serviceIdField: formData.get('serviceIdField'),
                 serviceLogo: formData.get('serviceLogo'),
                 serviceCode: formData.get('serviceCode'),
-                serverId: formData.get('serverId'),
-                price: parseFloat(formData.get('price')) || 0,
-                description: formData.get('description'),
-                disableCancellation: parseInt(formData.get('disableCancellation')) || 0,
-                status: 'active'
+                disableCancellation: parseInt(formData.get('disableCancellation')) || 0
             };
             
             try {
                 let response;
                 if (serviceId) {
+                    const updateData = {
+                        name: serviceData.name,
+                        description: serviceData.description,
+                        price: serviceData.price,
+                        status: serviceData.status,
+                        serverId: serviceData.serverId,
+                        serviceIdField: serviceData.serviceIdField,
+                        serviceLogo: serviceData.serviceLogo,
+                        serviceCode: serviceData.serviceCode,
+                        disableCancellation: serviceData.disableCancellation
+                    };
                     response = await fetch(`/api/services/${serviceId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(serviceData)
+                        body: JSON.stringify(updateData)
                     });
                 } else {
                     response = await fetch('/api/services', {
@@ -687,7 +709,7 @@
             const tbody = document.getElementById('servicesTable');
             
             if (!services || services.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-3 sm:px-6 py-4 text-center text-gray-500">No services found. Add your first service to get started.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-3 sm:px-6 py-4 text-center text-gray-500">No services found. Add your first service to get started.</td></tr>';
                 return;
             }
             
@@ -695,18 +717,32 @@
                 <tr>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <span class="text-2xl mr-3">🔧</span>
+                            <img src="${service.serviceLogo || 'https://via.placeholder.com/32x32?text=🔧'}" alt="${service.name}" class="w-8 h-8 rounded mr-3" onerror="this.src='https://via.placeholder.com/32x32?text=🔧'">
                             <div>
-                                <div class="text-sm font-medium text-gray-900">${service.serviceName || service.name || 'Unknown'}</div>
-                                <div class="text-sm text-gray-500">${service.description || 'No description'}</div>
+                                <div class="text-sm font-medium text-gray-900">${service.name || 'Unknown'}</div>
+                                <div class="text-xs text-gray-500">${service.serviceCode || 'No Code'}</div>
                             </div>
                         </div>
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${service.serverName || 'Unknown Server'}
+                        <div>
+                            <div class="font-medium">${service.serverId || 'No Server'}</div>
+                            <div class="text-xs text-gray-500">${service.serviceIdField || 'No ID'}</div>
+                        </div>
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ₹${service.price || 0}
+                        <div>
+                            <div class="font-medium">₹${service.price || 0}</div>
+                            <div class="text-xs text-gray-500">${service.provider || 'No Provider'}</div>
+                        </div>
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div class="max-w-xs truncate" title="${service.description || 'No description'}">
+                            ${service.description || 'No description'}
+                        </div>
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${service.disableCancellation || 0} min
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -743,3 +779,4 @@
     </script>
 </body>
 </html>
+

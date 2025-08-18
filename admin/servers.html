@@ -419,6 +419,8 @@
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Server</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country Code</th>
+                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
                             <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -490,6 +492,16 @@
                         </select>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="provider" class="form-label">Provider *</label>
+                        <input type="text" id="provider" name="provider" required class="form-input" placeholder="5sim, sms-activate, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="url" class="form-label">Server URL</label>
+                        <input type="url" id="url" name="url" class="form-input" placeholder="https://example.com">
+                    </div>
+                    
                     <div class="form-buttons">
                         <button type="button" onclick="closeServerModal()" class="btn btn-secondary">
                             Cancel
@@ -550,9 +562,11 @@
                     const serverData = await response.json();
                     const server = serverData.data || serverData;
                     
-                                         document.getElementById('serverName').value = server.serverName || server.name || '';
-                     document.getElementById('countryCode').value = server.countryCode || '';
-                     document.getElementById('countryName').value = server.countryName || '';
+                                                             document.getElementById('serverName').value = server.serverName || server.name || '';
+                    document.getElementById('countryCode').value = server.countryCode || '';
+                    document.getElementById('countryName').value = server.countryName || '';
+                    document.getElementById('provider').value = server.provider || '';
+                    document.getElementById('url').value = server.url || '';
                 } else {
                     console.error('Failed to load server data');
                     alert('Failed to load server data for editing');
@@ -593,9 +607,10 @@
             const serverId = formData.get('serverId');
             const serverData = {
                 name: formData.get('serverName'),
-                url: '', // Not in mobile form
+                url: formData.get('url') || '',
                 countryCode: formData.get('countryCode'),
                 countryName: formData.get('countryName'),
+                provider: formData.get('provider'),
                 status: 'active'
             };
             
@@ -676,7 +691,7 @@
             const tbody = document.getElementById('serversTable');
             
             if (!servers || servers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">No servers found. Add your first server to get started.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-3 sm:px-6 py-4 text-center text-gray-500">No servers found. Add your first server to get started.</td></tr>';
                 return;
             }
             
@@ -687,7 +702,7 @@
                             <span class="text-2xl mr-3">🖥️</span>
                             <div>
                                 <div class="text-sm font-medium text-gray-900">${server.serverName || server.name || 'Unknown'}</div>
-                                <div class="text-sm text-gray-500">${server.countryCode || ''}</div>
+                                <div class="text-xs text-gray-500">${server.serverId || server.id || 'No ID'}</div>
                             </div>
                         </div>
                     </td>
@@ -703,6 +718,12 @@
                             <span class="text-lg mr-2">${getCountryFlag(server.countryName)}</span>
                             <span class="text-sm text-gray-900">${server.countryName || 'Unknown'}</span>
                         </div>
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${server.countryCode || 'No Code'}
+                    </td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${server.provider || 'No Provider'}
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

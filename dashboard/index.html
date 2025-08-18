@@ -370,6 +370,19 @@
                     <button onclick="openAddServiceModal()" class="btn-primary">➕ Add Service</button>
                 </div>
                 
+                <!-- Search Services Section -->
+                <div class="card mb-6">
+                    <h4 class="text-lg font-semibold text-white mb-3">🔍 Search Services</h4>
+                    <div class="flex gap-3 mb-4">
+                        <input type="text" id="serviceSearchInput" placeholder="Search services..." class="form-input flex-1" onkeyup="searchServices()">
+                        <button onclick="clearServiceSearch()" class="btn-secondary">Clear</button>
+                    </div>
+                    <div id="serviceSearchResults" class="hidden">
+                        <h5 class="text-white font-medium mb-2">Search Results:</h5>
+                        <div id="serviceSearchList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
+                
                 <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="text-center p-8 text-gray-400">Loading services...</div>
                 </div>
@@ -1355,7 +1368,73 @@
             }
         });
 
+        // Service Search Functions
+        let searchTimeout;
 
+        async function searchServices() {
+            const searchInput = document.getElementById('serviceSearchInput');
+            const query = searchInput.value.trim();
+            
+            if (query.length < 2) {
+                document.getElementById('serviceSearchResults').classList.add('hidden');
+                return;
+            }
+
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            // Set new timeout for search
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/services/search/${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        const services = result.data || result;
+                        displaySearchResults(services);
+                    } else {
+                        showError('Failed to search services');
+                    }
+                } catch (error) {
+                    console.error('Error searching services:', error);
+                    showError('Error searching services');
+                }
+            }, 300);
+        }
+
+        function displaySearchResults(services) {
+            const searchResults = document.getElementById('serviceSearchResults');
+            const searchList = document.getElementById('serviceSearchList');
+            
+            if (services.length === 0) {
+                searchList.innerHTML = '<div class="text-center p-4 text-gray-400">No services found</div>';
+            } else {
+                searchList.innerHTML = services.map(service => `
+                    <div class="card">
+                        <h4 class="text-lg font-semibold text-white mb-2">${service.name}</h4>
+                        <p class="text-gray-300 text-sm mb-2">Code: ${service.code}</p>
+                        <p class="text-gray-300 text-sm mb-2">Price: $${service.price || 'N/A'}</p>
+                        <p class="text-gray-300 text-sm mb-3">${service.description || 'No description'}</p>
+                        <div class="flex gap-2">
+                            <button onclick="selectService('${service._id || service.code}')" class="btn-secondary text-xs">Select</button>
+                            <button onclick="editService('${service._id || service.code}')" class="btn-secondary text-xs">Edit</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            searchResults.classList.remove('hidden');
+        }
+
+        function clearServiceSearch() {
+            document.getElementById('serviceSearchInput').value = '';
+            document.getElementById('serviceSearchResults').classList.add('hidden');
+        }
+
+        function selectService(serviceId) {
+            // This function can be used to select a service for further operations
+            showSuccess(`Service ${serviceId} selected`);
+            clearServiceSearch();
+        }
 
         // Utility functions
         function showSuccess(message) {

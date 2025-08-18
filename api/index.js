@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const compression = require('compression');
 
 // Import middleware
 const { logger } = require('./middleware/logger');
@@ -25,7 +26,8 @@ const { connectToMongoDB } = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Basic middleware
+// Performance optimizations
+app.use(compression()); // Enable gzip compression
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -58,6 +60,7 @@ app.use(express.static(path.join(__dirname, '..')));
 // API Routes
 app.use('/api/servers', serversRoutes);
 app.use('/api/services', servicesRoutes);
+app.use('/api/basic-services', servicesRoutes); // Add this line to support both endpoints
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/apis', apisRoutes);
 app.use('/api/users', usersRoutes);
@@ -131,7 +134,7 @@ app.get('/api/statistics', async (req, res) => {
     }
 });
 
-// Add balance endpoint
+// Optimized Add balance endpoint with performance improvements
 app.post('/api/add_balance', async (req, res) => {
     try {
         const { user_id, amount, description, admin_id } = req.body;
@@ -146,50 +149,89 @@ app.post('/api/add_balance', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const parsedAmount = parseFloat(amount);
+        const parsedUserId = parseInt(user_id);
         
-        const newBalance = (parseFloat(user.balance) || 0) + parseFloat(amount);
-        
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { user_id: parsedUserId },
+            { $inc: { balance: parsedAmount } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record with enhanced details
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { user_id: user_id.toString() },
+                { $inc: { balance: parsedAmount } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: 'credit',
+                amount: parsedAmount,
+                description: description || 'Balance added by admin',
+                source: 'admin',
+                timestamp: new Date(),
+                balance_before: stringResult.value.balance - parsedAmount,
+                balance_after: stringResult.value.balance,
+                admin_id: admin_id || null
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'Balance added successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
         const transaction = {
-            user_id: user.user_id,
+            user_id: result.value.user_id,
             type: 'credit',
-            amount: parseFloat(amount),
+            amount: parsedAmount,
             description: description || 'Balance added by admin',
             source: 'admin',
             timestamp: new Date(),
-            balance_before: parseFloat(user.balance) || 0,
-            balance_after: newBalance,
+            balance_before: result.value.balance - parsedAmount,
+            balance_after: result.value.balance,
             admin_id: admin_id || null
         };
         
-        await db.collection('transactions').insertOne(transaction);
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
         
-        res.json({ success: true, message: 'Balance added successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Balance added successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error adding balance:', error);
         res.status(500).json({ success: false, message: 'Failed to add balance' });
     }
 });
 
-// Cut balance endpoint
+// Optimized Cut balance endpoint with performance improvements
 app.post('/api/cut_balance', async (req, res) => {
     try {
         const { user_id, amount, description, admin_id } = req.body;
@@ -204,51 +246,89 @@ app.post('/api/cut_balance', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const parsedAmount = parseFloat(amount);
+        const parsedUserId = parseInt(user_id);
         
-        const currentBalance = parseFloat(user.balance) || 0;
-        const newBalance = Math.max(0, currentBalance - parseFloat(amount));
-        
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { user_id: parsedUserId },
+            { $inc: { balance: -parsedAmount } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record with enhanced details
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { user_id: user_id.toString() },
+                { $inc: { balance: -parsedAmount } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: 'debit',
+                amount: parsedAmount,
+                description: description || 'Balance cut by admin',
+                source: 'admin',
+                timestamp: new Date(),
+                balance_before: stringResult.value.balance + parsedAmount,
+                balance_after: stringResult.value.balance,
+                admin_id: admin_id || null
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'Balance cut successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
         const transaction = {
-            user_id: user.user_id,
+            user_id: result.value.user_id,
             type: 'debit',
-            amount: parseFloat(amount),
-            description: description || 'Balance deducted by admin',
+            amount: parsedAmount,
+            description: description || 'Balance cut by admin',
             source: 'admin',
             timestamp: new Date(),
-            balance_before: currentBalance,
-            balance_after: newBalance,
+            balance_before: result.value.balance + parsedAmount,
+            balance_after: result.value.balance,
             admin_id: admin_id || null
         };
         
-        await db.collection('transactions').insertOne(transaction);
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
         
-        res.json({ success: true, message: 'Balance cut successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Balance cut successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error cutting balance:', error);
         res.status(500).json({ success: false, message: 'Failed to cut balance' });
     }
 });
 
-// Add QR payment endpoint
+// Optimized QR payment endpoint with performance improvements
 app.post('/api/qr_payment', async (req, res) => {
     try {
         const { user_id, amount, payment_method, reference_id, description } = req.body;
@@ -263,51 +343,91 @@ app.post('/api/qr_payment', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const parsedAmount = parseFloat(amount);
+        const parsedUserId = parseInt(user_id);
         
-        const newBalance = (parseFloat(user.balance) || 0) + parseFloat(amount);
-        
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { user_id: parsedUserId },
+            { $inc: { balance: parsedAmount } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record for QR payment
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { user_id: user_id.toString() },
+                { $inc: { balance: parsedAmount } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: 'credit',
+                amount: parsedAmount,
+                description: description || `QR Payment via ${payment_method}`,
+                source: 'qr_payment',
+                timestamp: new Date(),
+                balance_before: stringResult.value.balance - parsedAmount,
+                balance_after: stringResult.value.balance,
+                payment_method: payment_method,
+                reference_id: reference_id || null
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'QR payment processed successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
         const transaction = {
-            user_id: user.user_id,
+            user_id: result.value.user_id,
             type: 'credit',
-            amount: parseFloat(amount),
+            amount: parsedAmount,
             description: description || `QR Payment via ${payment_method}`,
             source: 'qr_payment',
             timestamp: new Date(),
-            balance_before: parseFloat(user.balance) || 0,
-            balance_after: newBalance,
+            balance_before: result.value.balance - parsedAmount,
+            balance_after: result.value.balance,
             payment_method: payment_method,
             reference_id: reference_id || null
         };
         
-        await db.collection('transactions').insertOne(transaction);
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
         
-        res.json({ success: true, message: 'QR payment processed successfully' });
+        res.json({ 
+            success: true, 
+            message: 'QR payment processed successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error processing QR payment:', error);
         res.status(500).json({ success: false, message: 'Failed to process QR payment' });
     }
 });
 
-// Add promo code endpoint
+// Optimized Promo code endpoint with performance improvements
 app.post('/api/promo_payment', async (req, res) => {
     try {
         const { user_id, amount, promo_code, description } = req.body;
@@ -322,50 +442,89 @@ app.post('/api/promo_payment', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const parsedAmount = parseFloat(amount);
+        const parsedUserId = parseInt(user_id);
         
-        const newBalance = (parseFloat(user.balance) || 0) + parseFloat(amount);
-        
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { user_id: parsedUserId },
+            { $inc: { balance: parsedAmount } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record for promo code
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { user_id: user_id.toString() },
+                { $inc: { balance: parsedAmount } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: 'credit',
+                amount: parsedAmount,
+                description: description || `Promo code: ${promo_code}`,
+                source: 'promo',
+                timestamp: new Date(),
+                balance_before: stringResult.value.balance - parsedAmount,
+                balance_after: stringResult.value.balance,
+                promo_code: promo_code
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'Promo code applied successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
         const transaction = {
-            user_id: user.user_id,
+            user_id: result.value.user_id,
             type: 'credit',
-            amount: parseFloat(amount),
+            amount: parsedAmount,
             description: description || `Promo code: ${promo_code}`,
             source: 'promo',
             timestamp: new Date(),
-            balance_before: parseFloat(user.balance) || 0,
-            balance_after: newBalance,
+            balance_before: result.value.balance - parsedAmount,
+            balance_after: result.value.balance,
             promo_code: promo_code
         };
         
-        await db.collection('transactions').insertOne(transaction);
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
         
-        res.json({ success: true, message: 'Promo code applied successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Promo code applied successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error applying promo code:', error);
         res.status(500).json({ success: false, message: 'Failed to apply promo code' });
     }
 });
 
-// Add order payment endpoint
+// Optimized Order payment endpoint with performance improvements
 app.post('/api/order_payment', async (req, res) => {
     try {
         const { user_id, amount, order_id, description } = req.body;
@@ -380,48 +539,97 @@ app.post('/api/order_payment', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const parsedAmount = parseFloat(amount);
+        const parsedUserId = parseInt(user_id);
         
-        const currentBalance = parseFloat(user.balance) || 0;
-        if (currentBalance < parseFloat(amount)) {
-            return res.status(400).json({ success: false, message: 'Insufficient balance' });
-        }
-        
-        const newBalance = currentBalance - parseFloat(amount);
-        
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { 
+                user_id: parsedUserId,
+                balance: { $gte: parsedAmount } // Ensure sufficient balance
+            },
+            { $inc: { balance: -parsedAmount } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record for order payment
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { 
+                    user_id: user_id.toString(),
+                    balance: { $gte: parsedAmount } // Ensure sufficient balance
+                },
+                { $inc: { balance: -parsedAmount } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                // Check if user exists but has insufficient balance
+                const userCheck = await db.collection('users').findOne({ 
+                    $or: [{ user_id: parsedUserId }, { user_id: user_id.toString() }] 
+                });
+                
+                if (!userCheck) {
+                    return res.status(404).json({ success: false, message: 'User not found' });
+                } else {
+                    return res.status(400).json({ success: false, message: 'Insufficient balance' });
+                }
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: 'debit',
+                amount: parsedAmount,
+                description: description || `Order purchase: ${order_id}`,
+                source: 'order',
+                timestamp: new Date(),
+                balance_before: stringResult.value.balance + parsedAmount,
+                balance_after: stringResult.value.balance,
+                order_id: order_id
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'Order payment processed successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
         const transaction = {
-            user_id: user.user_id,
+            user_id: result.value.user_id,
             type: 'debit',
-            amount: parseFloat(amount),
+            amount: parsedAmount,
             description: description || `Order purchase: ${order_id}`,
             source: 'order',
             timestamp: new Date(),
-            balance_before: currentBalance,
-            balance_after: newBalance,
+            balance_before: result.value.balance + parsedAmount,
+            balance_after: result.value.balance,
             order_id: order_id
         };
         
-        await db.collection('transactions').insertOne(transaction);
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
         
-        res.json({ success: true, message: 'Order payment processed successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Order payment processed successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error processing order payment:', error);
         res.status(500).json({ success: false, message: 'Failed to process order payment' });
@@ -506,7 +714,7 @@ app.post('/api/unban_user', async (req, res) => {
     }
 });
 
-// Update user balance endpoint
+// Optimized Update user balance endpoint with performance improvements
 app.post('/api/update_user', async (req, res) => {
     try {
         const { user_id, balance } = req.body;
@@ -521,41 +729,80 @@ app.post('/api/update_user', async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database not available' });
         }
         
-        // Handle large user IDs properly - try both string and number formats
-        let user = await db.collection('users').findOne({ user_id: parseInt(user_id) });
-        if (!user) {
-            user = await db.collection('users').findOne({ user_id: user_id.toString() });
-        }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-        
-        const oldBalance = parseFloat(user.balance) || 0;
+        const parsedUserId = parseInt(user_id);
         const newBalance = parseFloat(balance) || 0;
         
-        // Update using the same format as the found user
-        const updateQuery = user.user_id === parseInt(user_id) ? 
-            { user_id: parseInt(user_id) } : 
-            { user_id: user_id.toString() };
-        
-        await db.collection('users').updateOne(
-            updateQuery,
-            { $set: { balance: newBalance } }
+        // Use atomic operation for better performance and consistency
+        const result = await db.collection('users').findOneAndUpdate(
+            { user_id: parsedUserId },
+            { $set: { balance: newBalance } },
+            { 
+                returnDocument: 'after',
+                projection: { balance: 1, user_id: 1 }
+            }
         );
         
-        // Create transaction record for balance change
-        await db.collection('transactions').insertOne({
-            user_id: user.user_id,
-            type: newBalance > oldBalance ? 'credit' : 'debit',
-            amount: Math.abs(newBalance - oldBalance),
-            description: newBalance > oldBalance ? 'Balance updated by admin' : 'Balance reduced by admin',
+        if (!result.value) {
+            // Try with string user_id as fallback
+            const stringResult = await db.collection('users').findOneAndUpdate(
+                { user_id: user_id.toString() },
+                { $set: { balance: newBalance } },
+                { 
+                    returnDocument: 'after',
+                    projection: { balance: 1, user_id: 1 }
+                }
+            );
+            
+            if (!stringResult.value) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            
+            // Create transaction record asynchronously (don't wait for it)
+            const transaction = {
+                user_id: stringResult.value.user_id,
+                type: newBalance > 0 ? 'credit' : 'debit',
+                amount: Math.abs(newBalance),
+                description: newBalance > 0 ? 'Balance updated by admin' : 'Balance reduced by admin',
+                source: 'admin',
+                timestamp: new Date(),
+                balance_before: 0, // Since we're setting a new balance
+                balance_after: newBalance
+            };
+            
+            // Fire and forget transaction creation for better performance
+            db.collection('transactions').insertOne(transaction).catch(err => 
+                console.error('Transaction logging error:', err)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'User balance updated successfully',
+                new_balance: stringResult.value.balance
+            });
+        }
+        
+        // Create transaction record asynchronously (don't wait for it)
+        const transaction = {
+            user_id: result.value.user_id,
+            type: newBalance > 0 ? 'credit' : 'debit',
+            amount: Math.abs(newBalance),
+            description: newBalance > 0 ? 'Balance updated by admin' : 'Balance reduced by admin',
             source: 'admin',
             timestamp: new Date(),
-            balance_before: oldBalance,
+            balance_before: 0, // Since we're setting a new balance
             balance_after: newBalance
-        });
+        };
         
-        res.json({ success: true, message: 'User balance updated successfully' });
+        // Fire and forget transaction creation for better performance
+        db.collection('transactions').insertOne(transaction).catch(err => 
+            console.error('Transaction logging error:', err)
+        );
+        
+        res.json({ 
+            success: true, 
+            message: 'User balance updated successfully',
+            new_balance: result.value.balance
+        });
     } catch (error) {
         console.error('Error updating user balance:', error);
         res.status(500).json({ success: false, message: 'Failed to update user balance' });

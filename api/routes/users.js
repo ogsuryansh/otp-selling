@@ -322,35 +322,32 @@ router.put('/:id', async (req, res, next) => {
             updateOperator.$set = updateData;
         }
         
-        // Try to update by user_id (numeric) first, then by _id (ObjectId)
-        let result = await db.collection('users').updateOne(
+        // Use findOneAndUpdate for better performance and atomicity
+        let result = await db.collection('users').findOneAndUpdate(
             { user_id: parseInt(id) },
-            updateOperator
+            updateOperator,
+            { 
+                returnDocument: 'after',
+                projection: { password: 0 } // Exclude password from response
+            }
         );
         
-        if (result.matchedCount === 0 && validateObjectId(id)) {
-            result = await db.collection('users').updateOne(
+        if (!result.value && validateObjectId(id)) {
+            result = await db.collection('users').findOneAndUpdate(
                 { _id: new ObjectId(id) },
-                updateOperator
+                updateOperator,
+                { 
+                    returnDocument: 'after',
+                    projection: { password: 0 } // Exclude password from response
+                }
             );
         }
         
-        if (result.matchedCount === 0) {
+        if (!result.value) {
             return res.status(404).json(errorResponse('User not found'));
         }
         
-        // Get updated user
-        let updatedUser = await db.collection('users').findOne({ user_id: parseInt(id) });
-        if (!updatedUser && validateObjectId(id)) {
-            updatedUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
-        }
-        
-        // Remove password from response
-        if (updatedUser) {
-            delete updatedUser.password;
-        }
-        
-        res.json(successResponse(updatedUser, 'User updated successfully'));
+        res.json(successResponse(result.value, 'User updated successfully'));
     } catch (error) {
         next(new AppError('Failed to update user', 500));
     }

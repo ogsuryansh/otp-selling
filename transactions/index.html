@@ -68,8 +68,8 @@
         <!-- Page Header -->
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
             <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Bot Transactions</h1>
-                <p class="text-gray-600 mt-2">View all bot transaction history including balance changes</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Transaction History</h1>
+                <p class="text-gray-600 mt-2">View and filter all transaction history including bot transactions, admin panel actions, and user activities</p>
             </div>
             <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                 <button onclick="exportTransactions()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center justify-center">
@@ -157,6 +157,15 @@
                     <input type="text" id="searchTransactions" placeholder="Search transactions by user, amount, or description..." 
                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
                 </div>
+                <select id="transactionTypeFilter" class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                    <option value="">All Transactions</option>
+                    <option value="bot">🤖 Bot Transactions</option>
+                    <option value="admin">👨‍💼 Admin Panel Transactions</option>
+                    <option value="promo">🎫 Promo Code Transactions</option>
+                    <option value="payment">💳 Payment Transactions</option>
+                    <option value="order">📋 Order Transactions</option>
+                    <option value="system">⚙️ System Transactions</option>
+                </select>
                 <button onclick="searchTransactions()" class="w-full sm:w-auto bg-primary hover:bg-secondary text-white px-6 py-2 rounded-md">
                     Search
                 </button>
@@ -166,7 +175,8 @@
         <!-- Transactions Table -->
         <div class="bg-white rounded-lg shadow">
             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">All Bot Transactions</h3>
+                <h3 class="text-lg font-semibold text-gray-900">All Transactions</h3>
+                <p class="text-sm text-gray-600 mt-1">Use the filters above to view specific transaction types</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -327,13 +337,21 @@
 
         function searchTransactions() {
             const searchTerm = document.getElementById('searchTransactions').value;
-            loadTransactions(searchTerm);
+            const filterType = document.getElementById('transactionTypeFilter').value;
+            loadTransactions(searchTerm, filterType);
         }
 
         // Load transactions data
         document.addEventListener('DOMContentLoaded', function() {
             loadTransactions();
             loadStatistics();
+            
+            // Add event listeners for filter changes
+            document.getElementById('transactionTypeFilter').addEventListener('change', function() {
+                const searchTerm = document.getElementById('searchTransactions').value;
+                const filterType = this.value;
+                loadTransactions(searchTerm, filterType);
+            });
         });
 
         async function loadStatistics() {
@@ -353,23 +371,49 @@
             }
         }
 
-        async function loadTransactions(searchTerm = '') {
+        async function loadTransactions(searchTerm = '', filterType = '') {
             try {
-                const response = await fetch('/api/transactions');
+                const params = new URLSearchParams();
+                if (searchTerm) params.append('search', searchTerm);
+                if (filterType) params.append('type', filterType);
+
+                const response = await fetch(`/api/transactions?${params.toString()}`);
                 if (response.ok) {
                     const transactions = await response.json();
-                    updateTransactionsList(transactions, searchTerm);
+                    updateTransactionsList(transactions, searchTerm, filterType);
+                    
+                    // Update active filter indicator
+                    updateActiveFilterIndicator(filterType);
                 } else {
                     console.error('Failed to load transactions:', response.status);
-                    updateTransactionsList([], searchTerm);
+                    updateTransactionsList([], searchTerm, filterType);
                 }
             } catch (error) {
                 console.error('Error loading transactions:', error);
-                updateTransactionsList([], searchTerm);
+                updateTransactionsList([], searchTerm, filterType);
             }
         }
 
-        function updateTransactionsList(transactions, searchTerm = '') {
+        function updateActiveFilterIndicator(filterType) {
+            const tableHeader = document.querySelector('.bg-white.rounded-lg.shadow .px-4.sm\\:px-6.py-4.border-b.border-gray-200 h3');
+            if (tableHeader) {
+                if (filterType) {
+                    const filterLabels = {
+                        'bot': 'Bot Transactions',
+                        'admin': 'Admin Panel Transactions',
+                        'promo': 'Promo Code Transactions',
+                        'payment': 'Payment Transactions',
+                        'order': 'Order Transactions',
+                        'system': 'System Transactions'
+                    };
+                    tableHeader.textContent = filterLabels[filterType] || 'Filtered Transactions';
+                } else {
+                    tableHeader.textContent = 'All Transactions';
+                }
+            }
+        }
+
+        function updateTransactionsList(transactions, searchTerm = '', filterType = '') {
             const tbody = document.getElementById('transactionsTable');
             
             // Filter transactions if search term provided
@@ -383,6 +427,28 @@
                     txn.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     (txn.promo_code && txn.promo_code.toLowerCase().includes(searchTerm.toLowerCase()))
                 );
+            }
+
+            // Apply filter based on type if selected
+            if (filterType) {
+                filteredTransactions = filteredTransactions.filter(txn => {
+                    switch(filterType) {
+                        case 'bot':
+                            return txn.source === 'bot';
+                        case 'admin':
+                            return txn.source === 'admin';
+                        case 'promo':
+                            return txn.source === 'promo' || txn.source === 'promo_code';
+                        case 'payment':
+                            return txn.source === 'qr_payment' || txn.source === 'payment';
+                        case 'order':
+                            return txn.source === 'order';
+                        case 'system':
+                            return txn.source === 'system' || !txn.source;
+                        default:
+                            return true;
+                    }
+                });
             }
             
             if (filteredTransactions.length === 0) {

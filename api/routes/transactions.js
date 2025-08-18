@@ -11,14 +11,59 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
     try {
         const { db } = await connectToMongoDB();
+        const { search, type } = req.query;
         
         if (!db) {
             return res.json([]);
         }
         
+        // Build query filter
+        let queryFilter = {};
+        
+        // Add search filter if provided
+        if (search) {
+            queryFilter.$or = [
+                { description: { $regex: search, $options: 'i' } },
+                { 'promo_code': { $regex: search, $options: 'i' } }
+            ];
+        }
+        
+        // Add type filter if provided
+        if (type) {
+            switch(type) {
+                case 'bot':
+                    queryFilter.source = 'bot';
+                    break;
+                case 'admin':
+                    queryFilter.source = 'admin';
+                    break;
+                case 'promo':
+                    queryFilter.$or = [
+                        { source: 'promo' },
+                        { source: 'promo_code' }
+                    ];
+                    break;
+                case 'payment':
+                    queryFilter.$or = [
+                        { source: 'qr_payment' },
+                        { source: 'payment' }
+                    ];
+                    break;
+                case 'order':
+                    queryFilter.source = 'order';
+                    break;
+                case 'system':
+                    queryFilter.$or = [
+                        { source: 'system' },
+                        { source: { $exists: false } }
+                    ];
+                    break;
+            }
+        }
+        
         // Get all transactions from the transactions collection
         const transactions = await db.collection('transactions')
-            .find({})
+            .find(queryFilter)
             .sort({ timestamp: -1 })
             .toArray();
         

@@ -281,7 +281,8 @@ router.put('/:id', async (req, res, next) => {
             password, 
             role, 
             status,
-            balance
+            balance,
+            action
         } = req.body;
         
         const { db } = await connectToMongoDB();
@@ -293,6 +294,7 @@ router.put('/:id', async (req, res, next) => {
         const updateData = {
             updatedAt: new Date()
         };
+        const updateOperator = {};
         
         if (username !== undefined) updateData.username = username;
         if (email !== undefined) {
@@ -306,18 +308,30 @@ router.put('/:id', async (req, res, next) => {
         if (password !== undefined) updateData.password = password; // In production, hash the password
         if (role !== undefined) updateData.role = role;
         if (status !== undefined) updateData.status = status;
-        if (balance !== undefined) updateData.balance = parseFloat(balance) || 0;
+        if (balance !== undefined) {
+            const amount = parseFloat(balance) || 0;
+            if (action === 'add_balance') {
+                updateOperator.$inc = { balance: amount };
+            } else if (action === 'cut_balance') {
+                updateOperator.$inc = { balance: -amount };
+            } else {
+                updateData.balance = amount;
+            }
+        }
+        if (Object.keys(updateData).length > 0) {
+            updateOperator.$set = updateData;
+        }
         
         // Try to update by user_id (numeric) first, then by _id (ObjectId)
         let result = await db.collection('users').updateOne(
             { user_id: parseInt(id) },
-            { $set: updateData }
+            updateOperator
         );
         
         if (result.matchedCount === 0 && validateObjectId(id)) {
             result = await db.collection('users').updateOne(
                 { _id: new ObjectId(id) },
-                { $set: updateData }
+                updateOperator
             );
         }
         

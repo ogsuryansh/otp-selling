@@ -263,71 +263,12 @@
                     const transactions = await response.json();
                     updateTransactionsList(transactions, searchTerm);
                 } else {
-                    throw new Error('Failed to load transactions');
+                    console.error('Failed to load transactions:', response.status);
+                    updateTransactionsList([], searchTerm);
                 }
             } catch (error) {
-                // Handle error silently
-                // Use mock data for bot transactions
-                const mockTransactions = [
-                    {
-                        id: 'TXN001',
-                        user_id: 123456789,
-                        user: 'John Doe',
-                        type: 'add_balance',
-                        amount: 100,
-                        description: 'Balance added by admin',
-                        source: 'admin',
-                        admin_id: 7574316340,
-                        created_at: '2024-01-15T10:30:00Z',
-                        status: 'completed'
-                    },
-                    {
-                        id: 'TXN002',
-                        user_id: 987654321,
-                        user: 'Jane Smith',
-                        type: 'cut_balance',
-                        amount: 25,
-                        description: 'Service purchase - WhatsApp verification',
-                        source: 'payment',
-                        created_at: '2024-01-14T15:45:00Z',
-                        status: 'completed'
-                    },
-                    {
-                        id: 'TXN003',
-                        user_id: 555666777,
-                        user: 'Mike Johnson',
-                        type: 'add_balance',
-                        amount: 50,
-                        description: 'Promo code WELCOME50 redemption',
-                        source: 'promo',
-                        created_at: '2024-01-13T09:15:00Z',
-                        status: 'completed'
-                    },
-                    {
-                        id: 'TXN004',
-                        user_id: 111222333,
-                        user: 'Sarah Wilson',
-                        type: 'cut_balance',
-                        amount: 30,
-                        description: 'Service purchase - Telegram verification',
-                        source: 'payment',
-                        created_at: '2024-01-12T14:20:00Z',
-                        status: 'completed'
-                    },
-                    {
-                        id: 'TXN005',
-                        user_id: 444555666,
-                        user: 'David Brown',
-                        type: 'add_balance',
-                        amount: 200,
-                        description: 'Balance added by admin',
-                        source: 'admin',
-                        admin_id: 7574316340,
-                        created_at: '2024-01-11T11:00:00Z',
-                        status: 'completed'
-                    }
-                ];
-                updateTransactionsList(mockTransactions, searchTerm);
+                console.error('Error loading transactions:', error);
+                updateTransactionsList([], searchTerm);
             }
         }
 

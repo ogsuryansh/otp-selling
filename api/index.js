@@ -17,6 +17,7 @@ const apisRoutes = require('./routes/apis');
 const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
 const promoCodesRoutes = require('./routes/promo-codes');
+const transactionsRoutes = require('./routes/transactions');
 
 // Import database config
 const { connectToMongoDB } = require('./config/database');
@@ -59,6 +60,7 @@ app.use('/api/apis', apisRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/promo-codes', promoCodesRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
 // Test endpoint
 app.get('/api/test', (req, res) => {

@@ -36,7 +36,24 @@ router.get('/', async (req, res, next) => {
         }
         
         const services = await db.collection('services').find({}).toArray();
-        res.json(successResponse(services));
+        
+        // Populate server information for each service
+        const servicesWithServerInfo = await Promise.all(services.map(async (service) => {
+            if (service.serverId) {
+                try {
+                    const server = await db.collection('servers').findOne({ _id: new ObjectId(service.serverId) });
+                    if (server) {
+                        service.serverName = server.name;
+                        service.serverCode = server.code;
+                    }
+                } catch (error) {
+                    console.error('Error fetching server info for service:', service._id, error);
+                }
+            }
+            return service;
+        }));
+        
+        res.json(successResponse(servicesWithServerInfo));
     } catch (error) {
         next(new AppError('Failed to fetch services', 500));
     }
